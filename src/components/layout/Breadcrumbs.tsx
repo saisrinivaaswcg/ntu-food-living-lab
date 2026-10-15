@@ -7,11 +7,17 @@ export interface Crumb {
   to?: string
 }
 
+interface Props {
+  items: Crumb[]
+  /** Space below the trail; tighter on the log forms so they fit a phone screen. */
+  className?: string
+}
+
 /** Trail starting at Explore. Pass the crumbs below the top level. */
-export default function Breadcrumbs({ items }: { items: Crumb[] }) {
+export default function Breadcrumbs({ items, className = 'mb-4' }: Props) {
   const trail: Crumb[] = [{ label: 'Explore', to: '/' }, ...items]
   return (
-    <nav aria-label="Breadcrumb" className="mb-4">
+    <nav aria-label="Breadcrumb" className={className}>
       <ol className="flex flex-wrap items-center gap-x-1 text-sm text-ink-muted">
         {trail.map((crumb, i) => {
           const last = i === trail.length - 1

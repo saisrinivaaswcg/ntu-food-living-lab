@@ -53,5 +53,8 @@ export const protocolCategoryLabels: Record<ProtocolCategory, string> = {
 }
 
 /** Shown wherever demo records appear. */
+/** One-line version for narrow phone screens; screen readers still get the full notice. */
+export const DEMO_DATA_SHORT_NOTICE = 'Demo data: logs, names and figures are invented.'
+
 export const DEMO_DATA_NOTICE =
   'Demonstration data: sites are real NTU locations, but every log, name and figure shown is invented for this prototype.'

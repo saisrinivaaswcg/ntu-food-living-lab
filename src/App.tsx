@@ -2,6 +2,7 @@ import { BrowserRouter, Route, Routes } from 'react-router-dom'
 import AppShell from './components/layout/AppShell'
 import DashboardPage from './pages/DashboardPage'
 import ExplorePage from './pages/ExplorePage'
+import LogFormPage from './pages/LogFormPage'
 import LogPage from './pages/LogPage'
 import NotFoundPage from './pages/NotFoundPage'
 import SiteDetailPage from './pages/SiteDetailPage'
@@ -14,6 +15,7 @@ export default function App() {
         <Route element={<AppShell />}>
           <Route index element={<ExplorePage />} />
           <Route path="log" element={<LogPage />} />
+          <Route path="log/:kind" element={<LogFormPage />} />
           <Route path="dashboard" element={<DashboardPage />} />
           <Route path="sites" element={<SitesPage />} />
           <Route path="sites/:siteId" element={<SiteDetailPage />} />

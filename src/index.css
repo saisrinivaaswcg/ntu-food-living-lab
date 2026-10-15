@@ -29,6 +29,10 @@
   --color-demo: #b45309;
   --color-demo-bg: #fffbeb;
 
+  /* Form validation messages */
+  --color-danger: #b91c1c;
+  --color-danger-bg: #fef2f2;
+
   /* Site status (map markers + badges). "active" uses the brand greens. */
   --color-attention: #c2410c;
   --color-attention-bg: #ffedd5;
