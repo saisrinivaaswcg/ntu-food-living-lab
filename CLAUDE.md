@@ -28,7 +28,7 @@ No backend, no auth, no database.
 ## Build order and status
 
 1. [x] Project structure, types, mock data, log store
-2. [ ] Explore — app shell (top nav + mobile bottom nav, breadcrumbs, demo-data banner), Leaflet map, site side panel
+2. [x] Explore — app shell (top nav + mobile bottom nav, breadcrumbs, demo-data banner), Leaflet map, site side panel
 3. [ ] Log — four forms, harvest form first
 4. [ ] Dashboard
 5. [ ] Sites — Knowledge and Handover sections
