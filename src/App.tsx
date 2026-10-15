@@ -1,12 +1,15 @@
+import { lazy } from 'react'
 import { BrowserRouter, Route, Routes } from 'react-router-dom'
 import AppShell from './components/layout/AppShell'
-import DashboardPage from './pages/DashboardPage'
-import ExplorePage from './pages/ExplorePage'
-import LogFormPage from './pages/LogFormPage'
-import LogPage from './pages/LogPage'
-import NotFoundPage from './pages/NotFoundPage'
-import SiteDetailPage from './pages/SiteDetailPage'
-import SitesPage from './pages/SitesPage'
+
+// Each page is its own chunk, so the map (Leaflet) and the charts (Recharts) only load where they're used.
+const ExplorePage = lazy(() => import('./pages/ExplorePage'))
+const LogPage = lazy(() => import('./pages/LogPage'))
+const LogFormPage = lazy(() => import('./pages/LogFormPage'))
+const DashboardPage = lazy(() => import('./pages/DashboardPage'))
+const SitesPage = lazy(() => import('./pages/SitesPage'))
+const SiteDetailPage = lazy(() => import('./pages/SiteDetailPage'))
+const NotFoundPage = lazy(() => import('./pages/NotFoundPage'))
 
 export default function App() {
   return (

@@ -1,7 +1,8 @@
-import { useEffect } from 'react'
+import { Suspense, useEffect } from 'react'
 import { Outlet, useLocation } from 'react-router-dom'
 import BottomNav from './BottomNav'
 import DemoBanner from './DemoBanner'
+import PageLoading from './PageLoading'
 import TopNav from './TopNav'
 
 export default function AppShell() {
@@ -23,7 +24,10 @@ export default function AppShell() {
       <TopNav />
       <DemoBanner />
       <main id="main" tabIndex={-1} className="flex-1 pb-[calc(5rem+env(safe-area-inset-bottom))] outline-none lg:pb-8">
-        <Outlet />
+        {/* Pages load as separate chunks; the nav and banner stay in place meanwhile. */}
+        <Suspense fallback={<PageLoading />}>
+          <Outlet />
+        </Suspense>
       </main>
       <BottomNav />
     </div>
