@@ -1,0 +1,55 @@
+@import "tailwindcss";
+@import "leaflet/dist/leaflet.css";
+
+/*
+ * Design tokens — green and white university dashboard.
+ * Tailwind v4 turns these into utilities, e.g. bg-brand-600, text-ink-muted, shadow-card.
+ */
+@theme {
+  --font-sans: "Inter", ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+
+  --color-brand-50: #f0fdf4;
+  --color-brand-100: #dcfce7;
+  --color-brand-200: #bbf7d0;
+  --color-brand-300: #86efac;
+  --color-brand-400: #4ade80;
+  --color-brand-500: #22c55e;
+  --color-brand-600: #16a34a;
+  --color-brand-700: #15803d;
+  --color-brand-800: #166534;
+  --color-brand-900: #14532d;
+
+  --color-ink: #10231a;
+  --color-ink-muted: #4b5f55;
+  --color-ink-subtle: #7b8c83;
+  --color-surface: #ffffff;
+  --color-canvas: #f6faf7;
+  --color-line: #e3ece6;
+
+  --color-demo: #b45309;
+  --color-demo-bg: #fffbeb;
+
+  --radius-card: 1rem;
+  --shadow-card: 0 1px 2px rgb(16 35 26 / 0.05), 0 4px 16px rgb(16 35 26 / 0.06);
+}
+
+@layer base {
+  html {
+    -webkit-tap-highlight-color: transparent;
+  }
+  body {
+    @apply bg-canvas text-ink font-sans antialiased;
+  }
+  /* Keep form controls at 16px on phones so iOS doesn't zoom in on focus. */
+  input,
+  select,
+  textarea {
+    font-size: 16px;
+  }
+}
+
+/* Leaflet sits under our sticky header and slide-over panels. */
+.leaflet-container {
+  z-index: 0;
+  font-family: inherit;
+}
