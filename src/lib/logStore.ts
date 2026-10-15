@@ -157,6 +157,26 @@ export function removeUserLog(kind: LogKind, id: string): void {
   commit({ ...state, userLogs })
 }
 
+/**
+ * Replaces some of the user's records with a new one in a single write, so a failed
+ * save (e.g. storage full) never loses the old records. Used for "one weekly record per site-week".
+ */
+export function replaceUserLogs<K extends LogKind>(kind: K, oldIds: string[], input: NewLog<K>): SaveResult {
+  const id = newId(ID_PREFIX[kind])
+  const record = { ...input, id, source: 'user', createdAt: new Date().toISOString() } as LogCollections[K][number]
+  const kept = (state.userLogs[kind] as { id: string }[]).filter((r) => !oldIds.includes(r.id))
+  const userLogs = { ...state.userLogs, [kind]: [...kept, record] }
+  const failure = commit({ ...state, userLogs })
+  return failure ?? { ok: true, id }
+}
+
+/** Undo for replaceUserLogs: removes the new record and puts the previous ones back unchanged. */
+export function undoReplaceUserLogs<K extends LogKind>(kind: K, newId: string, previous: LogCollections[K]): void {
+  const kept = (state.userLogs[kind] as { id: string }[]).filter((r) => r.id !== newId)
+  const userLogs = { ...state.userLogs, [kind]: [...kept, ...previous] }
+  commit({ ...state, userLogs })
+}
+
 export function setShowDemoData(show: boolean): void {
   commit({ ...state, showDemoData: show })
 }

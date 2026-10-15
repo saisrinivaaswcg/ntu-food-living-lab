@@ -1,14 +1,16 @@
 import { useMemo, useState, type FormEvent } from 'react'
-import { compostOptions } from '../../data'
+import { compostOptions, demoLogs } from '../../data'
+import { compostSummary } from '../../lib/format'
 import { useLogs } from '../../hooks/useLogs'
 import { formatDate, mondayOf, recentMondays, todayISO } from '../../lib/dates'
 import { focusFirstIssue, issueMessage, parseDecimal, type FieldIssue } from '../../lib/forms'
-import { addLog, removeUserLog, type NewLog } from '../../lib/logStore'
+import { addLog, removeUserLog, replaceUserLogs, undoReplaceUserLogs, type NewLog } from '../../lib/logStore'
 import { siteName } from '../../lib/lookups'
 import { getLastSiteId, setLastSiteId } from '../../lib/preferences'
 import { checkNumber } from '../../lib/validation'
-import type { CompostType, ISODate, SiteId } from '../../types'
+import type { CompostType, ISODate, SiteId, WeeklyInputLog } from '../../types'
 import ChoiceGroup from './ChoiceGroup'
+import ExistingWeekRecord from './ExistingWeekRecord'
 import FormHeader from './FormHeader'
 import NumberField from './NumberField'
 import SaveBar from './SaveBar'
@@ -34,9 +36,15 @@ function weekLabel(monday: ISODate, thisMonday: ISODate): string {
   return monday === thisMonday ? `${base} (this week)` : base
 }
 
-/** One record per site per week — these records drive the data completeness score. */
+const DEMO_WEEK_MESSAGE =
+  'This week already has a demonstration record for this site, so it can’t be logged again. Pick another week.'
+
+/**
+ * One record per site per week — these records drive the data completeness score.
+ * A week already logged on this device can be replaced; a week with a demo record is blocked.
+ */
 export default function WeeklyInputForm() {
-  const { logs } = useLogs()
+  const { userLogs } = useLogs()
   const thisMonday = mondayOf(todayISO())
   const [siteId, setSiteId] = useState<SiteId | ''>(() => getLastSiteId() ?? '')
   const [week, setWeek] = useState<ISODate>(thisMonday)
@@ -47,19 +55,31 @@ export default function WeeklyInputForm() {
   const [notes, setNotes] = useState('')
   const [showErrors, setShowErrors] = useState(false)
   const [saveError, setSaveError] = useState<string | null>(null)
-  const [saved, setSaved] = useState<{ id: string; record: NewLog<'weeklyInputs'> } | null>(null)
+  const [saved, setSaved] = useState<{
+    id: string
+    record: NewLog<'weeklyInputs'>
+    /** Records this save replaced, kept for Undo. */
+    replaced: WeeklyInputLog[]
+  } | null>(null)
   const [undone, setUndone] = useState(false)
 
-  /** Weeks this site already has a record for. */
-  const loggedWeeks = useMemo(
-    () => new Set(logs.weeklyInputs.filter((w) => w.siteId === siteId).map((w) => w.weekStart)),
-    [logs, siteId],
+  // Demo records count even while hidden: the site-week is taken either way.
+  const demoWeeks = useMemo(
+    () => new Set(demoLogs.weeklyInputs.filter((w) => w.siteId === siteId).map((w) => w.weekStart)),
+    [siteId],
   )
-  const weekOptions = recentMondays(WEEKS_TO_OFFER).map((m) => ({
-    value: m,
-    label: `${weekLabel(m, thisMonday)}${loggedWeeks.has(m) ? ' · logged' : ''}`,
-  }))
-  const alreadyLogged = siteId !== '' && loggedWeeks.has(week)
+  const deviceRecordsForSite = useMemo(
+    () => userLogs.weeklyInputs.filter((w) => w.siteId === siteId),
+    [userLogs, siteId],
+  )
+  const deviceWeeks = new Set(deviceRecordsForSite.map((w) => w.weekStart))
+  const weekOptions = recentMondays(WEEKS_TO_OFFER).map((m) => {
+    const taken = demoWeeks.has(m) ? ' · logged (demo)' : deviceWeeks.has(m) ? ' · logged on this device' : ''
+    return { value: m, label: `${weekLabel(m, thisMonday)}${taken}` }
+  })
+  const demoBlocked = siteId !== '' && demoWeeks.has(week)
+  /** Normally one; older versions of the form allowed duplicates, and replacing clears them all. */
+  const existing = demoBlocked ? [] : deviceRecordsForSite.filter((w) => w.weekStart === week)
 
   const waterL = parseDecimal(water)
   const compost = compostType === 'none' ? 0 : parseDecimal(compostKg)
@@ -67,6 +87,7 @@ export default function WeeklyInputForm() {
 
   const issues: FieldIssue[] = []
   if (!siteId) issues.push({ id: ID.site, short: 'site', message: 'Choose the site.' })
+  if (demoBlocked) issues.push({ id: ID.week, short: 'another week', message: DEMO_WEEK_MESSAGE })
   const waterError = checkNumber(waterL, { what: 'water used', max: 50000, unit: 'L', allowZero: true })
   if (waterError) issues.push({ id: ID.water, short: 'water', message: waterError })
   if (!compostType) issues.push({ id: ID.compostType, short: 'compost type', message: 'Choose the compost type, or None this week.' })
@@ -97,7 +118,13 @@ export default function WeeklyInputForm() {
       labourHours: labourH,
       notes: notes.trim() || undefined,
     }
-    const result = addLog('weeklyInputs', record)
+    const result = existing.length
+      ? replaceUserLogs(
+          'weeklyInputs',
+          existing.map((w) => w.id),
+          record,
+        )
+      : addLog('weeklyInputs', record)
     if (!result.ok) {
       setSaveError(result.error)
       return
@@ -105,7 +132,16 @@ export default function WeeklyInputForm() {
     setLastSiteId(siteId)
     setSaveError(null)
     setUndone(false)
-    setSaved({ id: result.id, record })
+    setSaved({ id: result.id, record, replaced: existing })
+  }
+
+  /** Fill the form from this week's existing record, to correct it. */
+  const editExisting = (r: WeeklyInputLog) => {
+    setWater(String(r.waterLitres))
+    setCompostType(r.compostType)
+    setCompostKg(r.compostType === 'none' ? '' : String(r.compostKg))
+    setLabour(String(r.labourHours))
+    setNotes(r.notes ?? '')
   }
 
   const logAnother = () => {
@@ -123,23 +159,19 @@ export default function WeeklyInputForm() {
     const r = saved.record
     return (
       <SavedConfirmation
-        title="Weekly inputs saved"
+        title={saved.replaced.length ? "This week's record replaced" : 'Weekly inputs saved'}
         rows={[
           ['Site', siteName(r.siteId)],
           ['Week', weekLabel(r.weekStart, thisMonday)],
           ['Water', `${r.waterLitres} L`],
-          [
-            'Compost',
-            r.compostType === 'none'
-              ? 'None'
-              : `${r.compostKg} kg ${compostOptions.find((c) => c.value === r.compostType)?.label.toLowerCase() ?? ''}`,
-          ],
+          ['Compost', compostSummary(r)],
           ['Labour', `${r.labourHours} h`],
         ]}
         anotherLabel="Log another week"
         onAnother={logAnother}
         onUndo={() => {
-          removeUserLog('weeklyInputs', saved.id)
+          if (saved.replaced.length) undoReplaceUserLogs('weeklyInputs', saved.id, saved.replaced)
+          else removeUserLog('weeklyInputs', saved.id)
           setSaved(null)
           setUndone(true)
         }}
@@ -151,7 +183,9 @@ export default function WeeklyInputForm() {
     <form noValidate onSubmit={handleSubmit} className="space-y-3">
       <FormHeader
         title="Log weekly inputs"
-        undoneMessage={undone ? 'Weekly record removed. Your entries are still here — change anything and save again.' : null}
+        undoneMessage={
+          undone ? 'Undone — the week is back as it was. Your entries are still here — change anything and save again.' : null
+        }
       />
       <SiteSelect id={ID.site} value={siteId} onChange={setSiteId} error={err(ID.site)} />
       <SelectField
@@ -161,12 +195,10 @@ export default function WeeklyInputForm() {
         onChange={setWeek}
         options={weekOptions}
         placeholder="Choose a week"
-        hint={
-          alreadyLogged
-            ? 'This site already has a record for this week. Saving adds a second one, and both count towards totals.'
-            : undefined
-        }
+        // Shown straight away, not only after Save: the user needs to pick another week.
+        error={demoBlocked ? DEMO_WEEK_MESSAGE : undefined}
       />
+      {existing.length > 0 && <ExistingWeekRecord record={existing[existing.length - 1]} onEdit={editExisting} />}
       <NumberField
         id={ID.water}
         label="Water used"
@@ -218,7 +250,7 @@ export default function WeeklyInputForm() {
         onChange={setNotes}
         placeholder="e.g. heavy rain Tuesday, topped up wicking reservoirs"
       />
-      <SaveBar label="Save weekly inputs" missing={issues.map((i) => i.short)} error={saveError} />
+      <SaveBar label={existing.length ? "Replace this week's record" : 'Save weekly inputs'} missing={issues.map((i) => i.short)} error={saveError} />
     </form>
   )
 }
