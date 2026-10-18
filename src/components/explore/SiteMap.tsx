@@ -4,6 +4,7 @@ import { MapContainer, Marker, TileLayer, useMap } from 'react-leaflet'
 import { CAMPUS_MAP_VIEW, siteStatusLabels } from '../../data'
 import type { Site, SiteId, SiteStatus } from '../../types'
 import { statusDotClass } from '../ui/statusStyles'
+import MapZoomControls from './MapZoomControls'
 
 /**
  * Two base layers, switched with the Map / Satellite toggle.
@@ -72,14 +73,26 @@ function prefersReducedMotion(): boolean {
   return typeof window !== 'undefined' && window.matchMedia('(prefers-reduced-motion: reduce)').matches
 }
 
-/** Pans to the selected site, whether it was picked on the map or from the list. */
+/** Zoom the map flies to when a site is selected: close enough to see the site's surroundings. */
+const SITE_ZOOM = 17
+
+/**
+ * Flies to the selected site, whether it was picked on the map or from the list. The detail panel
+ * covers part of the map (right side on desktop, bottom sheet on phones), so the site is placed in
+ * the middle of the part that stays visible.
+ */
 function FocusSelected({ site }: { site: Site | undefined }) {
   const map = useMap()
   useEffect(() => {
     if (!site) return
-    const zoom = Math.max(map.getZoom(), 16)
-    if (prefersReducedMotion()) map.setView(site.coordinates, zoom, { animate: false })
-    else map.flyTo(site.coordinates, zoom, { duration: 0.6 })
+    const zoom = Math.max(map.getZoom(), SITE_ZOOM)
+    const size = map.getSize()
+    const desktop = window.matchMedia('(min-width: 1024px)').matches
+    // Desktop panel: 26rem wide + 1rem gap on the right. Phone sheet: up to 55% of the screen at the bottom.
+    const shift = desktop ? L.point(Math.min(size.x / 3, 216), 0) : L.point(0, Math.min(size.y * 0.3, window.innerHeight * 0.27))
+    const center = map.unproject(map.project(site.coordinates, zoom).add(shift), zoom)
+    if (prefersReducedMotion()) map.setView(center, zoom, { animate: false })
+    else map.flyTo(center, zoom, { duration: 1.2 })
   }, [map, site])
   return null
 }
@@ -105,6 +118,7 @@ export default function SiteMap({ sites, selectedId, onSelect }: Props) {
         maxZoom={MAX_ZOOM}
         maxBounds={SINGAPORE_BOUNDS}
         maxBoundsViscosity={1}
+        zoomControl={false}
         scrollWheelZoom={false}
         className="size-full"
         aria-label="Map of the NTU campus showing the four growing sites"
@@ -144,13 +158,14 @@ export default function SiteMap({ sites, selectedId, onSelect }: Props) {
             />
           )
         })}
+        <MapZoomControls />
         <FocusSelected site={selectedSite} />
       </MapContainer>
 
       <div
         role="group"
         aria-label="Map style"
-        className="absolute top-3 right-3 z-[500] flex overflow-hidden rounded-sm bg-surface shadow-float"
+        className="absolute top-3 left-[4.25rem] z-[500] flex overflow-hidden rounded-sm bg-surface shadow-float"
       >
         {BASE_LAYERS.map((layer) => (
           <button

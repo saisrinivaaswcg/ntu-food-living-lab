@@ -1,21 +1,27 @@
-import { MousePointerClick } from 'lucide-react'
+import { AnimatePresence } from 'motion/react'
 import { useCallback, useEffect, useRef } from 'react'
 import { useSearchParams } from 'react-router-dom'
+import ExploreHero from '../components/explore/ExploreHero'
 import MapLegend from '../components/explore/MapLegend'
 import SiteList from '../components/explore/SiteList'
 import SiteMap from '../components/explore/SiteMap'
 import SitePanel from '../components/explore/SitePanel'
+import Reveal from '../components/ui/Reveal'
 import { sites } from '../data'
 import { usePageTitle } from '../hooks/usePageTitle'
 import { findSite } from '../lib/lookups'
 import type { SiteId } from '../types'
+
+const MAP_ID = 'map'
 
 export default function ExplorePage() {
   usePageTitle('Explore')
   // The open site lives in the URL (?site=…) so it can be linked and survives Back.
   const [params, setParams] = useSearchParams()
   const selected = findSite(params.get('site') ?? undefined) ?? null
+  const selectedIndex = selected ? sites.findIndex((s) => s.id === selected.id) : -1
   const openerRef = useRef<HTMLElement | null>(null)
+  const mapRef = useRef<HTMLDivElement>(null)
 
   const select = useCallback(
     (id: SiteId) => {
@@ -23,6 +29,16 @@ export default function ExplorePage() {
       setParams({ site: id }, { replace: true })
     },
     [setParams],
+  )
+
+  // Picking a site from the list below brings the map back into view, so the fly-to can be seen.
+  const selectFromList = useCallback(
+    (id: SiteId) => {
+      select(id)
+      const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches
+      mapRef.current?.scrollIntoView({ behavior: reduce ? 'auto' : 'smooth', block: 'start' })
+    },
+    [select],
   )
 
   const close = useCallback(() => {
@@ -46,40 +62,44 @@ export default function ExplorePage() {
   }, [selected, close])
 
   return (
-    <div className="mx-auto max-w-7xl px-4 py-5 lg:px-8 lg:py-8">
-      <header className="mb-4">
-        <h1 className="text-2xl font-semibold tracking-tight lg:text-3xl">Explore the growing sites</h1>
-        <p className="mt-1 max-w-2xl text-ink-muted">
-          Four campus food gardens, one shared way of recording what they grow. Pick a site on the map or from the
-          list below.
-        </p>
-      </header>
+    <>
+      <ExploreHero mapId={MAP_ID} />
 
-      <div className="grid gap-4 lg:grid-cols-[minmax(0,1fr)_24rem]">
-        <section aria-label="Campus map" className="space-y-2">
-          <div className="h-[50dvh] min-h-72 overflow-hidden rounded-card bg-surface shadow-card lg:h-[560px]">
-            <SiteMap sites={sites} selectedId={selected?.id ?? null} onSelect={select} />
+      <section id={MAP_ID} aria-labelledby="map-heading" className="scroll-mt-16 pt-14 lg:pt-20">
+        <Reveal className="mx-auto max-w-7xl px-4 lg:grid lg:grid-cols-12 lg:items-end lg:gap-x-10 lg:px-8">
+          <div className="lg:col-span-6">
+            <h2 id="map-heading" className="font-display text-section font-medium">
+              Where the food grows
+            </h2>
+            <p className="mt-3 max-w-xl text-lg text-ink-muted">
+              Select a marker to see what each site is growing right now. Switch to satellite to see the beds
+              themselves.
+            </p>
           </div>
-          <MapLegend />
-        </section>
-
-        {selected ? (
-          <SitePanel key={selected.id} site={selected} onClose={close} />
-        ) : (
-          <div className="hidden flex-col items-center justify-center gap-3 rounded-card border-2 border-dashed border-line p-8 text-center text-ink-muted lg:flex lg:h-[560px]">
-            <MousePointerClick className="size-8 text-brand-600" aria-hidden />
-            <p className="font-medium text-ink">No site selected</p>
-            <p className="text-sm">Click a marker on the map, or choose a site from the list, to see its details here.</p>
+          <div className="mt-5 lg:col-span-6 lg:mt-0 lg:flex lg:justify-end">
+            <MapLegend />
           </div>
-        )}
-      </div>
+        </Reveal>
 
-      <section aria-labelledby="site-list-heading" className="mt-8">
-        <h2 id="site-list-heading" className="mb-3 text-lg font-semibold">
-          All sites
-        </h2>
-        <SiteList sites={sites} selectedId={selected?.id ?? null} onSelect={select} />
+        <div ref={mapRef} className="relative mt-8 h-[68svh] min-h-80 scroll-mt-16 bg-sunken lg:h-[min(82vh,48rem)]">
+          <SiteMap sites={sites} selectedId={selected?.id ?? null} onSelect={select} />
+          <AnimatePresence>
+            {selected && <SitePanel key={selected.id} site={selected} index={selectedIndex} onClose={close} />}
+          </AnimatePresence>
+        </div>
       </section>
-    </div>
+
+      <section aria-labelledby="site-list-heading" className="mx-auto max-w-7xl px-4 py-14 lg:px-8 lg:py-20">
+        <Reveal>
+          <h2 id="site-list-heading" className="font-display text-section font-medium">
+            The four sites
+          </h2>
+          <p className="mt-3 mb-8 max-w-xl text-lg text-ink-muted">
+            Choose one to find it on the map, then open its page for crop notes and handover records.
+          </p>
+        </Reveal>
+        <SiteList sites={sites} selectedId={selected?.id ?? null} onSelect={selectFromList} />
+      </section>
+    </>
   )
 }

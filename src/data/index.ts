@@ -12,6 +12,8 @@ import { demoPlantings } from './plantings'
 import { demoWeeklyInputs } from './weeklyInputs'
 
 export { sites, CAMPUS_MAP_VIEW } from './sites'
+export { exploreHeroImage, exploreHeroVideo, siteImages } from './images'
+export type { ImageSlot, VideoSlot } from './images'
 export { crops } from './crops'
 export { cropNotes, problemLog } from './knowledge'
 export { protocols } from './protocols'
