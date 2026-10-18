@@ -8,10 +8,10 @@ interface Props {
 export default function SeriesTable({ caption, headers, rows }: Props) {
   return (
     <div className="max-h-72 overflow-y-auto">
-      <table className="w-full text-sm">
+      <table className="w-full">
         <caption className="sr-only">{caption}</caption>
-        <thead className="sticky top-0 bg-surface">
-          <tr className="border-b border-line text-ink-muted">
+        <thead className="sticky top-0 bg-canvas">
+          <tr className="border-b border-ink text-sm text-ink-muted">
             <th scope="col" className="py-2 text-left font-medium">
               {headers[0]}
             </th>

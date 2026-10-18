@@ -59,14 +59,7 @@ const columns: Column<CropCost>[] = [
 export default function CostTable({ rows }: { rows: CropCost[] }) {
   const a = costAssumptions
   return (
-    <section aria-labelledby="cost-heading" className="rounded-card bg-surface p-4 shadow-card lg:p-5">
-      <h2 id="cost-heading" className="font-semibold">
-        Cost per kg: campus vs supermarket
-      </h2>
-      <p className="mb-3 text-xs text-ink-muted">
-        Campus cost = water + compost + seeds/seedlings + labour, divided by kg harvested. Inputs logged per site are
-        shared across crops by bed count, as in the efficiency table.
-      </p>
+    <div>
       {rows.length === 0 ? (
         <EmptyState title="No crops in this view" detail="Nothing was harvested or growing for the chosen period and site." />
       ) : (
@@ -79,9 +72,10 @@ export default function CostTable({ rows }: { rows: CropCost[] }) {
         />
       )}
 
-      <details className="mt-4 rounded-xl bg-canvas p-3 text-sm">
-        <summary className="flex min-h-12 cursor-pointer items-center font-medium">Assumptions and price survey</summary>
-        <dl className="mt-2 grid gap-x-6 gap-y-2 sm:grid-cols-2">
+      {/* Shown, not hidden behind a click: the comparison only means something with its assumptions. */}
+      <div className="mt-6 bg-sunken p-4 text-sm lg:p-5">
+        <h3 className="font-semibold">Assumptions and price survey</h3>
+        <dl className="mt-3 grid gap-x-6 gap-y-3 sm:grid-cols-2">
           <div>
             <dt className="text-ink-muted">Supermarket prices surveyed</dt>
             <dd>{PRICE_SURVEY_DATE} — demonstration figures</dd>
@@ -117,7 +111,7 @@ export default function CostTable({ rows }: { rows: CropCost[] }) {
             <li key={n}>{n}</li>
           ))}
         </ul>
-      </details>
-    </section>
+      </div>
+    </div>
   )
 }

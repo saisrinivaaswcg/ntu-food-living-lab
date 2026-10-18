@@ -28,24 +28,19 @@ export default function SiteComparison({ rows, highlight, completeWeeks }: Props
   ]
 
   return (
-    <section aria-labelledby="sites-heading" className="rounded-card bg-surface p-4 shadow-card lg:p-5">
-      <h2 id="sites-heading" className="font-semibold">
-        Site comparison
-      </h2>
-      <p className="mb-3 text-xs text-ink-muted">
-        All four sites for the chosen period{highlight !== 'all' && ' — the selected site is highlighted'}.
-      </p>
+    <div>
+      {highlight !== 'all' && <p className="mb-3 text-sm text-ink-muted">The selected site is highlighted.</p>}
       <div className="overflow-x-auto">
-        <table className="w-full min-w-[34rem] text-sm">
+        <table className="w-full min-w-[34rem]">
           <caption className="sr-only">Site comparison for the chosen period</caption>
           <thead>
-            <tr className="border-b border-line">
+            <tr className="border-b border-ink">
               <td />
               {rows.map((r) => (
                 <th
                   key={r.siteId}
                   scope="col"
-                  className={`px-3 py-2 text-right align-bottom font-semibold ${r.siteId === highlight ? 'rounded-t-lg bg-brand-50' : ''}`}
+                  className={`px-3 py-2 text-right align-bottom font-semibold ${r.siteId === highlight ? 'bg-brand-50' : ''}`}
                 >
                   {siteName(r.siteId, true)}
                   {r.siteId === highlight && <span className="block text-xs font-normal text-brand-800">Selected</span>}
@@ -56,14 +51,14 @@ export default function SiteComparison({ rows, highlight, completeWeeks }: Props
           <tbody>
             {measures.map((m) => (
               <tr key={m.label} className="border-b border-line last:border-0">
-                <th scope="row" className="py-2.5 pr-3 text-left font-medium text-ink-muted">
+                <th scope="row" className="py-3 pr-3 text-left font-normal text-ink-muted">
                   {m.label}
-                  {m.hint && <span className="block text-xs font-normal">{m.hint}</span>}
+                  {m.hint && <span className="block text-sm">{m.hint}</span>}
                 </th>
                 {rows.map((r) => (
                   <td
                     key={r.siteId}
-                    className={`px-3 py-2.5 text-right tabular-nums ${r.siteId === highlight ? 'bg-brand-50' : ''}`}
+                    className={`px-3 py-3 text-right tabular-nums ${r.siteId === highlight ? 'bg-brand-50' : ''}`}
                   >
                     {m.value(r)}
                   </td>
@@ -73,6 +68,6 @@ export default function SiteComparison({ rows, highlight, completeWeeks }: Props
           </tbody>
         </table>
       </div>
-    </section>
+    </div>
   )
 }

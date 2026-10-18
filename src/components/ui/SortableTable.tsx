@@ -40,10 +40,10 @@ export default function SortableTable<T>({ caption, columns, rows, rowKey, initi
 
   return (
     <div className="overflow-x-auto">
-      <table className="w-full min-w-[32rem] text-sm">
+      <table className="w-full min-w-[32rem]">
         <caption className="sr-only">{caption}, sortable by any column</caption>
         <thead>
-          <tr className="border-b border-line text-left text-ink-muted">
+          <tr className="border-b border-ink text-left text-sm text-ink-muted">
             {columns.map((c) => {
               const active = c.key === sort.key
               const Icon = !active ? ArrowUpDown : sort.direction === 'asc' ? ArrowUp : ArrowDown
@@ -78,7 +78,7 @@ export default function SortableTable<T>({ caption, columns, rows, rowKey, initi
                   <Cell
                     key={c.key}
                     scope={i === 0 ? 'row' : undefined}
-                    className={`px-3 py-2.5 ${i === 0 ? 'text-left font-medium' : ''} ${c.numeric ? 'text-right tabular-nums' : ''}`}
+                    className={`px-3 py-3 ${i === 0 ? 'text-left font-semibold' : ''} ${c.numeric ? 'text-right tabular-nums' : ''}`}
                   >
                     {c.render(row)}
                   </Cell>

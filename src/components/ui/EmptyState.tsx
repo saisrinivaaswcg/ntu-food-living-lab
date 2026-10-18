@@ -3,10 +3,12 @@ import { Inbox } from 'lucide-react'
 /** Shown in place of a chart, table or list with nothing to display. */
 export default function EmptyState({ title, detail }: { title: string; detail?: string }) {
   return (
-    <div className="flex flex-col items-center justify-center gap-1 rounded-xl border border-dashed border-line px-4 py-8 text-center">
-      <Inbox className="size-6 text-ink-subtle" aria-hidden />
-      <p className="font-medium text-ink">{title}</p>
-      {detail && <p className="max-w-sm text-sm text-ink-muted">{detail}</p>}
+    <div className="flex items-start gap-3 bg-sunken px-4 py-5">
+      <Inbox className="mt-0.5 size-5 shrink-0 text-ink-muted" aria-hidden />
+      <div>
+        <p className="font-semibold text-ink">{title}</p>
+        {detail && <p className="mt-0.5 max-w-prose text-ink-muted">{detail}</p>}
+      </div>
     </div>
   )
 }

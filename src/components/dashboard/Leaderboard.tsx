@@ -1,4 +1,3 @@
-import { Trophy } from 'lucide-react'
 import { formatNumber, formatPercent } from '../../lib/format'
 import { siteName } from '../../lib/lookups'
 import {
@@ -27,66 +26,75 @@ interface Props {
   highlight: SiteFilter
 }
 
+// Rank · site and score · four components. On large screens the component labels move into a header row.
+const ROW_GRID = 'lg:grid lg:grid-cols-[3rem_minmax(0,2fr)_repeat(4,minmax(0,1fr))] lg:gap-x-6'
+
 /** Ranks sites on a blended score, showing every component so the ranking is transparent. */
 export default function Leaderboard({ entries, highlight }: Props) {
   const weightTotal = Object.values(LEADERBOARD_WEIGHTS).reduce((a, b) => a + b, 0)
   const weightPct = (k: LeaderboardComponent) => Math.round((LEADERBOARD_WEIGHTS[k] / weightTotal) * 100)
 
   return (
-    <section aria-labelledby="leaderboard-heading" className="rounded-card bg-surface p-4 shadow-card lg:p-5">
-      <h2 id="leaderboard-heading" className="flex items-center gap-2 font-semibold">
-        <Trophy className="size-5 text-brand-700" aria-hidden />
-        Inter-hall challenge
-      </h2>
-      <p className="mb-3 text-xs text-ink-muted">
-        Not yield alone. Each measure is scored 0–100 against the best site, then blended:{' '}
-        {LEADERBOARD_COMPONENTS.map((c) => `${c.label.toLowerCase()} ${weightPct(c.key)}%`).join(', ')}. Yield is per m²,
-        so small sites aren’t penalised.
-      </p>
-      <ol className="space-y-3">
-        {entries.map((e) => (
-          <li
-            key={e.siteId}
-            className={`rounded-xl border p-3 ${e.siteId === highlight ? 'border-brand-600 bg-brand-50' : 'border-line'}`}
-          >
-            <div className="flex items-center gap-3">
-              <span
-                className={`flex size-9 shrink-0 items-center justify-center rounded-full text-sm font-bold ${
-                  e.rank === 1 ? 'bg-brand-700 text-white' : 'bg-canvas text-ink'
-                }`}
-                aria-label={`Rank ${e.rank}`}
-              >
-                {e.rank}
-              </span>
-              <span className="min-w-0 flex-1 font-semibold">{siteName(e.siteId)}</span>
-              <span className="text-2xl font-semibold">
-                {formatNumber(e.score, 0)}
-                <span className="text-sm font-normal text-ink-muted"> / 100</span>
-              </span>
-            </div>
-            {/* Score meter: the track is a lighter step of the same hue. */}
-            <div className="mt-2 h-2 rounded-full bg-brand-100" aria-hidden>
-              <div className="h-2 rounded-full bg-brand-600" style={{ width: `${Math.max(0, Math.min(100, e.score))}%` }} />
-            </div>
-            <dl className="mt-3 grid grid-cols-2 gap-2 sm:grid-cols-4">
-              {LEADERBOARD_COMPONENTS.map((c) => {
-                const comp = e.components[c.key]
-                return (
-                  <div key={c.key} className="rounded-lg bg-surface px-2.5 py-2 ring-1 ring-line">
-                    <dt className="text-xs text-ink-muted">
-                      {c.label} <span className="whitespace-nowrap">({weightPct(c.key)}%)</span>
-                    </dt>
-                    <dd>
-                      <span className="font-semibold tabular-nums">{formatNumber(comp.scaled, 0)}</span>
-                      <span className="text-xs text-ink-muted"> /100 · {rawValue(c.key, comp.value)}</span>
-                    </dd>
-                  </div>
-                )
-              })}
-            </dl>
-          </li>
+    <div>
+      <div className={`hidden border-b border-ink pb-2 text-sm text-ink-muted ${ROW_GRID}`} aria-hidden>
+        <span>Rank</span>
+        <span>Site and blended score</span>
+        {LEADERBOARD_COMPONENTS.map((c) => (
+          <span key={c.key} className="text-right">
+            {c.label} ({weightPct(c.key)}%)
+          </span>
         ))}
+      </div>
+      <ol>
+        {entries.map((e) => {
+          const selected = e.siteId === highlight
+          return (
+            <li
+              key={e.siteId}
+              className={`border-b border-line py-4 lg:items-center ${ROW_GRID} ${selected ? 'bg-brand-50' : ''}`}
+            >
+              <div className="flex items-baseline gap-3 lg:contents">
+                <span className="font-display text-3xl font-medium tabular-nums lg:pl-1">
+                  <span className="sr-only">Rank </span>
+                  {e.rank}
+                </span>
+                <div className="min-w-0 flex-1">
+                  <div className="flex items-baseline justify-between gap-3">
+                    <span className="font-semibold">
+                      {siteName(e.siteId)}
+                      {selected && <span className="ml-2 text-sm font-normal text-brand-800">Selected</span>}
+                    </span>
+                    <span className="shrink-0 tabular-nums">
+                      <span className="font-display text-2xl font-medium">{formatNumber(e.score, 0)}</span>
+                      <span className="text-sm text-ink-muted"> / 100</span>
+                    </span>
+                  </div>
+                  {/* Score meter: a lighter step of the same hue for the track. */}
+                  <div className="mt-2 h-1.5 bg-brand-100" aria-hidden>
+                    <div className="h-1.5 bg-brand-700" style={{ width: `${Math.max(0, Math.min(100, e.score))}%` }} />
+                  </div>
+                </div>
+              </div>
+              <dl className="mt-3 grid grid-cols-2 gap-x-4 gap-y-2 sm:grid-cols-4 lg:contents">
+                {LEADERBOARD_COMPONENTS.map((c) => {
+                  const comp = e.components[c.key]
+                  return (
+                    <div key={c.key} className="lg:text-right">
+                      <dt className="text-sm text-ink-muted lg:sr-only">
+                        {c.label} ({weightPct(c.key)}%)
+                      </dt>
+                      <dd className="tabular-nums">
+                        <span className="font-semibold">{formatNumber(comp.scaled, 0)}</span>
+                        <span className="block text-sm text-ink-muted">{rawValue(c.key, comp.value)}</span>
+                      </dd>
+                    </div>
+                  )
+                })}
+              </dl>
+            </li>
+          )
+        })}
       </ol>
-    </section>
+    </div>
   )
 }

@@ -50,4 +50,4 @@ export function formatDecimal(n: number, decimals: number): string {
 
 /** Shared look for text inputs, selects and textareas. 16px text so iOS doesn't zoom. */
 export const inputClass =
-  'block min-h-12 w-full rounded-xl border border-line bg-surface px-3 text-base text-ink shadow-sm focus:border-brand-600 focus:outline-none focus:ring-2 focus:ring-brand-600/30 aria-[invalid=true]:border-danger disabled:bg-canvas disabled:text-ink-subtle'
+  'block min-h-12 w-full rounded-sm border border-line-strong bg-surface px-3 text-base text-ink focus:border-brand-700 focus:outline-2 focus:outline-offset-0 focus:outline-focus aria-[invalid=true]:border-danger disabled:border-line disabled:bg-sunken disabled:text-ink-subtle'

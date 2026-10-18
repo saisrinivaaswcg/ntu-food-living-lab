@@ -241,6 +241,21 @@ export function weeklySeries(logs: LogCollections, period: Period): WeekPoint[] 
   })
 }
 
+/** The week with the highest value, or null when every week is empty. For chart captions. */
+export function peakWeek(series: WeekPoint[], key: 'harvestKg' | 'waterLitres'): WeekPoint | null {
+  let peak: WeekPoint | null = null
+  for (const w of series) {
+    const v = w[key]
+    if (v !== null && v > 0 && (peak === null || v > (peak[key] ?? 0))) peak = w
+  }
+  return peak
+}
+
+/** Distinct sites with at least one harvest. Expects logs already filtered by period and site. */
+export function sitesWithHarvests(logs: Pick<LogCollections, 'harvests'>): number {
+  return new Set(logs.harvests.map((h) => h.siteId)).size
+}
+
 export function harvestByCrop(logs: LogCollections): { cropId: CropId; kg: number }[] {
   const totals = new Map<CropId, number>()
   for (const h of logs.harvests) totals.set(h.cropId, (totals.get(h.cropId) ?? 0) + h.weightKg)

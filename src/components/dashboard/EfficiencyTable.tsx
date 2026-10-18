@@ -40,14 +40,7 @@ const columns: Column<CropEfficiency>[] = [
 
 export default function EfficiencyTable({ rows }: { rows: CropEfficiency[] }) {
   return (
-    <section aria-labelledby="efficiency-heading" className="rounded-card bg-surface p-4 shadow-card lg:p-5">
-      <h2 id="efficiency-heading" className="font-semibold">
-        Efficiency by crop
-      </h2>
-      <p className="mb-3 text-xs text-ink-muted">
-        Water and weekly labour are logged per site, then shared across crops by the number of beds each crop
-        occupied that week. Harvest labour is counted per crop. Select a column heading to sort.
-      </p>
+    <div>
       {rows.length === 0 ? (
         <EmptyState title="No crops in this view" detail="Nothing was harvested or growing for the chosen period and site." />
       ) : (
@@ -59,6 +52,6 @@ export default function EfficiencyTable({ rows }: { rows: CropEfficiency[] }) {
           initialSort={{ key: 'kgPerHour', direction: 'desc' }}
         />
       )}
-    </section>
+    </div>
   )
 }
