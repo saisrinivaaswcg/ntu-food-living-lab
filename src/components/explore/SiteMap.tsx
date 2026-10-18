@@ -51,6 +51,8 @@ interface Props {
   sites: Site[]
   selectedId: SiteId | null
   onSelect: (id: SiteId) => void
+  /** Pin-placement mode (/?editPins=1): markers can be dragged. */
+  onPinMove?: (id: SiteId, coordinates: [number, number]) => void
 }
 
 /**
@@ -97,7 +99,7 @@ function FocusSelected({ site }: { site: Site | undefined }) {
   return null
 }
 
-export default function SiteMap({ sites, selectedId, onSelect }: Props) {
+export default function SiteMap({ sites, selectedId, onSelect, onPinMove }: Props) {
   const icons = useMemo(() => {
     const make = (selected: boolean) =>
       Object.fromEntries(
@@ -154,7 +156,14 @@ export default function SiteMap({ sites, selectedId, onSelect }: Props) {
               title={`${site.name} — ${siteStatusLabels[site.status]}`}
               alt={site.name}
               zIndexOffset={selected ? 1000 : 0}
-              eventHandlers={{ click: () => onSelect(site.id) }}
+              draggable={Boolean(onPinMove)}
+              eventHandlers={{
+                click: () => onSelect(site.id),
+                dragend: (e) => {
+                  const { lat, lng } = (e.target as L.Marker).getLatLng()
+                  onPinMove?.(site.id, [lat, lng])
+                },
+              }}
             />
           )
         })}

@@ -8,7 +8,7 @@ import type { Site } from '../types'
 
 /** Map centre and zoom that frame all four sites on the NTU campus. */
 export const CAMPUS_MAP_VIEW = {
-  center: [1.3485, 103.6845] as [number, number],
+  center: [1.3472, 103.6833] as [number, number],
   zoom: 15,
 }
 
@@ -19,7 +19,7 @@ export const sites: Site[] = [
     shortName: 'Yunnan Trail',
     description:
       'An edible trail of raised beds along the Yunnan Garden boardwalk, growing Southeast Asian cooking herbs with interpretive signage for visitors.',
-    coordinates: [1.3446, 103.6874],
+    coordinates: [1.3429189739088752, 103.68481580091718],
     locationNote: 'Yunnan Garden, along the boardwalk near Nanyang Lake',
     status: 'active',
     statusNote: 'All six beds in production. Turmeric harvest under way.',
@@ -42,7 +42,7 @@ export const sites: Site[] = [
     shortName: 'Hall 12',
     description:
       'Resident-run planter-box garden at Hall of Residence 12. Herbs and chillies go to hall events and the student pantry.',
-    coordinates: [1.3516, 103.6808],
+    coordinates: [1.351557326921281, 103.68090467882692],
     locationNote: 'Hall of Residence 12, edible garden planter boxes',
     status: 'active',
     statusNote: 'Four planter boxes active. Chilli padi fruiting.',
@@ -63,7 +63,7 @@ export const sites: Site[] = [
     shortName: 'Yunnan Corner',
     description:
       'A low-input demonstration plot run by the Earthlink environmental club, trialling water-saving methods and kangkong in wicking beds.',
-    coordinates: [1.3437, 103.6893],
+    coordinates: [1.3470549082308847, 103.68561981252013],
     locationNote: 'Eastern corner of Yunnan Garden, near the Chinese Heritage Centre',
     status: 'needs-attention',
     statusNote: 'Kangkong bed lost to drought in September. Irrigation fix pending.',
@@ -85,7 +85,7 @@ export const sites: Site[] = [
     shortName: 'Herb Garden',
     description:
       'Long-running terraced herb garden near the Jalan Bahar entrance. The student section grows culinary herbs alongside the medicinal collection.',
-    coordinates: [1.3537, 103.6874],
+    coordinates: [1.3431511324916636, 103.68479234232828],
     locationNote: 'Near the Jalan Bahar entrance, off Nanyang Avenue',
     status: 'active',
     statusNote: 'Eight terrace beds in the student section. Steady weekly harvests.',
