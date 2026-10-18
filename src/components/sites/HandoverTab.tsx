@@ -25,8 +25,8 @@ export default function HandoverTab({ site }: { site: Site }) {
 
   return (
     <div className="space-y-10">
-      <section aria-labelledby="current-handover-heading" className="rounded-card bg-surface p-5 shadow-card lg:p-6">
-        <h2 id="current-handover-heading" className="text-xl font-semibold">
+      <section aria-labelledby="current-handover-heading" className="rounded-2xl bg-surface p-5 shadow-card lg:p-8">
+        <h2 id="current-handover-heading" className="font-display text-section font-medium">
           Current handover · {latest.term}
         </h2>
         <p className="mt-1 mb-5 text-sm text-ink-muted">
@@ -36,8 +36,8 @@ export default function HandoverTab({ site }: { site: Site }) {
         <HandoverDetails record={latest} />
       </section>
 
-      <section aria-labelledby="checklist-heading" className="rounded-card bg-surface p-5 shadow-card lg:p-6">
-        <h2 id="checklist-heading" className="mb-3 text-xl font-semibold">
+      <section aria-labelledby="checklist-heading" className="rounded-2xl bg-surface p-5 shadow-card lg:p-8">
+        <h2 id="checklist-heading" className="mb-3 font-display text-section font-medium">
           Handover checklist
         </h2>
         {/* key: a different record starts from its own saved ticks */}
@@ -45,7 +45,7 @@ export default function HandoverTab({ site }: { site: Site }) {
       </section>
 
       <section aria-labelledby="history-heading">
-        <h2 id="history-heading" className="mb-4 text-xl font-semibold">
+        <h2 id="history-heading" className="mb-4 font-display text-section font-medium">
           Earlier handovers
         </h2>
         {history.length === 0 ? (
@@ -56,7 +56,7 @@ export default function HandoverTab({ site }: { site: Site }) {
               const done = record.checklist.filter((i) => i.done).length
               return (
                 <li key={record.id}>
-                  <details className="group rounded-card bg-surface shadow-card">
+                  <details className="group rounded-2xl bg-surface shadow-card">
                     <summary className="flex min-h-12 cursor-pointer list-none items-center gap-3 px-5 py-4 hover:bg-canvas focus-visible:outline-2 focus-visible:outline-offset-[-2px] focus-visible:outline-brand-700 [&::-webkit-details-marker]:hidden">
                       <span className="min-w-0 flex-1">
                         <span className="block font-semibold">{record.term}</span>

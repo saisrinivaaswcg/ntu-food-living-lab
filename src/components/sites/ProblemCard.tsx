@@ -7,11 +7,11 @@ export default function ProblemCard({ problem }: { problem: ProblemEntry }) {
   const cause = problemCauseOptions.find((c) => c.value === problem.cause)?.label ?? problem.cause
   const open = problem.status === 'open'
   return (
-    <article className="rounded-xl border border-line bg-surface p-4">
+    <article className="h-full rounded-2xl bg-surface p-5 shadow-card">
       <div className="flex flex-wrap items-start justify-between gap-2">
-        <h4 className="min-w-0 font-semibold">{problem.title}</h4>
+        <h4 className="min-w-0 font-display text-xl leading-snug font-medium">{problem.title}</h4>
         <span
-          className={`shrink-0 rounded-full px-2.5 py-1 text-xs font-semibold ${
+          className={`shrink-0 rounded-sm px-2 py-0.5 text-xs font-semibold ${
             open ? 'bg-attention-bg text-attention' : 'bg-brand-100 text-brand-800'
           }`}
         >

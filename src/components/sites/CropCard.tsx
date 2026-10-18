@@ -27,9 +27,9 @@ function NoteList({ title, items }: { title: string; items: string[] }) {
 export default function CropCard({ cropId, note, yields }: Props) {
   const crop = getCrop(cropId)
   return (
-    <article className="flex h-full flex-col gap-3 rounded-card bg-surface p-5 shadow-card">
+    <article className="flex h-full flex-col gap-3 rounded-2xl bg-surface p-5 shadow-card transition-transform duration-300 hover:-translate-y-0.5">
       <header>
-        <h3 className="text-lg font-semibold leading-snug">{cropName(cropId)}</h3>
+        <h3 className="font-display text-2xl leading-snug font-medium">{cropName(cropId)}</h3>
         <p className="text-sm text-ink-muted">
           <i>{crop.scientificName}</i>
           {crop.localName && ` · ${crop.localName}`}
@@ -37,7 +37,7 @@ export default function CropCard({ cropId, note, yields }: Props) {
       </header>
 
       {yields ? (
-        <dl className="grid grid-cols-3 gap-2 rounded-xl bg-canvas p-3 text-sm">
+        <dl className="grid grid-cols-3 gap-2 border-y border-line py-3 text-sm">
           <div>
             <dt className="text-ink-muted">Per harvest</dt>
             <dd className="font-semibold tabular-nums">
@@ -54,7 +54,7 @@ export default function CropCard({ cropId, note, yields }: Props) {
           </div>
         </dl>
       ) : (
-        <p className="rounded-xl bg-canvas p-3 text-sm text-ink-muted">No harvests logged for this crop here yet.</p>
+        <p className="border-y border-line py-3 text-sm text-ink-muted">No harvests logged for this crop here yet.</p>
       )}
 
       {note ? (

@@ -39,10 +39,10 @@ export default function HandoverDetails({ record, level = 3 }: { record: Handove
         ) : (
           <ul className="space-y-2">
             {issues.map(({ issue, label }) => (
-              <li key={issue.title} className="rounded-xl border border-line p-3">
+              <li key={issue.title} className="border-b border-line py-3 first:border-t">
                 <div className="flex flex-wrap items-start justify-between gap-2">
                   <span className="min-w-0 font-semibold">{issue.title}</span>
-                  <span className={`shrink-0 rounded-full px-2.5 py-0.5 text-xs font-semibold ${priorityClass[issue.priority]}`}>
+                  <span className={`shrink-0 rounded-sm px-2 py-0.5 text-xs font-semibold ${priorityClass[issue.priority]}`}>
                     {label}
                   </span>
                 </div>

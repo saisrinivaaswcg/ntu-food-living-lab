@@ -27,14 +27,14 @@ export default function HandoverChecklist({ record }: { record: HandoverRecord }
         <p className="text-sm text-ink-muted">Ticks are saved on this device.</p>
       </div>
       <div
-        className="mt-2 h-2 rounded-full bg-brand-100"
+        className="mt-2 h-1.5 bg-brand-100"
         role="progressbar"
         aria-labelledby={`${id}-progress`}
         aria-valuemin={0}
         aria-valuemax={total}
         aria-valuenow={done}
       >
-        <div className="h-2 rounded-full bg-brand-700 transition-[width]" style={{ width: `${(done / total) * 100}%` }} />
+        <div className="h-1.5 bg-brand-700 transition-[width] duration-500" style={{ width: `${(done / total) * 100}%` }} />
       </div>
       <ul className="mt-3 divide-y divide-line">
         {record.checklist.map((item) => {

@@ -1,38 +1,41 @@
 import { MotionConfig } from 'motion/react'
-import { lazy } from 'react'
-import { BrowserRouter, Route, Routes } from 'react-router-dom'
+import { createBrowserRouter, RouterProvider } from 'react-router-dom'
 import AppShell from './components/layout/AppShell'
+import {
+  DashboardPage,
+  ExplorePage,
+  HarvestDashboardPage,
+  LogFormPage,
+  LogPage,
+  NotFoundPage,
+  PlantingDashboardPage,
+  SiteDetailPage,
+  SitesPage,
+} from './pages/lazyPages'
 
-// Each page is its own chunk, so the map (Leaflet) and the charts (Recharts) only load where they're used.
-const ExplorePage = lazy(() => import('./pages/ExplorePage'))
-const LogPage = lazy(() => import('./pages/LogPage'))
-const LogFormPage = lazy(() => import('./pages/LogFormPage'))
-const DashboardPage = lazy(() => import('./pages/DashboardPage'))
-const HarvestDashboardPage = lazy(() => import('./pages/HarvestDashboardPage'))
-const PlantingDashboardPage = lazy(() => import('./pages/PlantingDashboardPage'))
-const SitesPage = lazy(() => import('./pages/SitesPage'))
-const SiteDetailPage = lazy(() => import('./pages/SiteDetailPage'))
-const NotFoundPage = lazy(() => import('./pages/NotFoundPage'))
+// A data router, so links can use view transitions (Sites → site page photo morph).
+const router = createBrowserRouter([
+  {
+    element: <AppShell />,
+    children: [
+      { index: true, element: <ExplorePage /> },
+      { path: 'log', element: <LogPage /> },
+      { path: 'log/:kind', element: <LogFormPage /> },
+      { path: 'dashboard', element: <DashboardPage /> },
+      { path: 'dashboard/harvest', element: <HarvestDashboardPage /> },
+      { path: 'dashboard/planting', element: <PlantingDashboardPage /> },
+      { path: 'sites', element: <SitesPage /> },
+      { path: 'sites/:siteId', element: <SiteDetailPage /> },
+      { path: '*', element: <NotFoundPage /> },
+    ],
+  },
+])
 
 export default function App() {
   return (
     // reducedMotion="user": every motion component follows the device's reduce-motion setting.
     <MotionConfig reducedMotion="user">
-      <BrowserRouter>
-        <Routes>
-          <Route element={<AppShell />}>
-            <Route index element={<ExplorePage />} />
-            <Route path="log" element={<LogPage />} />
-            <Route path="log/:kind" element={<LogFormPage />} />
-            <Route path="dashboard" element={<DashboardPage />} />
-            <Route path="dashboard/harvest" element={<HarvestDashboardPage />} />
-            <Route path="dashboard/planting" element={<PlantingDashboardPage />} />
-            <Route path="sites" element={<SitesPage />} />
-            <Route path="sites/:siteId" element={<SiteDetailPage />} />
-            <Route path="*" element={<NotFoundPage />} />
-          </Route>
-        </Routes>
-      </BrowserRouter>
+      <RouterProvider router={router} />
     </MotionConfig>
   )
 }

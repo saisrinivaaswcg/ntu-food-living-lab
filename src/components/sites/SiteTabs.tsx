@@ -42,8 +42,8 @@ export default function SiteTabs({ active, onChange }: Props) {
             aria-controls={panelId(tab.id)}
             tabIndex={selected ? 0 : -1}
             onClick={() => onChange(tab.id)}
-            className={`-mb-px min-h-12 border-b-2 px-4 font-semibold transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-700 ${
-              selected ? 'border-brand-700 text-brand-800' : 'border-transparent text-ink-muted hover:text-ink'
+            className={`-mb-px min-h-12 border-b-2 px-4 text-lg font-semibold transition-colors ${
+              selected ? 'border-brand-700 text-ink' : 'border-transparent text-ink-muted hover:border-line-strong hover:text-ink'
             }`}
           >
             {tab.label}

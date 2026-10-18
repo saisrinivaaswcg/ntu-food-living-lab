@@ -121,7 +121,7 @@ export default function ProblemLog({ problems }: { problems: ProblemEntry[] }) {
 
       <fieldset className="mt-3">
         <legend className="mb-1 text-sm font-medium">Status</legend>
-        <div className="inline-grid grid-cols-3 rounded-xl border border-line p-1">
+        <div className="inline-grid grid-cols-3 border border-line-strong">
           {STATUS_FILTERS.map((s) => (
             <label key={s} className="cursor-pointer">
               <input
@@ -131,7 +131,7 @@ export default function ProblemLog({ problems }: { problems: ProblemEntry[] }) {
                 checked={status === s}
                 onChange={() => setStatus(s)}
               />
-              <span className="flex min-h-12 items-center justify-center rounded-lg px-4 text-sm font-medium text-ink-muted peer-checked:bg-brand-700 peer-checked:text-white peer-focus-visible:ring-2 peer-focus-visible:ring-brand-600 peer-focus-visible:ring-offset-1">
+              <span className="flex min-h-12 items-center justify-center px-4 text-sm font-medium text-ink-muted transition-colors hover:bg-sunken hover:text-ink peer-checked:bg-ink peer-checked:text-canvas peer-focus-visible:outline-2 peer-focus-visible:outline-offset-2 peer-focus-visible:outline-focus">
                 {s === 'all' ? 'All' : problemStatusLabels[s]}
               </span>
             </label>
@@ -149,7 +149,7 @@ export default function ProblemLog({ problems }: { problems: ProblemEntry[] }) {
           <button
             type="button"
             onClick={clearFilters}
-            className="min-h-12 rounded-xl px-3 text-sm font-semibold text-brand-800 underline underline-offset-2 hover:bg-canvas"
+            className="min-h-12 rounded-sm px-3 text-sm font-semibold text-ink underline underline-offset-4 hover:bg-canvas"
           >
             Clear filters
           </button>

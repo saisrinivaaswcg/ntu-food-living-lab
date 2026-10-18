@@ -19,7 +19,7 @@ export default function KnowledgeTab({ site }: { site: Site }) {
   return (
     <div className="space-y-10">
       <section aria-labelledby="crops-heading">
-        <h2 id="crops-heading" className="text-xl font-semibold">
+        <h2 id="crops-heading" className="font-display text-section font-medium">
           What grows here
         </h2>
         <p className="mt-1 mb-4 max-w-2xl text-sm text-ink-muted">
@@ -39,14 +39,14 @@ export default function KnowledgeTab({ site }: { site: Site }) {
       </section>
 
       <section aria-labelledby="problems-heading">
-        <h2 id="problems-heading" className="mb-4 text-xl font-semibold">
+        <h2 id="problems-heading" className="mb-4 font-display text-section font-medium">
           Problem log
         </h2>
         <ProblemLog problems={problems} />
       </section>
 
       <section aria-labelledby="protocols-heading">
-        <h2 id="protocols-heading" className="text-xl font-semibold">
+        <h2 id="protocols-heading" className="font-display text-section font-medium">
           Shared protocols
         </h2>
         <p className="mt-1 mb-4 max-w-2xl text-sm text-ink-muted">The same protocols apply at all four sites.</p>

@@ -8,6 +8,7 @@ import Breadcrumbs from '../layout/Breadcrumbs'
 import CountUp from '../ui/CountUp'
 import SlotImage from '../ui/SlotImage'
 import StatusBadge from '../ui/StatusBadge'
+import { sitePhotoTransitionName } from './siteTransitions'
 
 const EASE = [0.22, 1, 0.36, 1] as const
 /** How far the photo drifts with the mouse, in px each way. */
@@ -55,7 +56,11 @@ export default function SiteHero({ site, growing }: Props) {
   const enter = (delay: number) =>
     reduce
       ? {}
-      : { initial: { opacity: 0, y: 24 }, animate: { opacity: 1, y: 0 }, transition: { duration: 0.8, delay, ease: EASE } }
+      : {
+          initial: { opacity: 0, y: 24 },
+          animate: { opacity: 1, y: 0 },
+          transition: { duration: 0.8, delay, ease: EASE },
+        }
 
   return (
     <section
@@ -65,24 +70,30 @@ export default function SiteHero({ site, growing }: Props) {
       onPointerLeave={onPointerLeave}
       className="relative isolate flex min-h-[64svh] flex-col overflow-hidden bg-ink text-white lg:min-h-[min(80vh,46rem)]"
     >
-      {/* Oversized so drifting and zooming never reveal an edge. */}
-      <motion.div className="absolute -inset-[6%] -z-10" style={reduce ? undefined : { y: parallaxY }}>
-        <motion.div className="absolute inset-0" style={reduce ? undefined : { x: driftX, y: driftY }}>
-          <motion.div
-            className="absolute inset-0"
-            animate={reduce ? undefined : { scale: [1, 1.1] }}
-            transition={{ duration: 24, ease: 'linear', repeat: Infinity, repeatType: 'reverse' }}
-          >
-            <SlotImage
-              slot={siteImages[site.id]}
-              tone={index}
-              labelAt="top-right"
-              placeholderClassName="px-[8%] py-[7%]"
-              priority
-            />
+      {/* Named for the view transition from the Sites list; the photo morphs from its card into this frame. */}
+      <div
+        className="absolute inset-0 -z-10 overflow-hidden"
+        style={{ viewTransitionName: sitePhotoTransitionName(site.id) }}
+      >
+        {/* Oversized so drifting and zooming never reveal an edge. */}
+        <motion.div className="absolute -inset-[6%]" style={reduce ? undefined : { y: parallaxY }}>
+          <motion.div className="absolute inset-0" style={reduce ? undefined : { x: driftX, y: driftY }}>
+            <motion.div
+              className="absolute inset-0"
+              animate={reduce ? undefined : { scale: [1, 1.1] }}
+              transition={{ duration: 24, ease: 'linear', repeat: Infinity, repeatType: 'reverse' }}
+            >
+              <SlotImage
+                slot={siteImages[site.id]}
+                tone={index}
+                labelAt="top-right"
+                placeholderClassName="px-[8%] py-[7%]"
+                priority
+              />
+            </motion.div>
           </motion.div>
         </motion.div>
-      </motion.div>
+      </div>
       <div className="absolute inset-0 -z-10 bg-linear-to-t from-ink/90 via-ink/50 to-ink/20" aria-hidden />
 
       <div className="mx-auto flex w-full max-w-7xl flex-1 flex-col px-4 pt-3 pb-8 lg:px-8 lg:pb-12">

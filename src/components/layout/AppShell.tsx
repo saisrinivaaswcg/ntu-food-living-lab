@@ -1,5 +1,5 @@
 import { motion } from 'motion/react'
-import { Suspense, useEffect } from 'react'
+import { Suspense, useEffect, useLayoutEffect } from 'react'
 import { Outlet, useLocation } from 'react-router-dom'
 import { jumpToTop, startSmoothScroll } from '../../lib/smoothScroll'
 import BottomNav from './BottomNav'
@@ -8,14 +8,17 @@ import PageLoading from './PageLoading'
 import TopNav from './TopNav'
 
 export default function AppShell() {
-  const { pathname } = useLocation()
+  const { pathname, state } = useLocation()
   // Log pages are used outdoors against the clock: keep their transition short.
   const quick = pathname.startsWith('/log')
+  // Links that use a view transition (Sites → site page) animate through it, not this fade.
+  const viaTransition = (state as { viaTransition?: boolean } | null)?.viaTransition === true
 
   useEffect(() => startSmoothScroll(), [])
 
   // New page → start at the top (query-string changes, like selecting a site, keep the scroll).
-  useEffect(() => {
+  // Layout effect: runs before a view transition captures the new page.
+  useLayoutEffect(() => {
     jumpToTop()
   }, [pathname])
 
@@ -35,7 +38,7 @@ export default function AppShell() {
           {/* Opacity only: a transform here would break position: fixed inside pages while it runs. */}
           <motion.div
             key={pathname}
-            initial={{ opacity: 0 }}
+            initial={viaTransition ? false : { opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ duration: quick ? 0.15 : 0.4, ease: 'easeOut' }}
           >
