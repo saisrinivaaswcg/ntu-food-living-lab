@@ -11,8 +11,9 @@ import RecordTable from '../components/dashboard/RecordTable'
 import SeriesTable from '../components/dashboard/SeriesTable'
 import StatRow from '../components/dashboard/StatRow'
 import EmptyState from '../components/ui/EmptyState'
+import SlotImage from '../components/ui/SlotImage'
 import type { Column } from '../components/ui/SortableTable'
-import { destinationOptions } from '../data'
+import { destinationOptions, emptyGalleryImage } from '../data'
 import { useDashboard } from '../hooks/useDashboard'
 import { usePageTitle } from '../hooks/usePageTitle'
 import { downloadText, harvestsToCsv } from '../lib/csv'
@@ -217,7 +218,15 @@ export default function HarvestDashboardPage() {
             layout="stacked"
           >
             {view.photos.length === 0 ? (
-              <EmptyState title="No harvest photos in this period" detail={`Nothing was logged for ${scope}.`} />
+              <div className="grid items-center gap-6 sm:grid-cols-2">
+                <div className="relative aspect-[4/3] overflow-hidden rounded-2xl">
+                  <SlotImage slot={emptyGalleryImage} sizes="(min-width: 640px) 40vw, 100vw" />
+                </div>
+                <EmptyState
+                  title="No harvest photos in this period"
+                  detail={`Nothing was logged for ${scope}. Photos taken with the harvest form will appear here.`}
+                />
+              </div>
             ) : (
               <>
                 <HarvestGallery harvests={view.photos} />

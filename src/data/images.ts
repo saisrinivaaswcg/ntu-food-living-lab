@@ -1,20 +1,40 @@
 import type { SiteId } from '../types'
-import { sites } from './sites'
 
 /**
- * Every image slot in the app. Drop a file at `src` (under /public) and it appears;
- * until then the UI shows a labelled gradient placeholder, never a broken image.
- * Sizes and formats to provide: public/images/README.md.
+ * Every image slot in the app. Drop a file at `src` (under public/) and it appears; until then the
+ * UI shows a labelled gradient placeholder, never a broken image. Sizes and formats to provide:
+ * public/images/README.md.
+ *
+ * The current files are freely licensed photos from Wikimedia Commons (CC BY / CC BY-SA). Each one's
+ * source, author and licence are recorded in `credit`, shown on the photo and on /credits. To use your
+ * own photo, replace the file (same name) and set `credit` to undefined, or to your own credit.
  */
+
+export interface PhotoCredit {
+  /** Title of the original work */
+  title: string
+  author: string
+  /** Where the original lives (file page) */
+  sourceUrl: string
+  license: 'CC0' | 'CC BY 2.0' | 'CC BY 4.0' | 'CC BY-SA 2.0' | 'CC BY-SA 3.0' | 'CC BY-SA 4.0'
+  licenseUrl: string
+  /** What we changed, as CC licences ask */
+  changes: string
+}
+
 export interface ImageSlot {
-  /** Path under /public */
+  /** Path under public/ */
   src: string
-  /** Describes the intended photo; used as alt text, and as the placeholder's label */
+  /** Describes the photo; used as alt text, and as the placeholder's label */
   alt: string
   width: number
   height: number
   /** CSS object-position, to keep the subject in frame when cropped */
   focus?: string
+  /** Shown as a small "Representative photo" label: not the actual site or activity */
+  representative?: boolean
+  /** Present when the photo is someone else's licensed work */
+  credit?: PhotoCredit
 }
 
 export interface VideoSlot {
@@ -23,12 +43,25 @@ export interface VideoSlot {
   poster: ImageSlot
 }
 
+const CHANGES = 'Resized, cropped to fit and converted to WebP'
+const CC_BY_SA_4 = { license: 'CC BY-SA 4.0', licenseUrl: 'https://creativecommons.org/licenses/by-sa/4.0/' } as const
+const CC_BY_SA_3 = { license: 'CC BY-SA 3.0', licenseUrl: 'https://creativecommons.org/licenses/by-sa/3.0/' } as const
+const CC_BY_SA_2 = { license: 'CC BY-SA 2.0', licenseUrl: 'https://creativecommons.org/licenses/by-sa/2.0/' } as const
+
 export const exploreHeroImage: ImageSlot = {
   src: '/images/hero/explore-hero.jpg',
-  alt: 'Volunteers harvesting herbs from raised beds in a campus garden',
+  alt: 'A lush community herb garden in a Singapore estate, with a path winding between planted beds',
   width: 2400,
-  height: 1350,
+  height: 1800,
   focus: 'center',
+  representative: true,
+  credit: {
+    title: 'Community Garden in Jalan Senang Estate',
+    author: 'Wzhkevin',
+    sourceUrl: 'https://commons.wikimedia.org/wiki/File:Community_Garden_in_Jalan_Senang_Estate.jpg',
+    ...CC_BY_SA_4,
+    changes: CHANGES,
+  },
 }
 
 /** Optional. If the file exists it plays muted and looped behind the Explore headline. */
@@ -37,10 +70,156 @@ export const exploreHeroVideo: VideoSlot = {
   poster: exploreHeroImage,
 }
 
-/** One photo per site; alt text comes from the site record. */
-export const siteImages: Record<SiteId, ImageSlot> = Object.fromEntries(
-  sites.map((site) => [
-    site.id,
-    { src: `/images/sites/${site.id}.jpg`, alt: site.photoAlt, width: 1600, height: 1200, focus: 'center' },
-  ]),
-) as Record<SiteId, ImageSlot>
+/** One photo per site. All four are representative: no freely licensed photo of the beds themselves exists. */
+export const siteImages: Record<SiteId, ImageSlot> = {
+  'yunnan-culinary-trail': {
+    src: '/images/sites/yunnan-culinary-trail.jpg',
+    alt: 'Mature rain trees and lawns in Yunnan Garden, Nanyang Technological University',
+    width: 2400,
+    height: 1800,
+    focus: 'center',
+    representative: true,
+    credit: {
+      title: 'Yunnan Garden',
+      author: 'Jeslynn',
+      sourceUrl: 'https://commons.wikimedia.org/wiki/File:Yunnan_Garden.jpeg',
+      ...CC_BY_SA_4,
+      changes: CHANGES,
+    },
+  },
+  'hall-12-herb-spice': {
+    src: '/images/sites/hall-12-herb-spice.jpg',
+    alt: 'The entrance porch of Hall of Residence 12 at Nanyang Technological University',
+    width: 2272,
+    height: 1704,
+    focus: 'center 40%',
+    representative: true,
+    credit: {
+      title: 'NTU Hall 12',
+      author: 'Kimchi.sg',
+      sourceUrl: 'https://commons.wikimedia.org/wiki/File:NTU_Hall_12.jpg',
+      ...CC_BY_SA_3,
+      changes: CHANGES,
+    },
+  },
+  'earthlink-yunnan-corner': {
+    src: '/images/sites/earthlink-yunnan-corner.jpg',
+    alt: 'The Chinese Heritage Centre seen across the lawn of Yunnan Garden',
+    width: 2400,
+    height: 1800,
+    focus: 'center',
+    representative: true,
+    credit: {
+      title: 'Chinese Heritage Centre from Yunan Garden',
+      author: 'Jeslynn',
+      sourceUrl: 'https://commons.wikimedia.org/wiki/File:Chinese_Heritage_Centre_from_Yunan_Garden.jpeg',
+      ...CC_BY_SA_4,
+      changes: CHANGES,
+    },
+  },
+  'community-herb-garden': {
+    src: '/images/sites/community-herb-garden.jpg',
+    alt: 'Raised planting beds in a netted community garden beside housing blocks in Singapore',
+    width: 2400,
+    height: 1800,
+    focus: 'center 70%',
+    representative: true,
+    credit: {
+      title: 'Community garden at Fajar in Singapore',
+      author: 'Demaris99',
+      sourceUrl: 'https://commons.wikimedia.org/wiki/File:Community_garden_at_Fajar_in_Singapore.jpg',
+      ...CC_BY_SA_4,
+      changes: CHANGES,
+    },
+  },
+}
+
+/** Photos for the four log forms and the empty harvest-photo gallery. */
+export const logImages = {
+  harvest: {
+    src: '/images/log/harvest.jpg',
+    alt: 'Freshly harvested kangkong in a yellow colander',
+    width: 2048,
+    height: 1371,
+    focus: 'center',
+    credit: {
+      title: 'Harvested - Kangkong',
+      author: 'Alpha from Melbourne, Australia',
+      sourceUrl: 'https://commons.wikimedia.org/wiki/File:Harvested_-_Kangkong_(3446711239).jpg',
+      ...CC_BY_SA_2,
+      changes: CHANGES,
+    },
+  },
+  planting: {
+    src: '/images/log/planting.jpg',
+    alt: 'A farm worker transplanting choy sum seedlings from trays into a soil bed',
+    width: 2400,
+    height: 1800,
+    focus: 'center 60%',
+    credit: {
+      title: 'Transplanting choy sum seedlings onto soil bed at Zenxin Organic Park',
+      author: 'Wee Hong',
+      sourceUrl:
+        'https://commons.wikimedia.org/wiki/File:Transplanting_choy_sum_seedlings_onto_soil_bed_at_Zenxin_Organic_Park.jpg',
+      ...CC_BY_SA_4,
+      changes: CHANGES,
+    },
+  },
+  weekly: {
+    src: '/images/log/weekly.jpg',
+    alt: 'A green watering can pouring water in a garden',
+    width: 1600,
+    height: 2400,
+    focus: 'center 45%',
+    credit: {
+      title: 'Watering-can-green',
+      author: 'Kate Nielsen Photos',
+      sourceUrl: 'https://commons.wikimedia.org/wiki/File:Watering-can-green.jpg',
+      ...CC_BY_SA_3,
+      changes: CHANGES,
+    },
+  },
+  losses: {
+    src: '/images/log/losses.jpg',
+    alt: 'Green leaves with holes eaten by caterpillars',
+    width: 2400,
+    height: 1600,
+    focus: 'center',
+    credit: {
+      title: 'Kawakawa leaves with caterpillar damage March 2026',
+      author: 'Aaron.brunet',
+      sourceUrl: 'https://commons.wikimedia.org/wiki/File:Kawakawa_leaves_with_caterpillar_damage_March_2026.jpg',
+      ...CC_BY_SA_4,
+      changes: CHANGES,
+    },
+  },
+} satisfies Record<string, ImageSlot>
+
+export const emptyGalleryImage: ImageSlot = {
+  src: '/images/dashboard/gallery-empty.jpg',
+  alt: 'A clump of lemongrass growing in a tropical garden',
+  width: 2400,
+  height: 1800,
+  focus: 'center',
+  credit: {
+    title: 'Cymbopogon citratus lemongrass plant in garden',
+    author: 'Undeka 11',
+    sourceUrl: 'https://commons.wikimedia.org/wiki/File:Cymbopogon_citratus_lemongrass_plant_in_garden.jpg',
+    ...CC_BY_SA_4,
+    changes: CHANGES,
+  },
+}
+
+/** Every slot, for the Photo credits page. */
+export const allImageSlots: { use: string; slot: ImageSlot }[] = [
+  { use: 'Explore page header', slot: exploreHeroImage },
+  { use: 'Yunnan Garden Culinary Trail', slot: siteImages['yunnan-culinary-trail'] },
+  { use: 'Hall 12 Herb & Spice Garden', slot: siteImages['hall-12-herb-spice'] },
+  { use: "Earthlink's Yunnan Corner", slot: siteImages['earthlink-yunnan-corner'] },
+  { use: 'NTU Community Herb Garden', slot: siteImages['community-herb-garden'] },
+  { use: 'Log: harvest', slot: logImages.harvest },
+  { use: 'Log: planting', slot: logImages.planting },
+  { use: 'Log: weekly inputs', slot: logImages.weekly },
+  { use: 'Log: plant losses', slot: logImages.losses },
+  { use: 'Dashboard: empty photo gallery', slot: emptyGalleryImage },
+]

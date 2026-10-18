@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import { imageAsset, type ImageSlot } from '../../data'
+import PhotoCaption from './PhotoCaption'
 
 /** Placeholder tones, all from the palette. Pick one per slot so neighbouring cards differ. */
 const PLACEHOLDER_TONES = [
@@ -24,6 +25,8 @@ interface Props {
   labelAt?: 'bottom-left' | 'top-right'
   /** Extra classes for the placeholder, e.g. more padding when the slot is oversized for zooming. */
   placeholderClassName?: string
+  /** Credit and "Representative photo" chips. 'none' when the caller shows <PhotoCaption> itself (moving heroes). */
+  caption?: 'bottom' | 'top' | 'none'
   className?: string
 }
 
@@ -41,6 +44,7 @@ export default function SlotImage({
   sizes = '100vw',
   labelAt = 'bottom-left',
   placeholderClassName = '',
+  caption = 'bottom',
   className = '',
 }: Props) {
   const asset = imageAsset(slot.src)
@@ -98,6 +102,9 @@ export default function SlotImage({
           loaded ? 'opacity-100' : 'opacity-0'
         } ${zoom}`}
       />
+      {caption !== 'none' && (
+        <PhotoCaption slot={slot} className={`absolute inset-x-0 p-2 ${caption === 'top' ? 'top-0' : 'bottom-0'}`} />
+      )}
     </div>
   )
 }

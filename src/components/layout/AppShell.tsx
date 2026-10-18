@@ -5,6 +5,7 @@ import { Toaster } from 'sonner'
 import { jumpToTop } from '../../lib/smoothScroll'
 import BottomNav from './BottomNav'
 import DemoBanner from './DemoBanner'
+import Footer from './Footer'
 import PageLoading from './PageLoading'
 import TopNav from './TopNav'
 
@@ -31,7 +32,7 @@ export default function AppShell() {
       </a>
       <TopNav />
       <DemoBanner />
-      <main id="main" tabIndex={-1} className="flex-1 pb-[calc(5rem+env(safe-area-inset-bottom))] outline-none lg:pb-0">
+      <main id="main" tabIndex={-1} className="flex-1 outline-none">
         {/* Pages load as separate chunks; the nav and banner stay in place meanwhile. */}
         <Suspense fallback={<PageLoading />}>
           {/* Opacity only: a transform here would break position: fixed inside pages while it runs. */}
@@ -45,6 +46,7 @@ export default function AppShell() {
           </motion.div>
         </Suspense>
       </main>
+      <Footer />
       <BottomNav />
       {/* Save, undo and export confirmations. Sits above the phone tab bar. */}
       <Toaster

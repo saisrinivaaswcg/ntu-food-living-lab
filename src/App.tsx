@@ -4,6 +4,7 @@ import { createBrowserRouter, RouterProvider } from 'react-router-dom'
 import AppShell from './components/layout/AppShell'
 import {
   DashboardPage,
+  CreditsPage,
   ExplorePage,
   HarvestDashboardPage,
   LogFormPage,
@@ -27,6 +28,7 @@ const router = createBrowserRouter([
       { path: 'dashboard/planting', element: <PlantingDashboardPage /> },
       { path: 'sites', element: <SitesPage /> },
       { path: 'sites/:siteId', element: <SiteDetailPage /> },
+      { path: 'credits', element: <CreditsPage /> },
       { path: '*', element: <NotFoundPage /> },
     ],
   },

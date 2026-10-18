@@ -2,10 +2,11 @@ import { MapPin } from 'lucide-react'
 import { motion, useMotionValue, useReducedMotion, useScroll, useSpring, useTransform } from 'motion/react'
 import { useRef, type PointerEvent } from 'react'
 import { Link } from 'react-router-dom'
-import { siteImages, sites } from '../../data'
+import { imageAsset, siteImages, sites } from '../../data'
 import type { CropId, Site } from '../../types'
 import Breadcrumbs from '../layout/Breadcrumbs'
 import CountUp from '../ui/CountUp'
+import PhotoCaption from '../ui/PhotoCaption'
 import SlotImage from '../ui/SlotImage'
 import StatusBadge from '../ui/StatusBadge'
 import { sitePhotoTransitionName } from './siteTransitions'
@@ -88,12 +89,16 @@ export default function SiteHero({ site, growing }: Props) {
                 tone={index}
                 labelAt="top-right"
                 placeholderClassName="px-[8%] py-[7%]"
+                caption="none"
                 priority
               />
             </motion.div>
           </motion.div>
         </motion.div>
       </div>
+      {imageAsset(siteImages[site.id].src) && (
+        <PhotoCaption slot={siteImages[site.id]} className="absolute top-3 right-3 z-10 max-w-[60%]" />
+      )}
       <div className="absolute inset-0 -z-10 bg-linear-to-t from-ink/90 via-ink/50 to-ink/20" aria-hidden />
 
       <div className="mx-auto flex w-full max-w-7xl flex-1 flex-col px-4 pt-3 pb-8 lg:px-8 lg:pb-12">

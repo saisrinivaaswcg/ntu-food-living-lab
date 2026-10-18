@@ -1,5 +1,6 @@
 import { ClipboardList, Scale, Sprout, TriangleAlert, type LucideIcon } from 'lucide-react'
 import type { ComponentType } from 'react'
+import { logImages, type ImageSlot } from '../../data'
 import FailureForm from './FailureForm'
 import HarvestForm from './HarvestForm'
 import PlantingForm from './PlantingForm'
@@ -13,6 +14,8 @@ export interface LogFormKind {
   title: string
   description: string
   icon: LucideIcon
+  /** Photo shown on the Log page for this form */
+  image: ImageSlot
   Form: ComponentType
 }
 
@@ -23,6 +26,7 @@ export const logFormKinds: LogFormKind[] = [
     title: 'Harvest',
     description: 'Weight, where it went, time taken and a photo. Under a minute.',
     icon: Scale,
+    image: logImages.harvest,
     Form: HarvestForm,
   },
   {
@@ -30,6 +34,7 @@ export const logFormKinds: LogFormKind[] = [
     title: 'Planting',
     description: 'What went into which bed, how many and how it was propagated.',
     icon: Sprout,
+    image: logImages.planting,
     Form: PlantingForm,
   },
   {
@@ -37,6 +42,7 @@ export const logFormKinds: LogFormKind[] = [
     title: 'Weekly inputs',
     description: 'Water, compost and maintenance hours for the week. Once per site per week.',
     icon: ClipboardList,
+    image: logImages.weekly,
     Form: WeeklyInputForm,
   },
   {
@@ -44,6 +50,7 @@ export const logFormKinds: LogFormKind[] = [
     title: 'Failure',
     description: 'Plants lost to pests, disease or drought, so the next committee knows.',
     icon: TriangleAlert,
+    image: logImages.losses,
     Form: FailureForm,
   },
 ]

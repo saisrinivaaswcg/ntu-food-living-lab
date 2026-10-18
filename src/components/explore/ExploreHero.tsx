@@ -5,6 +5,7 @@ import { Link } from 'react-router-dom'
 import { crops, exploreHeroImage, exploreHeroVideo, imageAsset, sites, videoAsset } from '../../data'
 import { formatNumber } from '../../lib/format'
 import CountUp from '../ui/CountUp'
+import PhotoCaption from '../ui/PhotoCaption'
 import SlotImage from '../ui/SlotImage'
 
 const totalBeds = sites.reduce((n, s) => n + s.beds.length, 0)
@@ -48,7 +49,7 @@ export default function ExploreHero({ mapId }: { mapId: string }) {
         animate={{ scale: 1 }}
         transition={{ duration: 1.6, ease: EASE }}
       >
-        <SlotImage slot={exploreHeroImage} tone={0} labelAt="top-right" priority />
+        <SlotImage slot={exploreHeroImage} tone={0} labelAt="top-right" caption="none" priority />
         {videoSrc && !reduce && !videoFailed && (
           <video
             className="absolute inset-0 size-full object-cover"
@@ -63,6 +64,7 @@ export default function ExploreHero({ mapId }: { mapId: string }) {
           />
         )}
       </motion.div>
+      {imageAsset(exploreHeroImage.src) && <PhotoCaption slot={exploreHeroImage} className="absolute top-3 right-3 z-10" />}
       {/* Scrim so white text stays above 4.5:1 over any photo. */}
       <div className="absolute inset-0 -z-10 bg-linear-to-t from-ink/90 via-ink/55 to-ink/10" aria-hidden />
 
