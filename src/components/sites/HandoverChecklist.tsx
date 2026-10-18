@@ -34,7 +34,10 @@ export default function HandoverChecklist({ record }: { record: HandoverRecord }
         aria-valuemax={total}
         aria-valuenow={done}
       >
-        <div className="h-1.5 bg-brand-700 transition-[width] duration-500" style={{ width: `${(done / total) * 100}%` }} />
+        <div
+          className="h-1.5 origin-left bg-brand-700 transition-transform duration-500"
+          style={{ transform: `scaleX(${done / total})` }}
+        />
       </div>
       <ul className="mt-3 divide-y divide-line">
         {record.checklist.map((item) => {

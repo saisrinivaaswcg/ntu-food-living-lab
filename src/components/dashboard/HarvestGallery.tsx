@@ -78,7 +78,7 @@ export default function HarvestGallery({ harvests }: { harvests: HarvestLog[] })
         onClose={() => open && close()}
         onClick={(e) => e.target === e.currentTarget && close()}
         aria-label={open ? `Harvest photo: ${describe(open)}` : 'Harvest photo'}
-        className="m-auto w-[min(48rem,calc(100vw-2rem))] max-w-none overflow-hidden rounded-3xl bg-surface p-0 text-ink shadow-float backdrop:bg-ink/70 backdrop:backdrop-blur-sm"
+        className="m-auto w-[min(48rem,calc(100vw-2rem))] max-w-none overflow-hidden rounded-3xl bg-surface p-0 text-ink shadow-float backdrop:bg-ink/75"
       >
         {open && (
           <div>

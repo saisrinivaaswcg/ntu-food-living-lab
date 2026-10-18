@@ -1,7 +1,7 @@
-import { useReducedMotion } from 'motion/react'
 import { Bar, BarChart, CartesianGrid, ResponsiveContainer, Tooltip, XAxis, YAxis, type TooltipContentProps } from 'recharts'
 import { formatShortDate } from '../../lib/dates'
 import { formatNumber } from '../../lib/format'
+import { useChartAnimation } from './chartAnimation'
 
 interface Point {
   weekStart: string
@@ -24,7 +24,7 @@ const AXIS_TEXT = 'var(--color-ink-muted)'
 
 /** One bar per week, for counts (plantings). Bars grow in on first view. */
 export default function WeeklyCountChart({ data, valueKey, describe, ariaLabel }: Props) {
-  const reduce = useReducedMotion()
+  const animate = useChartAnimation()
 
   const renderTooltip = ({ active, payload }: TooltipContentProps) => {
     const point = active ? (payload?.[0]?.payload as Point | undefined) : undefined
@@ -67,7 +67,7 @@ export default function WeeklyCountChart({ data, valueKey, describe, ariaLabel }
             fill={COLOR}
             radius={[2, 2, 0, 0]}
             maxBarSize={28}
-            isAnimationActive={!reduce}
+            isAnimationActive={animate}
             animationDuration={800}
           />
         </BarChart>

@@ -60,6 +60,7 @@ Tick items here when a step is finished. Remove the `.gitkeep` from a folder onc
 - TypeScript strict, no `any`. Reuse types from `src/types` instead of redefining shapes.
 - Wrap every localStorage read and write in try/catch (see `logStore.ts`). Storage can be full, blocked or empty.
 - Dates are ISO strings (`YYYY-MM-DD`); weeks start on Monday. Demo logs cover 13 Jul – 14 Oct 2026 (`DEMO_DATA_PERIOD`). Default dashboard periods anchor on the latest logged date, not `new Date()`, so demo charts still look right after Oct 2026.
-- Photos: compress in the browser (canvas, longest side ≈1024px, JPEG quality ≈0.7) before storing as a data URL. localStorage holds about 5 MB.
-- Leaflet: import `leaflet/dist/leaflet.css` once (already in `index.css`); use `L.divIcon` or fix the default marker icon paths, because Vite breaks Leaflet's default icon URLs.
+- Site and hero photos live in `public/images/` (slots listed in `src/data/images.ts`). That folder is NOT Vite's raw public dir: photos go through vite-imagetools (resized WebP + blur-up preview, `src/data/imageAssets.ts`). Files to copy as-is (favicon) go in `static/` (`publicDir`).
+- Photos logged in forms: compress in the browser (canvas, longest side ≈1024px, JPEG quality ≈0.7) before storing as a data URL. localStorage holds about 5 MB.
+- Leaflet: import `leaflet/dist/leaflet.css` once (in `SiteMap.tsx`, so it ships with the lazily loaded map chunk); use `L.divIcon` or fix the default marker icon paths, because Vite breaks Leaflet's default icon URLs.
 - Run `npm run build` after each change set and fix every type error before finishing.

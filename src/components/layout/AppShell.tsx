@@ -1,7 +1,8 @@
 import { motion } from 'motion/react'
-import { Suspense, useEffect, useLayoutEffect } from 'react'
+import { Suspense, useLayoutEffect } from 'react'
 import { Outlet, useLocation } from 'react-router-dom'
-import { jumpToTop, startSmoothScroll } from '../../lib/smoothScroll'
+import { Toaster } from 'sonner'
+import { jumpToTop } from '../../lib/smoothScroll'
 import BottomNav from './BottomNav'
 import DemoBanner from './DemoBanner'
 import PageLoading from './PageLoading'
@@ -13,8 +14,6 @@ export default function AppShell() {
   const quick = pathname.startsWith('/log')
   // Links that use a view transition (Sites → site page) animate through it, not this fade.
   const viaTransition = (state as { viaTransition?: boolean } | null)?.viaTransition === true
-
-  useEffect(() => startSmoothScroll(), [])
 
   // New page → start at the top (query-string changes, like selecting a site, keep the scroll).
   // Layout effect: runs before a view transition captures the new page.
@@ -47,6 +46,19 @@ export default function AppShell() {
         </Suspense>
       </main>
       <BottomNav />
+      {/* Save, undo and export confirmations. Sits above the phone tab bar. */}
+      <Toaster
+        position="bottom-center"
+        offset={24}
+        mobileOffset={{ bottom: 'calc(4.5rem + env(safe-area-inset-bottom))' }}
+        toastOptions={{
+          classNames: {
+            toast: '!rounded-2xl !border-0 !bg-ink !text-canvas !shadow-float !font-sans',
+            description: '!text-canvas/80',
+            icon: '!text-brand-200',
+          },
+        }}
+      />
     </div>
   )
 }

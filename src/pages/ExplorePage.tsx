@@ -1,13 +1,13 @@
 import { AnimatePresence } from 'motion/react'
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
+import { lazy, Suspense, useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { useSearchParams } from 'react-router-dom'
 import ExploreHero from '../components/explore/ExploreHero'
 import MapLegend from '../components/explore/MapLegend'
 import PinEditor from '../components/explore/PinEditor'
 import SiteList from '../components/explore/SiteList'
-import SiteMap from '../components/explore/SiteMap'
 import SitePanel from '../components/explore/SitePanel'
 import Reveal from '../components/ui/Reveal'
+import Skeleton from '../components/ui/Skeleton'
 import { sites } from '../data'
 import { usePageTitle } from '../hooks/usePageTitle'
 import { findSite } from '../lib/lookups'
@@ -15,6 +15,9 @@ import { scrollToElement } from '../lib/smoothScroll'
 import type { SiteId } from '../types'
 
 const MAP_ID = 'map'
+
+// Leaflet loads in its own chunk, after the hero has painted.
+const SiteMap = lazy(() => import('../components/explore/SiteMap'))
 
 export default function ExplorePage() {
   usePageTitle('Explore')
@@ -42,6 +45,7 @@ export default function ExplorePage() {
   const selectedIndex = selected ? sites.findIndex((s) => s.id === selected.id) : -1
   const openerRef = useRef<HTMLElement | null>(null)
   const mapRef = useRef<HTMLDivElement>(null)
+  const [mapMoving, setMapMoving] = useState(false)
 
   const select = useCallback(
     (id: SiteId) => {
@@ -102,14 +106,25 @@ export default function ExplorePage() {
         </Reveal>
 
         <div ref={mapRef} className="relative mt-8 h-[68svh] min-h-80 scroll-mt-16 bg-sunken lg:h-[min(82vh,48rem)]">
-          <SiteMap
-            sites={mapSites}
-            selectedId={selected?.id ?? null}
-            onSelect={select}
-            onPinMove={editPins ? movePin : undefined}
-          />
+          <Suspense fallback={<Skeleton label="Loading map" className="size-full rounded-none" />}>
+            <SiteMap
+              sites={mapSites}
+              selectedId={selected?.id ?? null}
+              onSelect={select}
+              onPinMove={editPins ? movePin : undefined}
+              onMovingChange={setMapMoving}
+            />
+          </Suspense>
           <AnimatePresence>
-            {selected && <SitePanel key={selected.id} site={selected} index={selectedIndex} onClose={close} />}
+            {selected && (
+              <SitePanel
+                key={selected.id}
+                site={selected}
+                index={selectedIndex}
+                onClose={close}
+                mapMoving={mapMoving}
+              />
+            )}
           </AnimatePresence>
         </div>
       </section>

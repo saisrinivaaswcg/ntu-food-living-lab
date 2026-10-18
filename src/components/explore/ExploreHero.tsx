@@ -2,7 +2,7 @@ import { ArrowDown, ClipboardPen } from 'lucide-react'
 import { motion, useReducedMotion, useScroll, useTransform } from 'motion/react'
 import { useRef, useState } from 'react'
 import { Link } from 'react-router-dom'
-import { crops, exploreHeroImage, exploreHeroVideo, sites } from '../../data'
+import { crops, exploreHeroImage, exploreHeroVideo, imageAsset, sites, videoAsset } from '../../data'
 import { formatNumber } from '../../lib/format'
 import CountUp from '../ui/CountUp'
 import SlotImage from '../ui/SlotImage'
@@ -25,6 +25,9 @@ export default function ExploreHero({ mapId }: { mapId: string }) {
   const { scrollYProgress } = useScroll({ target: ref, offset: ['start start', 'end start'] })
   const imageY = useTransform(scrollYProgress, [0, 1], ['0%', '18%'])
   const [videoFailed, setVideoFailed] = useState(false)
+  // Only when the file exists (known at build time), so there is never a failed request.
+  const videoSrc = videoAsset(exploreHeroVideo.src)
+  const poster = imageAsset(exploreHeroVideo.poster.src)?.src
 
   // Staggered entrance for the text, skipped when motion is reduced.
   const enter = (delay: number) =>
@@ -46,11 +49,11 @@ export default function ExploreHero({ mapId }: { mapId: string }) {
         transition={{ duration: 1.6, ease: EASE }}
       >
         <SlotImage slot={exploreHeroImage} tone={0} labelAt="top-right" priority />
-        {!reduce && !videoFailed && (
+        {videoSrc && !reduce && !videoFailed && (
           <video
             className="absolute inset-0 size-full object-cover"
-            src={exploreHeroVideo.src}
-            poster={exploreHeroVideo.poster.src}
+            src={videoSrc}
+            poster={poster}
             autoPlay
             muted
             loop

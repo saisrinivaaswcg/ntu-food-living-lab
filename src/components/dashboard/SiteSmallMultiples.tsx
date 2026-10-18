@@ -1,9 +1,9 @@
-import { useReducedMotion } from 'motion/react'
 import { Area, AreaChart, ResponsiveContainer, Tooltip, XAxis, YAxis, type TooltipContentProps } from 'recharts'
 import { formatShortDate } from '../../lib/dates'
 import { formatNumber } from '../../lib/format'
 import { siteName } from '../../lib/lookups'
 import type { SiteWeeklyHarvest } from '../../lib/metrics'
+import { useChartAnimation } from './chartAnimation'
 
 const COLOR = 'var(--color-series-harvest)'
 const AXIS_TEXT = 'var(--color-ink-muted)'
@@ -16,7 +16,7 @@ type Point = SiteWeeklyHarvest['points'][number]
  * chart: each site reads on its own, and the shared y-axis keeps them comparable.
  */
 export default function SiteSmallMultiples({ series }: { series: SiteWeeklyHarvest[] }) {
-  const reduce = useReducedMotion()
+  const animate = useChartAnimation()
   const maxKg = Math.max(0.1, ...series.flatMap((s) => s.points.map((p) => p.kg)))
   const grandTotal = series.reduce((a, s) => a + s.totalKg, 0)
 
@@ -73,7 +73,7 @@ export default function SiteSmallMultiples({ series }: { series: SiteWeeklyHarve
                   fillOpacity={0.1}
                   dot={false}
                   activeDot={{ r: 5, fill: COLOR, stroke: 'var(--color-canvas)', strokeWidth: 2 }}
-                  isAnimationActive={!reduce}
+                  isAnimationActive={animate}
                   animationDuration={900}
                 />
               </AreaChart>

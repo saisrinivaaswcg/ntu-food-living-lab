@@ -32,7 +32,13 @@ export default function SiteRow({ site, index, growing }: Props) {
           className={`relative block aspect-[16/10] overflow-hidden rounded-2xl shadow-float lg:col-span-7 ${flip ? 'lg:order-2' : ''}`}
           style={{ viewTransitionName: sitePhotoTransitionName(site.id) }}
         >
-          <SlotImage slot={siteImages[site.id]} title={site.shortName} tone={index} zoomOnHover />
+          <SlotImage
+            slot={siteImages[site.id]}
+            title={site.shortName}
+            tone={index}
+            zoomOnHover
+            sizes="(min-width: 1024px) 58vw, 100vw"
+          />
         </span>
 
         <span className={`block lg:col-span-5 ${flip ? 'lg:order-1' : ''}`}>

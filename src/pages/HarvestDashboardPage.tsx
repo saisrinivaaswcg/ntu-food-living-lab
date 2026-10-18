@@ -1,15 +1,14 @@
 import { useMemo } from 'react'
 import BarList from '../components/dashboard/BarList'
 import ChartFigure from '../components/dashboard/ChartFigure'
-import CropBarChart from '../components/dashboard/CropBarChart'
 import DashboardHeader from '../components/dashboard/DashboardHeader'
 import DashboardSection from '../components/dashboard/DashboardSection'
+import { CropBarChart, SiteSmallMultiples } from '../components/dashboard/lazyCharts'
 import HarvestGallery from '../components/dashboard/HarvestGallery'
 import NoLogsNotice from '../components/dashboard/NoLogsNotice'
 import PhotoThumb from '../components/dashboard/PhotoThumb'
 import RecordTable from '../components/dashboard/RecordTable'
 import SeriesTable from '../components/dashboard/SeriesTable'
-import SiteSmallMultiples from '../components/dashboard/SiteSmallMultiples'
 import StatRow from '../components/dashboard/StatRow'
 import EmptyState from '../components/ui/EmptyState'
 import type { Column } from '../components/ui/SortableTable'
@@ -28,6 +27,7 @@ import {
   newestFirst,
   weeklyHarvestBySite,
 } from '../lib/metrics'
+import { notifyExported } from '../lib/notify'
 import type { HarvestLog } from '../types'
 
 const destinationLabel = (value: HarvestLog['destination']) =>
@@ -78,8 +78,10 @@ export default function HarvestDashboardPage() {
   const { summary } = view
   const none = filtered.harvests.length === 0
 
-  const exportCsv = () =>
+  const exportCsv = () => {
     downloadText(`ntu-harvests_${dash.periodKey}_${site}_${period.end}.csv`, harvestsToCsv(filtered.harvests))
+    notifyExported(filtered.harvests.length, 'harvests')
+  }
 
   const headline = !dash.hasAnyLogs
     ? 'Harvest dashboard'

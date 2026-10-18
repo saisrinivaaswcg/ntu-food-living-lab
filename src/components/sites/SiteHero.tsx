@@ -20,7 +20,7 @@ interface Props {
 }
 
 /**
- * Full-width "living" photo of the site: a slow Ken Burns zoom, parallax as the page scrolls, and on
+ * Full-width "living" photo of the site: one slow Ken Burns zoom (not looped, so the GPU rests after), parallax as the page scrolls, and on
  * desktop a slight drift with the mouse. Name, status and key numbers sit over a dark gradient.
  * All motion is off when the device asks for reduced motion.
  */
@@ -81,7 +81,7 @@ export default function SiteHero({ site, growing }: Props) {
             <motion.div
               className="absolute inset-0"
               animate={reduce ? undefined : { scale: [1, 1.1] }}
-              transition={{ duration: 24, ease: 'linear', repeat: Infinity, repeatType: 'reverse' }}
+              transition={{ duration: 18, ease: 'easeOut' }}
             >
               <SlotImage
                 slot={siteImages[site.id]}

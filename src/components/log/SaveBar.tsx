@@ -19,7 +19,7 @@ export default function SaveBar({ label, missing, error }: Props) {
       : missing.join(', ')
 
   return (
-    <div className="sticky bottom-[calc(4rem+env(safe-area-inset-bottom))] z-30 -mx-4 mt-2 border-t border-line bg-surface/90 px-4 py-3 backdrop-blur-md lg:bottom-4 lg:mx-0 lg:rounded-2xl lg:border-0 lg:shadow-float">
+    <div className="sticky bottom-[calc(4rem+env(safe-area-inset-bottom))] z-30 -mx-4 mt-2 border-t border-line bg-surface px-4 py-3 lg:bottom-4 lg:mx-0 lg:rounded-2xl lg:border-0 lg:shadow-float">
       {error && (
         <p role="alert" className="mb-2 rounded-sm bg-danger-bg px-3 py-2 text-sm font-medium text-danger">
           {error}

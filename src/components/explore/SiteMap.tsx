@@ -1,6 +1,8 @@
 import L from 'leaflet'
+// Leaflet's CSS travels with the map chunk, so pages without a map don't load it.
+import 'leaflet/dist/leaflet.css'
 import { useEffect, useMemo, useState } from 'react'
-import { MapContainer, Marker, TileLayer, useMap } from 'react-leaflet'
+import { MapContainer, Marker, TileLayer, useMap, useMapEvents } from 'react-leaflet'
 import { CAMPUS_MAP_VIEW, siteStatusLabels } from '../../data'
 import type { Site, SiteId, SiteStatus } from '../../types'
 import { statusDotClass } from '../ui/statusStyles'
@@ -18,7 +20,7 @@ import MapZoomControls from './MapZoomControls'
 const ONEMAP_HD_TILES = 'https://www.onemap.gov.sg/maps/tiles/Default_HD/{z}/{x}/{y}.png'
 const onemapFallbackUrl = ({ x, y, z }: L.Coords) => `https://www.onemap.gov.sg/maps/tiles/Default/${z}/${x}/${y}.png`
 const ONEMAP_ATTRIBUTION =
-  '<img src="https://www.onemap.gov.sg/web-assets/images/logo/om_logo.png" style="height:20px;width:20px;"/>&nbsp;<a href="https://www.onemap.gov.sg/" target="_blank" rel="noopener noreferrer">OneMap</a>&nbsp;&copy;&nbsp;contributors&nbsp;&#124;&nbsp;<a href="https://www.sla.gov.sg/" target="_blank" rel="noopener noreferrer">Singapore Land Authority</a>'
+  '<img src="https://www.onemap.gov.sg/web-assets/images/logo/om_logo.png" alt="OneMap logo" style="height:20px;width:20px;"/>&nbsp;<a href="https://www.onemap.gov.sg/" target="_blank" rel="noopener noreferrer">OneMap</a>&nbsp;&copy;&nbsp;contributors&nbsp;&#124;&nbsp;<a href="https://www.sla.gov.sg/" target="_blank" rel="noopener noreferrer">Singapore Land Authority</a>'
 
 const ESRI_TILES = 'https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}'
 const ESRI_ATTRIBUTION =
@@ -53,6 +55,14 @@ interface Props {
   onSelect: (id: SiteId) => void
   /** Pin-placement mode (/?editPins=1): markers can be dragged. */
   onPinMove?: (id: SiteId, coordinates: [number, number]) => void
+  /** Called when the map starts and stops moving (pan, zoom, fly-to). */
+  onMovingChange?: (moving: boolean) => void
+}
+
+/** Reports when the map is moving, so overlays can drop expensive effects meanwhile. */
+function MovementWatcher({ onChange }: { onChange: (moving: boolean) => void }) {
+  useMapEvents({ movestart: () => onChange(true), moveend: () => onChange(false) })
+  return null
 }
 
 /**
@@ -60,14 +70,18 @@ interface Props {
  * Colour = site status; the selected site gets a larger marker with a ring. White outline + dark shadow keep
  * markers readable on both the light map and the satellite imagery.
  */
+/** Marker tap target, in px (WCAG / Lighthouse target size). */
+const MARKER_HIT = 48
+
 function markerIcon(status: SiteStatus, selected: boolean): L.DivIcon {
-  const size = selected ? 44 : 32
+  // The visible pin is 32px (44px when selected); the tap target around it is always 48px.
+  const pin = selected ? 'size-11' : 'size-8'
   const ring = selected ? 'ring-4 ring-white/70' : ''
   return L.divIcon({
     className: 'site-marker',
-    iconSize: [size, size],
-    iconAnchor: [size / 2, size / 2],
-    html: `<span class="flex size-full items-center justify-center rounded-full border-[3px] border-white shadow-[0_1px_3px_rgb(0_0_0/0.45),0_4px_12px_rgb(0_0_0/0.35)] ${statusDotClass[status]} ${ring}"><span class="size-2.5 rounded-full bg-white"></span></span>`,
+    iconSize: [MARKER_HIT, MARKER_HIT],
+    iconAnchor: [MARKER_HIT / 2, MARKER_HIT / 2],
+    html: `<span class="flex size-full items-center justify-center"><span class="flex ${pin} items-center justify-center rounded-full border-[3px] border-white shadow-[0_1px_3px_rgb(0_0_0/0.45),0_4px_12px_rgb(0_0_0/0.35)] ${statusDotClass[status]} ${ring}"><span class="size-2.5 rounded-full bg-white"></span></span></span>`,
   })
 }
 
@@ -99,7 +113,7 @@ function FocusSelected({ site }: { site: Site | undefined }) {
   return null
 }
 
-export default function SiteMap({ sites, selectedId, onSelect, onPinMove }: Props) {
+export default function SiteMap({ sites, selectedId, onSelect, onPinMove, onMovingChange }: Props) {
   const icons = useMemo(() => {
     const make = (selected: boolean) =>
       Object.fromEntries(
@@ -168,6 +182,7 @@ export default function SiteMap({ sites, selectedId, onSelect, onPinMove }: Prop
           )
         })}
         <MapZoomControls />
+        {onMovingChange && <MovementWatcher onChange={onMovingChange} />}
         <FocusSelected site={selectedSite} />
       </MapContainer>
 

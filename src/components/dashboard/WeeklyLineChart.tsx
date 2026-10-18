@@ -1,8 +1,8 @@
-import { useReducedMotion } from 'motion/react'
 import { Area, AreaChart, CartesianGrid, LabelList, ResponsiveContainer, Tooltip, XAxis, YAxis, type TooltipContentProps } from 'recharts'
 import { formatShortDate } from '../../lib/dates'
 import { formatCompact, formatNumber } from '../../lib/format'
 import type { WeekPoint } from '../../lib/metrics'
+import { useChartAnimation } from './chartAnimation'
 
 interface Props {
   data: WeekPoint[]
@@ -36,7 +36,7 @@ interface LabelProps {
  * Direct labels on the peak and the latest week only, instead of a legend.
  */
 export default function WeeklyLineChart({ data, valueKey, unit, decimals, color, ariaLabel, missingLabel }: Props) {
-  const reduce = useReducedMotion()
+  const animate = useChartAnimation()
   const values = data.map((d) => d[valueKey])
   let lastIndex = -1
   let peakIndex = -1
@@ -114,7 +114,7 @@ export default function WeeklyLineChart({ data, valueKey, unit, decimals, color,
             connectNulls={false}
             dot={{ r: 3, fill: color, stroke: SURFACE, strokeWidth: 2 }}
             activeDot={{ r: 6, fill: color, stroke: SURFACE, strokeWidth: 2 }}
-            isAnimationActive={!reduce}
+            isAnimationActive={animate}
             animationDuration={900}
           >
             <LabelList dataKey={valueKey} content={renderLabel} />

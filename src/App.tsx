@@ -1,3 +1,4 @@
+import { SpeedInsights } from '@vercel/speed-insights/react'
 import { MotionConfig } from 'motion/react'
 import { createBrowserRouter, RouterProvider } from 'react-router-dom'
 import AppShell from './components/layout/AppShell'
@@ -36,6 +37,8 @@ export default function App() {
     // reducedMotion="user": every motion component follows the device's reduce-motion setting.
     <MotionConfig reducedMotion="user">
       <RouterProvider router={router} />
+      {/* Real-user Core Web Vitals, only on Vercel deployments (its script exists nowhere else). */}
+      {__ON_VERCEL__ && <SpeedInsights />}
     </MotionConfig>
   )
 }

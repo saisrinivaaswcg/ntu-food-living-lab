@@ -1,4 +1,3 @@
-import { useReducedMotion } from 'motion/react'
 import {
   Bar,
   BarChart,
@@ -13,6 +12,7 @@ import {
 import { formatNumber } from '../../lib/format'
 import { cropName } from '../../lib/lookups'
 import type { CropId } from '../../types'
+import { useChartAnimation } from './chartAnimation'
 
 interface Row {
   cropId: CropId
@@ -27,7 +27,7 @@ const ROW_HEIGHT = 36
 
 /** Horizontal bars (crop names stay readable on a phone), sorted largest first. */
 export default function CropBarChart({ data }: { data: Row[] }) {
-  const reduce = useReducedMotion()
+  const animate = useChartAnimation()
   const rows = data.map((d) => ({ ...d, name: cropName(d.cropId) }))
   const total = data.reduce((a, d) => a + d.kg, 0)
   const maxKg = Math.max(0, ...data.map((d) => d.kg))
@@ -64,7 +64,7 @@ export default function CropBarChart({ data }: { data: Row[] }) {
             axisLine={false}
           />
           <Tooltip content={renderTooltip} cursor={{ fill: 'var(--color-sunken)' }} />
-          <Bar dataKey="kg" barSize={20} radius={[0, 2, 2, 0]} isAnimationActive={!reduce} animationDuration={900}>
+          <Bar dataKey="kg" barSize={20} radius={[0, 2, 2, 0]} isAnimationActive={animate} animationDuration={900}>
             {rows.map((r) => (
               <Cell key={r.cropId} fill={r.kg === maxKg ? HIGHLIGHT : MUTED} />
             ))}

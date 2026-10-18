@@ -3,16 +3,15 @@ import ChartFigure from '../components/dashboard/ChartFigure'
 import CompletenessGrid from '../components/dashboard/CompletenessGrid'
 import CompletenessSummary from '../components/dashboard/CompletenessSummary'
 import CostTable from '../components/dashboard/CostTable'
-import CropBarChart from '../components/dashboard/CropBarChart'
 import DashboardHeader from '../components/dashboard/DashboardHeader'
 import DashboardSection from '../components/dashboard/DashboardSection'
+import { CropBarChart, WeeklyLineChart } from '../components/dashboard/lazyCharts'
 import EfficiencyTable from '../components/dashboard/EfficiencyTable'
 import HeadlineNumbers from '../components/dashboard/HeadlineNumbers'
 import Leaderboard from '../components/dashboard/Leaderboard'
 import NoLogsNotice from '../components/dashboard/NoLogsNotice'
 import SeriesTable from '../components/dashboard/SeriesTable'
 import SiteComparison from '../components/dashboard/SiteComparison'
-import WeeklyLineChart from '../components/dashboard/WeeklyLineChart'
 import EmptyState from '../components/ui/EmptyState'
 import { costAssumptions, PRICE_SURVEY_DATE, supermarketPrices } from '../data'
 import { useDashboard } from '../hooks/useDashboard'
@@ -35,6 +34,7 @@ import {
   sitesWithHarvests,
   weeklySeries,
 } from '../lib/metrics'
+import { notifyExported } from '../lib/notify'
 
 /** Public dashboard: the overview. All numbers come from lib/metrics; this page only arranges them. */
 export default function DashboardPage() {
@@ -63,8 +63,10 @@ export default function DashboardPage() {
     }
   }, [logs, p, filtered, siteIds])
 
-  const exportCsv = () =>
+  const exportCsv = () => {
     downloadText(`ntu-harvests_${dash.periodKey}_${site}_${p.end}.csv`, harvestsToCsv(filtered.harvests))
+    notifyExported(filtered.harvests.length, 'harvests')
+  }
 
   const noHarvests = filtered.harvests.length === 0
   const noWeekly = filtered.weeklyInputs.length === 0

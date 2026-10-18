@@ -1,9 +1,8 @@
 import { StrictMode } from 'react'
 import { createRoot } from 'react-dom/client'
-// Self-hosted fonts: Newsreader (headings, big numbers; with optical sizes) and Public Sans (text).
-import '@fontsource-variable/newsreader/opsz.css'
+// Self-hosted fonts: Newsreader (headings, big numbers) and Public Sans (text). Weight axis only, to keep them small.
+import '@fontsource-variable/newsreader/wght.css'
 import '@fontsource-variable/public-sans/wght.css'
-import 'lenis/dist/lenis.css'
 import './index.css'
 import App from './App.tsx'
 

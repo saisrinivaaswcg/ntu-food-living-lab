@@ -1,5 +1,7 @@
 import { useInView } from 'motion/react'
-import { useId, useRef, useState, type ReactNode } from 'react'
+import { startTransition, Suspense, useEffect, useId, useRef, useState, type ReactNode } from 'react'
+import Skeleton from '../ui/Skeleton'
+import { ChartAnimationContext } from './chartAnimation'
 
 interface Props {
   title: string
@@ -19,14 +21,26 @@ interface Props {
 }
 
 /**
- * A chart with an optional table twin, a plain-language summary and a source line. The chart mounts
- * when it scrolls into view, so its entrance animation plays where it can be seen.
+ * A chart with an optional table twin, a plain-language summary and a source line. The chart (and the
+ * charting library) loads when it scrolls into view, as a low-priority render so it never delays a tap,
+ * and its entrance animation plays once — not again when switching back from the table.
  */
 export default function ChartFigure({ title, subtitle, summary, source, chart, table, empty, minHeight = '16rem' }: Props) {
   const [view, setView] = useState<'chart' | 'table'>('chart')
   const headingId = useId()
   const ref = useRef<HTMLDivElement>(null)
-  const inView = useInView(ref, { once: true, amount: 0.25 })
+  const inView = useInView(ref, { once: true, amount: 0.25, margin: '0px 0px 200px 0px' })
+  const [mounted, setMounted] = useState(false)
+  const [animate, setAnimate] = useState(true)
+  useEffect(() => {
+    if (inView) startTransition(() => setMounted(true))
+  }, [inView])
+
+  function show(next: 'chart' | 'table') {
+    // After the first showing, the chart appears without replaying its animation.
+    if (next === 'table') setAnimate(false)
+    setView(next)
+  }
 
   return (
     <figure aria-labelledby={headingId} className="min-w-0">
@@ -44,7 +58,7 @@ export default function ChartFigure({ title, subtitle, summary, source, chart, t
                 key={v}
                 type="button"
                 aria-pressed={view === v}
-                onClick={() => setView(v)}
+                onClick={() => show(v)}
                 className={`min-h-12 min-w-16 px-3 text-sm font-medium capitalize transition-colors ${
                   view === v ? 'bg-ink text-canvas' : 'text-ink-muted hover:bg-sunken hover:text-ink'
                 }`}
@@ -55,8 +69,19 @@ export default function ChartFigure({ title, subtitle, summary, source, chart, t
           </div>
         )}
       </div>
-      <div ref={ref} style={empty || inView ? undefined : { minHeight }}>
-        {empty ?? (view === 'table' && table ? table : inView ? chart : null)}
+      <div ref={ref} style={empty || mounted ? undefined : { minHeight }}>
+        {empty ??
+          (view === 'table' && table ? (
+            table
+          ) : mounted ? (
+            <ChartAnimationContext.Provider value={animate}>
+              <Suspense fallback={<Skeleton label={`Loading ${title}`} className="w-full" style={{ height: minHeight }} />}>
+                {chart}
+              </Suspense>
+            </ChartAnimationContext.Provider>
+          ) : (
+            <Skeleton label={`Loading ${title}`} className="w-full" style={{ height: minHeight }} />
+          ))}
       </div>
       {!empty && (
         <figcaption className="mt-4 border-t border-line pt-3 text-sm">

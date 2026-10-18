@@ -16,6 +16,8 @@ interface Props {
   /** Position in the site list, so the placeholder tone matches the site's card. */
   index: number
   onClose: () => void
+  /** While the map pans or flies, the panel drops its blur and uses a solid background. */
+  mapMoving: boolean
 }
 
 /** Dragging the sheet down this far (px), or flicking it this fast (px/s), closes it. */
@@ -38,7 +40,7 @@ const item: Variants = {
  * A floating, frosted panel. Desktop: inset from the map's right edge, springs in from the side.
  * Phones: a bottom sheet above the tab bar; drag the handle down (or use the close button) to close.
  */
-export default function SitePanel({ site, index, onClose }: Props) {
+export default function SitePanel({ site, index, onClose, mapMoving }: Props) {
   const { logs } = useLogs()
   const growing = useMemo(() => cropsCurrentlyGrowing(logs, site), [logs, site])
   const headingRef = useRef<HTMLHeadingElement>(null)
@@ -67,7 +69,6 @@ export default function SitePanel({ site, index, onClose }: Props) {
   return (
     <motion.aside
       aria-labelledby={headingId}
-      data-lenis-prevent
       variants={panel}
       initial="hidden"
       animate="shown"
@@ -79,7 +80,9 @@ export default function SitePanel({ site, index, onClose }: Props) {
       dragConstraints={{ top: 0, bottom: 0 }}
       dragElastic={{ top: 0, bottom: 0.6 }}
       onDragEnd={onDragEnd}
-      className="fixed inset-x-0 bottom-[calc(4rem+env(safe-area-inset-bottom))] z-40 flex max-h-[55dvh] flex-col overflow-hidden rounded-t-3xl bg-surface/85 shadow-[0_-12px_48px_-12px_rgb(19_36_27/0.35)] backdrop-blur-xl backdrop-saturate-150 lg:absolute lg:inset-x-auto lg:top-6 lg:right-6 lg:bottom-10 lg:z-[600] lg:max-h-none lg:w-[26rem] lg:rounded-3xl lg:shadow-[0_32px_80px_-24px_rgb(19_36_27/0.45),0_12px_32px_-16px_rgb(19_36_27/0.25)]"
+      className={`fixed inset-x-0 bottom-[calc(4rem+env(safe-area-inset-bottom))] z-40 flex max-h-[55dvh] flex-col overflow-hidden rounded-t-3xl bg-surface shadow-[0_-12px_48px_-12px_rgb(19_36_27/0.35)] lg:absolute lg:inset-x-auto lg:top-6 lg:right-6 lg:bottom-10 lg:z-[600] lg:max-h-none lg:w-[26rem] lg:rounded-3xl lg:shadow-[0_32px_80px_-24px_rgb(19_36_27/0.45),0_12px_32px_-16px_rgb(19_36_27/0.25)] ${
+        mapMoving ? 'lg:bg-surface/95' : 'lg:bg-surface/85 lg:backdrop-blur-md'
+      }`}
     >
       {/* Phones: the handle starts the swipe-down; the close button is the non-gesture way out. */}
       <div
@@ -96,7 +99,7 @@ export default function SitePanel({ site, index, onClose }: Props) {
           onPointerDown={(e) => sheetDrag && dragControls.start(e)}
           className="relative aspect-[21/9] touch-none overflow-hidden rounded-2xl lg:aspect-[16/10] lg:touch-auto"
         >
-          <SlotImage slot={siteImages[site.id]} tone={index} />
+          <SlotImage slot={siteImages[site.id]} tone={index} sizes="(min-width: 1024px) 26rem, 100vw" />
           {/* Soft fade at the bottom so the photo melts into the panel. */}
           <div className="absolute inset-x-0 bottom-0 h-1/3 bg-linear-to-t from-surface/70 to-transparent" aria-hidden />
           <button
@@ -104,7 +107,7 @@ export default function SitePanel({ site, index, onClose }: Props) {
             onClick={onClose}
             onPointerDown={(e) => e.stopPropagation()}
             aria-label={`Close ${site.name} details`}
-            className="absolute top-2 right-2 flex size-12 items-center justify-center rounded-full bg-surface/85 text-ink shadow-float backdrop-blur transition-[background-color,transform] hover:scale-105 hover:bg-surface active:scale-95"
+            className="absolute top-2 right-2 flex size-12 items-center justify-center rounded-full bg-surface/95 text-ink shadow-float transition-[background-color,transform] hover:scale-105 hover:bg-surface active:scale-95"
           >
             <X className="size-5" aria-hidden />
           </button>

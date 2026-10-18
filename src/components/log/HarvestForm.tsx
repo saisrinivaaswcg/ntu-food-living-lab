@@ -5,6 +5,7 @@ import { formatDate, todayISO } from '../../lib/dates'
 import { focusFirstIssue, issueMessage, parseDecimal, type FieldIssue } from '../../lib/forms'
 import { addLog, removeUserLog, type NewLog } from '../../lib/logStore'
 import { cropName, getBed, siteName } from '../../lib/lookups'
+import { notifySaved, notifyUndone } from '../../lib/notify'
 import { setLastSiteId } from '../../lib/preferences'
 import { checkDate, checkNumber } from '../../lib/validation'
 import type { HarvestDestination } from '../../types'
@@ -93,6 +94,7 @@ export default function HarvestForm() {
     setLastSiteId(loc.siteId)
     setSaveError(null)
     setUndone(false)
+    notifySaved('Harvest')
     setSaved({ id: result.id, record })
   }
 
@@ -129,6 +131,7 @@ export default function HarvestForm() {
           removeUserLog('harvests', saved.id)
           setSaved(null)
           setUndone(true)
+          notifyUndone('Harvest')
         }}
       />
     )

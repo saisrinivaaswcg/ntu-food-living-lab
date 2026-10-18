@@ -37,7 +37,13 @@ export default function SiteList({ sites, selectedId, onSelect }: Props) {
                   selected ? 'ring-3 ring-brand-700' : ''
                 }`}
               >
-                <SlotImage slot={siteImages[site.id]} title={site.shortName} tone={i} zoomOnHover />
+                <SlotImage
+                  slot={siteImages[site.id]}
+                  title={site.shortName}
+                  tone={i}
+                  zoomOnHover
+                  sizes="(min-width: 1024px) 25vw, (min-width: 640px) 50vw, 80vw"
+                />
               </span>
               <span className="mt-3 flex items-start justify-between gap-3">
                 <span className="font-display text-xl leading-snug font-medium decoration-brand-700 decoration-2 underline-offset-4 group-hover:underline">

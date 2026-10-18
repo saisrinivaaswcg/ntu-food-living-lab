@@ -4,31 +4,38 @@ import { useState } from 'react'
 import { Link, NavLink } from 'react-router-dom'
 import { navItems } from './navItems'
 
-/** Sticky header; it tightens and gains a shadow once the page scrolls. */
+/**
+ * Sticky header. Once the page scrolls it tightens: the subtitle fades, the logo mark scales down and a
+ * shadow fades in. Only opacity and transform change, so scrolling never triggers layout.
+ */
 export default function TopNav() {
   const { scrollY } = useScroll()
   const [scrolled, setScrolled] = useState(false)
-  useMotionValueEvent(scrollY, 'change', (y) => setScrolled(y > 24))
+  // Motion value, not a scroll listener: React state changes only when the threshold is crossed.
+  useMotionValueEvent(scrollY, 'change', (y) => {
+    const next = y > 24
+    if (next !== scrolled) setScrolled(next)
+  })
 
   return (
-    <header
-      className={`sticky top-0 z-[1000] border-b bg-surface/95 backdrop-blur transition-[box-shadow,border-color] duration-300 ${
-        scrolled ? 'border-transparent shadow-float' : 'border-line'
-      }`}
-    >
-      <div
-        className={`mx-auto flex max-w-7xl items-center justify-between gap-4 px-4 transition-[height] duration-300 lg:px-8 ${
-          scrolled ? 'h-14' : 'h-14 lg:h-20'
-        }`}
-      >
+    <header className="sticky top-0 z-[1000] border-b border-line bg-surface">
+      <span
+        className={`pointer-events-none absolute inset-0 shadow-float transition-opacity duration-300 ${scrolled ? 'opacity-100' : 'opacity-0'}`}
+        aria-hidden
+      />
+      <div className="relative mx-auto flex h-14 max-w-7xl items-center justify-between gap-4 px-4 lg:h-16 lg:px-8">
         <Link to="/" className="group flex min-h-12 items-center gap-2.5 text-ink">
-          <span className="flex size-9 items-center justify-center rounded-sm bg-brand-700 text-white transition-transform duration-300 group-hover:-rotate-6">
+          <span
+            className={`flex size-9 items-center justify-center rounded-sm bg-brand-700 text-white transition-transform duration-300 group-hover:-rotate-6 ${
+              scrolled ? 'scale-90' : 'scale-100'
+            }`}
+          >
             <Leaf className="size-5" aria-hidden />
           </span>
           <span className="leading-tight">
             <span className="font-display text-lg font-medium">NTU Food Living Lab</span>
             <span
-              className={`hidden text-xs text-ink-muted transition-opacity duration-300 sm:block ${scrolled ? 'lg:hidden' : ''}`}
+              className={`hidden text-xs text-ink-muted transition-opacity duration-300 sm:block ${scrolled ? 'opacity-0' : 'opacity-100'}`}
             >
               Campus Food Systems
             </span>
@@ -43,7 +50,7 @@ export default function TopNav() {
                   to={to}
                   end={end}
                   className={({ isActive }) =>
-                    `group relative flex min-h-12 items-center px-3 font-medium transition-colors ${
+                    `group relative flex min-h-12 items-center px-3 font-medium ${
                       isActive ? 'text-ink' : 'text-ink-muted hover:text-ink'
                     }`
                   }
@@ -66,7 +73,7 @@ export default function TopNav() {
             <li className="ml-2">
               <Link
                 to="/log/harvest"
-                className="inline-flex min-h-12 items-center rounded-sm bg-accent px-4 font-semibold text-white transition-[background-color,transform] hover:-translate-y-0.5 hover:bg-accent-strong active:translate-y-0"
+                className="inline-flex min-h-12 items-center rounded-sm bg-accent px-4 font-semibold text-white transition-transform hover:-translate-y-0.5 hover:bg-accent-strong active:translate-y-0"
               >
                 Log a harvest
               </Link>

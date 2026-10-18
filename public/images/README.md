@@ -1,6 +1,9 @@
 # Image slots
 
 Drop files here with these exact names. Anything missing shows a labelled gradient placeholder.
+At build time each photo is resized to WebP at several widths (480–2400 px, never upscaled) with a tiny blurred
+preview for blur-up loading (vite-imagetools, `src/data/imageAssets.ts`). Give the largest size you have; JPEG or PNG.
+After adding a file while `npm run dev` is running, reload the page.
 The list of slots (paths, alt text, crop focus) lives in `src/data/images.ts`.
 
 | File | Size (px) | Ratio | Format | Max file size | Shown on |

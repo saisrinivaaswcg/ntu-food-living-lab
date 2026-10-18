@@ -31,7 +31,7 @@ export default function PinEditor({ sites, moved }: { sites: Site[]; moved: Set<
   return (
     <section
       aria-labelledby="pin-editor-heading"
-      className="fixed top-20 left-4 z-[1100] w-[min(26rem,calc(100vw-2rem))] rounded-2xl bg-surface/95 p-4 text-sm shadow-float backdrop-blur"
+      className="fixed top-20 left-4 z-[1100] w-[min(26rem,calc(100vw-2rem))] rounded-2xl bg-surface p-4 text-sm shadow-float"
     >
       <div className="flex items-center justify-between gap-2">
         <h2 id="pin-editor-heading" className="font-semibold">

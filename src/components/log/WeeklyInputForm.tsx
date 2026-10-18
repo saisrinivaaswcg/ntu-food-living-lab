@@ -6,6 +6,7 @@ import { formatDate, mondayOf, recentMondays, todayISO } from '../../lib/dates'
 import { focusFirstIssue, issueMessage, parseDecimal, type FieldIssue } from '../../lib/forms'
 import { addLog, removeUserLog, replaceUserLogs, undoReplaceUserLogs, type NewLog } from '../../lib/logStore'
 import { siteName } from '../../lib/lookups'
+import { notifySaved, notifyUndone } from '../../lib/notify'
 import { getLastSiteId, setLastSiteId } from '../../lib/preferences'
 import { checkNumber } from '../../lib/validation'
 import type { CompostType, ISODate, SiteId, WeeklyInputLog } from '../../types'
@@ -132,6 +133,7 @@ export default function WeeklyInputForm() {
     setLastSiteId(siteId)
     setSaveError(null)
     setUndone(false)
+    notifySaved('Weekly inputs')
     setSaved({ id: result.id, record, replaced: existing })
   }
 
@@ -174,6 +176,7 @@ export default function WeeklyInputForm() {
           else removeUserLog('weeklyInputs', saved.id)
           setSaved(null)
           setUndone(true)
+          notifyUndone('Weekly inputs')
         }}
       />
     )

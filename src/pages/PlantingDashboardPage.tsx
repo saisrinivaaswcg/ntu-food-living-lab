@@ -4,12 +4,12 @@ import BedBoard from '../components/dashboard/BedBoard'
 import ChartFigure from '../components/dashboard/ChartFigure'
 import DashboardHeader from '../components/dashboard/DashboardHeader'
 import DashboardSection from '../components/dashboard/DashboardSection'
+import { WeeklyCountChart } from '../components/dashboard/lazyCharts'
 import NoLogsNotice from '../components/dashboard/NoLogsNotice'
 import RecordTable from '../components/dashboard/RecordTable'
 import SeriesTable from '../components/dashboard/SeriesTable'
 import StatRow from '../components/dashboard/StatRow'
 import UpcomingHarvestList from '../components/dashboard/UpcomingHarvestList'
-import WeeklyCountChart from '../components/dashboard/WeeklyCountChart'
 import EmptyState from '../components/ui/EmptyState'
 import type { Column } from '../components/ui/SortableTable'
 import { failureCauseOptions, propagationOptions, sites } from '../data'
@@ -30,6 +30,7 @@ import {
   upcomingHarvests,
   weeklyPlantings,
 } from '../lib/metrics'
+import { notifyExported } from '../lib/notify'
 import type { PlantingLog } from '../types'
 
 const propagationLabel = (value: PlantingLog['propagation']) =>
@@ -76,8 +77,10 @@ export default function PlantingDashboardPage() {
   const noPlantings = filtered.plantings.length === 0
   const noFailures = filtered.failures.length === 0
 
-  const exportCsv = () =>
+  const exportCsv = () => {
     downloadText(`ntu-plantings_${dash.periodKey}_${site}_${period.end}.csv`, plantingsToCsv(filtered.plantings))
+    notifyExported(filtered.plantings.length, 'plantings')
+  }
 
   const headline = !dash.hasAnyLogs
     ? 'Planting dashboard'
