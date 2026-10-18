@@ -1,5 +1,5 @@
 import { motion } from 'motion/react'
-import { Suspense, useLayoutEffect } from 'react'
+import { Suspense, useLayoutEffect, useState } from 'react'
 import { Outlet, useLocation } from 'react-router-dom'
 import { Toaster } from 'sonner'
 import { jumpToTop } from '../../lib/smoothScroll'
@@ -15,6 +15,9 @@ export default function AppShell() {
   const quick = pathname.startsWith('/log')
   // Links that use a view transition (Sites → site page) animate through it, not this fade.
   const viaTransition = (state as { viaTransition?: boolean } | null)?.viaTransition === true
+  // No fade on the very first page: it would hold back the first paint (and LCP) for nothing.
+  const [firstPage] = useState(pathname)
+  const fade = !viaTransition && firstPage !== pathname
 
   // New page → start at the top (query-string changes, like selecting a site, keep the scroll).
   // Layout effect: runs before a view transition captures the new page.
@@ -32,13 +35,14 @@ export default function AppShell() {
       </a>
       <TopNav />
       <DemoBanner />
-      <main id="main" tabIndex={-1} className="flex-1 outline-none">
+      {/* At least a screen tall, so the footer starts below the fold and never jumps when a page loads in. */}
+      <main id="main" tabIndex={-1} className="min-h-dvh flex-1 outline-none">
         {/* Pages load as separate chunks; the nav and banner stay in place meanwhile. */}
         <Suspense fallback={<PageLoading />}>
           {/* Opacity only: a transform here would break position: fixed inside pages while it runs. */}
           <motion.div
             key={pathname}
-            initial={viaTransition ? false : { opacity: 0 }}
+            initial={fade ? { opacity: 0 } : false}
             animate={{ opacity: 1 }}
             transition={{ duration: quick ? 0.15 : 0.4, ease: 'easeOut' }}
           >

@@ -5,6 +5,9 @@ import '@fontsource-variable/newsreader/wght.css'
 import '@fontsource-variable/public-sans/wght.css'
 import './index.css'
 import App from './App.tsx'
+import { preloadHeroImage } from './lib/preloadHeroImage'
+
+preloadHeroImage(window.location.pathname)
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode>

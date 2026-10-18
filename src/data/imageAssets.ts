@@ -26,7 +26,7 @@ const GLOB_ROOT = '../../public'
 const full = import.meta.glob<ImgOutput>('../../public/images/**/*.{jpg,jpeg,png,webp}', {
   eager: true,
   import: 'default',
-  query: { w: '480;800;1200;1800;2400', format: 'webp', quality: '72', as: 'img' },
+  query: { w: '480;640;800;1200;1800;2400', format: 'webp', quality: '62', as: 'img' },
 })
 
 const previews = import.meta.glob<ImgOutput>('../../public/images/**/*.{jpg,jpeg,png,webp}', {

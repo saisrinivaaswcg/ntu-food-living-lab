@@ -98,8 +98,9 @@ export default function SlotImage({
         onLoad={() => setLoaded(true)}
         onError={() => setFailed(true)}
         style={{ objectPosition: slot.focus }}
-        className={`absolute inset-0 size-full object-cover transition-opacity duration-500 motion-reduce:transition-none ${
-          loaded ? 'opacity-100' : 'opacity-0'
+        // Priority (hero) photos show as soon as they paint; others fade in over the blur-up preview.
+        className={`absolute inset-0 size-full object-cover ${
+          priority ? '' : `transition-opacity duration-500 motion-reduce:transition-none ${loaded ? 'opacity-100' : 'opacity-0'}`
         } ${zoom}`}
       />
       {caption !== 'none' && (
