@@ -35,8 +35,11 @@ export type CompostType = 'vermicompost' | 'food-waste-compost' | 'leaf-mould' |
 
 export type FailureCause = 'pest' | 'disease' | 'drought' | 'unknown'
 
-/** Where a record came from. Demo records are always labelled in the UI. */
-export type RecordSource = 'demo' | 'user'
+/**
+ * Where a record came from. Demo records are always labelled in the UI. 'setup' records are made from
+ * the site setup (Beds & plants) when a bed's crop or plant count is set by hand; they are not plantings.
+ */
+export type RecordSource = 'demo' | 'user' | 'setup'
 
 /** ISO date string, e.g. "2026-09-14". */
 export type ISODate = string
@@ -48,6 +51,8 @@ export type ISODate = string
 export interface Bed {
   id: string // e.g. "YCT-B1" — unique across all sites
   label: string // e.g. "Bed 1 (raised)"
+  /** Growing area of this bed. Demo beds leave it out: the site's area is shared equally. */
+  areaSqm?: number
 }
 
 export interface Site {
@@ -86,6 +91,8 @@ interface LogBase {
   source: RecordSource
   /** When the record was created (ISO datetime). */
   createdAt: string
+  /** When the record was last edited (ISO datetime). Edited records show an "Edited" marker. */
+  editedAt?: string
 }
 
 /** Photo attached to a log. Demo records use a placeholder, real uploads a compressed data URL. */
@@ -131,6 +138,10 @@ export interface WeeklyInputLog extends LogBase {
   notes?: string
 }
 
+/**
+ * A plant loss: some plants in one bed lost (e.g. 3 of 20), not a whole-site failure. Shown in the UI
+ * as "Plant losses"; the type keeps its original name so stored records stay readable.
+ */
 export interface FailureLog extends LogBase {
   bedId: string
   cropId: CropId
@@ -138,6 +149,10 @@ export interface FailureLog extends LogBase {
   cause: FailureCause
   /** Estimated plants lost — same unit as PlantingLog.quantity, so survival rate can be computed */
   estimatedLossPlants: number
+  /** Plants in the bed just before the loss ("3 of 20 lost"). Older records may not have it. */
+  plantsInBed?: number
+  /** Plants that came back afterwards; they count as alive again. */
+  recoveredPlants?: number
   description: string
   photo?: PhotoRef
 }
@@ -206,6 +221,26 @@ export interface OpenIssue {
   title: string
   priority: 'high' | 'medium' | 'low'
   detail: string
+}
+
+/* ------------------------------------------------------------------ */
+/* Site setup (Beds & plants)                                          */
+/* ------------------------------------------------------------------ */
+
+/** One bed as set up by hand on a site page. */
+export interface BedSetup {
+  id: string
+  label: string
+  areaSqm: number
+  /** Present only when the crop or plant count was changed by hand; cropId null = nothing growing. */
+  planting?: { cropId: CropId | null; plants: number }
+}
+
+/** A site's beds as edited on this device; replaces the demo bed list for that site. */
+export interface SiteSetup {
+  beds: BedSetup[]
+  /** ISO datetime of the last save */
+  savedAt: string
 }
 
 export interface ChecklistItem {

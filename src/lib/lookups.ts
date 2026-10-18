@@ -1,18 +1,18 @@
-import { crops, sites } from '../data'
+import { crops } from '../data'
 import type { Bed, Crop, CropId, Site, SiteId } from '../types'
+import { getSiteById } from './siteRegistry'
 
-const siteMap = new Map(sites.map((s) => [s.id, s]))
 const cropMap = new Map(crops.map((c) => [c.id, c]))
 
 export function getSite(id: SiteId): Site {
-  const site = siteMap.get(id)
+  const site = getSiteById(id)
   if (!site) throw new Error(`Unknown site: ${id}`)
   return site
 }
 
 /** For URL params, which may be anything a user types. */
 export function findSite(id: string | undefined): Site | undefined {
-  return id ? siteMap.get(id as SiteId) : undefined
+  return id ? getSiteById(id as SiteId) : undefined
 }
 
 export function getCrop(id: CropId): Crop {
@@ -22,7 +22,7 @@ export function getCrop(id: CropId): Crop {
 }
 
 export function getBed(siteId: SiteId, bedId: string): Bed | undefined {
-  return siteMap.get(siteId)?.beds.find((b) => b.id === bedId)
+  return getSiteById(siteId)?.beds.find((b) => b.id === bedId)
 }
 
 export function cropName(id: CropId): string {
@@ -30,7 +30,7 @@ export function cropName(id: CropId): string {
 }
 
 export function siteName(id: SiteId, short = false): string {
-  const site = siteMap.get(id)
+  const site = getSiteById(id)
   if (!site) return id
   return short ? site.shortName : site.name
 }

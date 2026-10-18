@@ -1,12 +1,12 @@
 import { ClipboardList, Scale, Sprout, TriangleAlert, type LucideIcon } from 'lucide-react'
 import type { ComponentType } from 'react'
 import { logImages, type ImageSlot } from '../../data'
-import FailureForm from './FailureForm'
 import HarvestForm from './HarvestForm'
+import LossForm from './LossForm'
 import PlantingForm from './PlantingForm'
 import WeeklyInputForm from './WeeklyInputForm'
 
-export type LogFormSlug = 'harvest' | 'planting' | 'weekly' | 'failure'
+export type LogFormSlug = 'harvest' | 'planting' | 'weekly' | 'losses'
 
 export interface LogFormKind {
   slug: LogFormSlug
@@ -46,12 +46,12 @@ export const logFormKinds: LogFormKind[] = [
     Form: WeeklyInputForm,
   },
   {
-    slug: 'failure',
-    title: 'Failure',
-    description: 'Plants lost to pests, disease or drought, so the next committee knows.',
+    slug: 'losses',
+    title: 'Plant losses',
+    description: 'How many plants a bed lost to pests, disease or drought, and any that recovered.',
     icon: TriangleAlert,
     image: logImages.losses,
-    Form: FailureForm,
+    Form: LossForm,
   },
 ]
 

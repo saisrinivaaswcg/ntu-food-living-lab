@@ -10,6 +10,7 @@ import PhotoThumb from '../components/dashboard/PhotoThumb'
 import RecordTable from '../components/dashboard/RecordTable'
 import SeriesTable from '../components/dashboard/SeriesTable'
 import StatRow from '../components/dashboard/StatRow'
+import EditedTag from '../components/ui/EditedTag'
 import EmptyState from '../components/ui/EmptyState'
 import SlotImage from '../components/ui/SlotImage'
 import type { Column } from '../components/ui/SortableTable'
@@ -45,7 +46,17 @@ const columns: Column<HarvestLog>[] = [
       </span>
     ),
   },
-  { key: 'date', label: 'Date', sortValue: (h) => h.date + h.createdAt, render: (h) => formatShortDate(h.date) },
+  {
+    key: 'date',
+    label: 'Date',
+    sortValue: (h) => h.date + h.createdAt,
+    render: (h) => (
+      <>
+        {formatShortDate(h.date)}
+        {h.editedAt && <EditedTag />}
+      </>
+    ),
+  },
   { key: 'site', label: 'Site', sortValue: (h) => siteName(h.siteId, true), render: (h) => siteName(h.siteId, true) },
   { key: 'bed', label: 'Bed', sortValue: (h) => h.bedId, render: (h) => getBed(h.siteId, h.bedId)?.label ?? h.bedId },
   { key: 'crop', label: 'Crop', sortValue: (h) => cropName(h.cropId), render: (h) => cropName(h.cropId) },
@@ -56,7 +67,13 @@ const columns: Column<HarvestLog>[] = [
     sortValue: (h) => destinationLabel(h.destination),
     render: (h) => destinationLabel(h.destination),
   },
-  { key: 'labour', label: 'Labour h', numeric: true, sortValue: (h) => h.labourHours, render: (h) => formatNumber(h.labourHours, 2) },
+  {
+    key: 'labour',
+    label: 'Labour h',
+    numeric: true,
+    sortValue: (h) => h.labourHours,
+    render: (h) => formatNumber(h.labourHours, 2),
+  },
 ]
 
 /** Harvest dashboard: how much, from where, of what, and where it went. */

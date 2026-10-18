@@ -3,6 +3,7 @@ import { useParams, useSearchParams } from 'react-router-dom'
 import HandoverTab from '../components/sites/HandoverTab'
 import KnowledgeTab from '../components/sites/KnowledgeTab'
 import SiteHero from '../components/sites/SiteHero'
+import SiteSetupEditor from '../components/sites/SiteSetupEditor'
 import SiteTabs from '../components/sites/SiteTabs'
 import { SITE_TABS, panelId, tabId, type SiteTab } from '../components/sites/siteTabItems'
 import CropChips from '../components/ui/CropChips'
@@ -12,8 +13,8 @@ import { useLogs } from '../hooks/useLogs'
 import { usePageTitle } from '../hooks/usePageTitle'
 import { formatDate } from '../lib/dates'
 import { cropName, findSite } from '../lib/lookups'
-import { cropsCurrentlyGrowing, currentPlantingByBed } from '../lib/metrics'
-import type { PlantingLog } from '../types'
+import { bedStatuses, cropsCurrentlyGrowing, latestLogDate } from '../lib/metrics'
+import { todayISO } from '../lib/dates'
 import NotFoundPage from './NotFoundPage'
 
 export default function SiteDetailPage() {
@@ -26,10 +27,7 @@ export default function SiteDetailPage() {
   }
   const site = findSite(siteId)
   const { logs } = useLogs()
-  const current = useMemo(
-    () => (site ? currentPlantingByBed(logs, site) : new Map<string, PlantingLog>()),
-    [logs, site],
-  )
+  const beds = useMemo(() => (site ? bedStatuses(logs, site, latestLogDate(logs) ?? todayISO()) : []), [logs, site])
   const growing = useMemo(() => (site ? cropsCurrentlyGrowing(logs, site) : []), [logs, site])
   usePageTitle(site?.name ?? 'Site not found')
 
@@ -69,35 +67,45 @@ export default function SiteDetailPage() {
 
           <section aria-labelledby="beds-heading" className="lg:col-span-7">
             <h2 id="beds-heading" className="font-display text-section font-medium">
-              Beds
+              Beds & plants
             </h2>
-            {site.beds.length === 0 ? (
+            <p className="mt-1 text-sm text-ink-muted">
+              {site.beds.length} beds · {site.areaSqm} m² in all
+            </p>
+            {beds.length === 0 ? (
               <p className="mt-4 bg-sunken p-4 text-ink-muted">No beds recorded for this site.</p>
             ) : (
               <ul className="mt-4 border-t border-ink">
-                {site.beds.map((bed) => {
-                  const planting = current.get(bed.id)
-                  return (
-                    <li
-                      key={bed.id}
-                      className="flex flex-wrap items-baseline justify-between gap-x-4 gap-y-1 border-b border-line py-3"
-                    >
+                {beds.map(({ bed, planting, plantsAlive }) => (
+                  <li
+                    key={bed.id}
+                    className="flex flex-wrap items-baseline justify-between gap-x-4 gap-y-1 border-b border-line py-3"
+                  >
+                    <span>
                       <span className="font-semibold">{bed.label}</span>
-                      <span className={planting ? 'text-ink' : 'text-ink-muted'}>
-                        {planting ? (
-                          <>
-                            {cropName(planting.cropId)}
-                            <span className="text-ink-muted"> · planted {formatDate(planting.date)}</span>
-                          </>
-                        ) : (
-                          'Nothing growing'
-                        )}
-                      </span>
-                    </li>
-                  )
-                })}
+                      <span className="text-sm text-ink-muted"> · {bed.areaSqm} m²</span>
+                    </span>
+                    <span className={planting ? 'text-ink' : 'text-ink-muted'}>
+                      {planting ? (
+                        <>
+                          {cropName(planting.cropId)} · <span className="tabular-nums">{plantsAlive}</span> plants
+                          <span className="text-ink-muted">
+                            {' '}
+                            · {planting.source === 'setup' ? 'set by hand' : `planted ${formatDate(planting.date)}`}
+                          </span>
+                        </>
+                      ) : (
+                        'Nothing growing'
+                      )}
+                    </span>
+                  </li>
+                ))}
               </ul>
             )}
+            <div className="mt-5">
+              {/* key: a fresh editor when the site changes */}
+              <SiteSetupEditor key={site.id} site={site} />
+            </div>
           </section>
         </Reveal>
 

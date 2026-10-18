@@ -17,9 +17,9 @@ No backend, no auth, no database.
 
 ## Architecture
 
-- `src/types/index.ts` — the domain model. All four sites log into the same four record types: `PlantingLog`, `HarvestLog`, `WeeklyInputLog`, `FailureLog`.
+- `src/types/index.ts` — the domain model. All four sites log into the same four record types: `PlantingLog`, `HarvestLog`, `WeeklyInputLog`, `FailureLog` (shown as “Plant losses”: lost of N in a bed, with recovered plants added back).
 - `src/data/` — ALL mock data. Import data only from `src/data/index.ts`, never from the individual files, so the folder can be swapped for real data without touching pages.
-- `src/lib/logStore.ts` — merges read-only demo logs with the user's submissions in localStorage. Forms call `addLog(kind, record)`; `removeUserLog` supports Undo; `setShowDemoData` toggles demo records.
+- `src/lib/logStore.ts` — merges read-only demo logs with the user's submissions, demo-record edits/deletions and site setups (all in localStorage). Forms call `addLog(kind, record)`; `updateLog` / `deleteLog` (returns an undo) / `resetDemoRecord` edit any entry; `saveSiteSetup` / `resetSiteSetup` for Beds & plants; `setShowDemoData` toggles demo records. Current sites (with edited beds) come from `src/lib/siteRegistry.ts`, kept up to date by the store.
 - `src/hooks/useLogs.ts` — `useLogs()` returns live logs. Components using it re-render the moment a log is saved, which is how the dashboard updates immediately.
 - `src/lib/lookups.ts` — `getSite`, `findSite` (for URL params), `getCrop`, `getBed`, `cropName`, `siteName`.
 - Derived numbers (KPIs, completeness, survival, efficiency, cost per kg, leaderboard) go in `src/lib/metrics.ts` as pure functions over `LogCollections`, not inside components. Definitions are in `docs/SPEC.md` → Metric definitions.
@@ -37,7 +37,7 @@ Tick items here when a step is finished. Remove the `.gitkeep` from a folder onc
 
 ## Routes
 
-`/` Explore · `/log` (form picker) · `/log/:kind` (`harvest`, `planting`, `weekly`, `failure`) · `/dashboard` (Overview) · `/dashboard/harvest` · `/dashboard/planting` (period and site filters shared via the query string) · `/sites` · `/sites/:siteId` (Knowledge / Handover tabs) · `/credits` (photo credits, linked from the footer). Unknown routes and unknown site IDs show a not-found page with a way back. Hidden helper: `/?editPins=1` makes the map pins draggable and shows their coordinates with Copy buttons (nothing is saved; paste the values into `src/data/sites.ts`).
+`/` Explore · `/log` (form picker) · `/log/:kind` (`harvest`, `planting`, `weekly`, `losses`; `failure` redirects) · `/dashboard` (Overview) · `/dashboard/harvest` · `/dashboard/planting` (period and site filters shared via the query string) · `/sites` · `/sites/:siteId` (Knowledge / Handover tabs) · `/credits` (photo credits, linked from the footer). Unknown routes and unknown site IDs show a not-found page with a way back. Hidden helper: `/?editPins=1` makes the map pins draggable and shows their coordinates with Copy buttons (nothing is saved; paste the values into `src/data/sites.ts`).
 
 ## Non-negotiable rules
 
@@ -45,8 +45,8 @@ Tick items here when a step is finished. Remove the `.gitkeep` from a folder onc
 - Every list, chart and table has an empty state (e.g. a site with no logs, a search with no results).
 - Breadcrumbs on every page below the top level.
 - Demo data is always labelled as demonstration data in the UI (`DEMO_DATA_NOTICE`; records carry `source: 'demo'`).
-- Controlled vocabulary: site, bed, crop, destination, propagation, compost type and cause are selects or buttons fed from `src/data`. Free text only in notes/description fields.
-- Do NOT build: user accounts, authentication, notifications, inventory tracking, quizzes, badges, gamified virtual gardens.
+- Controlled vocabulary: site, bed, crop, destination, propagation, compost type and cause are selects or buttons fed from `src/data` (beds from the current site setup). Free text only in notes/description fields, and in bed names in site setup.
+- Do NOT build: user accounts, authentication, notifications, inventory tracking, quizzes, badges, gamified virtual gardens. Editing a site's beds, bed areas, crops and plant counts (Beds & plants on a site page) is **site setup**, not inventory tracking, and is allowed; so is editing or deleting log entries.
 
 ## Design
 

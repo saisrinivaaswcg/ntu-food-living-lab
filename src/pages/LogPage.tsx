@@ -2,6 +2,7 @@ import { ArrowRight } from 'lucide-react'
 import { Link } from 'react-router-dom'
 import Breadcrumbs from '../components/layout/Breadcrumbs'
 import { logFormKinds } from '../components/log/logFormKinds'
+import RecentEntries from '../components/log/RecentEntries'
 import SlotImage from '../components/ui/SlotImage'
 import { useLogs } from '../hooks/useLogs'
 import { usePageTitle } from '../hooks/usePageTitle'
@@ -58,6 +59,16 @@ export default function LogPage() {
           </li>
         ))}
       </ul>
+
+      <section aria-labelledby="recent-heading" className="mt-14">
+        <h2 id="recent-heading" className="font-display text-section font-medium">
+          Recent entries
+        </h2>
+        <p className="mt-2 mb-5 text-ink-muted">
+          Fix a typo or remove a duplicate. Changes show on every dashboard straight away.
+        </p>
+        <RecentEntries />
+      </section>
 
       <p className="mt-6 text-sm text-ink-muted">
         {userLogCount === 0

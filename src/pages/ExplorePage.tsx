@@ -8,7 +8,7 @@ import SiteList from '../components/explore/SiteList'
 import SitePanel from '../components/explore/SitePanel'
 import Reveal from '../components/ui/Reveal'
 import Skeleton from '../components/ui/Skeleton'
-import { sites } from '../data'
+import { useLogs } from '../hooks/useLogs'
 import { usePageTitle } from '../hooks/usePageTitle'
 import { findSite } from '../lib/lookups'
 import { scrollToElement } from '../lib/smoothScroll'
@@ -23,13 +23,14 @@ export default function ExplorePage() {
   usePageTitle('Explore')
   // The open site lives in the URL (?site=…) so it can be linked and survives Back.
   const [params, setParams] = useSearchParams()
+  const { sites } = useLogs()
 
   // Hidden pin-placement mode: /?editPins=1 makes the pins draggable and shows their coordinates.
   const editPins = params.get('editPins') === '1'
   const [pinOverrides, setPinOverrides] = useState<Partial<Record<SiteId, [number, number]>>>({})
   const mapSites = useMemo(
     () => sites.map((s) => ({ ...s, coordinates: pinOverrides[s.id] ?? s.coordinates })),
-    [pinOverrides],
+    [sites, pinOverrides],
   )
   const movePin = useCallback((id: SiteId, coordinates: [number, number]) => {
     setPinOverrides((prev) => ({ ...prev, [id]: coordinates }))

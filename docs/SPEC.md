@@ -32,7 +32,7 @@ Four forms with an identical structure across sites. Site and crop are always dr
 | **Harvest** (priority) | site, bed, crop, weight (kg), destination (pantry / members / food bank / compost), labour hours, photo (**required**), notes (optional) |
 | Planting | site, bed, crop, date, quantity, propagation type (seed / cutting / seedling), notes |
 | Weekly inputs | site, week (Monday; defaults to current week), water (L), compost type + amount (kg), labour hours, notes |
-| Failure | site, bed, crop, date, cause (pest / disease / drought / unknown), estimated loss (plants), description, photo (optional) |
+| Plant losses (`/log/losses`; was “Failure”) | site, bed, crop, date, cause (pest / disease / drought / unknown), plants lost **out of** plants in the bed (pre-filled from the bed's current count), recovered plants (optional, added back), description, photo (optional). Shows the plants remaining. A partial event, not a site failure. |
 
 ### Harvest form — must be completable in under 60 seconds on a phone
 
@@ -84,6 +84,11 @@ Tabs beside the Overview (`/dashboard`). Period and site filters are shared thro
 
 ---
 
+### Editing and site setup
+
+- **Recent entries** on the Log page: every record (harvest, planting, weekly inputs, losses) can be edited or deleted (with Undo). Demo records are changed through overrides on this device, with Reset per entry and for all. Edited entries show an “Edited” marker. Dashboards update immediately.
+- **Beds & plants** on each site page (site setup, not inventory tracking): add or remove beds, edit each bed's name and area (m²), and set the crop and plant count in each bed. Saved on this device as overrides with “Reset to original values”. A site's area becomes the sum of its bed areas; a bed's crop and plant count become a setup record dated at the latest log, so beds in use, plants in the ground, survival and kg per m² follow immediately. Setup records are not plantings: they are left out of planting activity, tables and CSV.
+
 ## Metric definitions
 
 Put these in `src/lib/metrics.ts` as pure functions. All respect the dashboard's period and site filters.
@@ -94,7 +99,7 @@ Put these in `src/lib/metrics.ts` as pure functions. All respect the dashboard's
 - **Labour hours:** harvest `labourHours` + weekly `labourHours`.
 - **kg per labour hour:** total kg ÷ labour hours.
 - **Data completeness:** a site-week is logged when a weekly-inputs record exists for that site and week. Score = logged site-weeks ÷ (sites × complete weeks in period). Headline period = last 4 complete weeks up to the anchor date. Weeks start Monday.
-- **Survival rate (per site):** 1 − Σ `estimatedLossPlants` ÷ Σ planted `quantity`.
+- **Survival rate (per site):** 1 − Σ net loss ÷ Σ planted `quantity`, where net loss = `estimatedLossPlants` − `recoveredPlants`.
 - **Allocating site inputs to crops:** water, compost and weekly labour are logged per site per week. Split each site-week's inputs across crops in proportion to the number of beds each crop occupies that week (bed's crop = its latest planting on or before that week).
 - **Efficiency by crop:** kg per litre = crop kg ÷ allocated water. kg per labour hour = crop kg ÷ (crop harvest labour + allocated weekly labour).
 - **Campus cost per kg (by crop):** (allocated water × `waterPerLitre` + allocated compost kg × compost price + propagation units × unit cost + labour × `labourPerHour`) ÷ crop kg. Volunteer labour is excluded by default (`labourPerHour = 0`).

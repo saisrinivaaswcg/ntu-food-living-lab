@@ -2,7 +2,6 @@ import { useEffect, useMemo } from 'react'
 import Breadcrumbs from '../components/layout/Breadcrumbs'
 import SiteRow from '../components/sites/SiteRow'
 import Reveal from '../components/ui/Reveal'
-import { sites } from '../data'
 import { useLogs } from '../hooks/useLogs'
 import { usePageTitle } from '../hooks/usePageTitle'
 import { cropsCurrentlyGrowing } from '../lib/metrics'
@@ -10,8 +9,8 @@ import { SiteDetailPage } from './lazyPages'
 
 export default function SitesPage() {
   usePageTitle('Sites')
-  const { logs } = useLogs()
-  const growing = useMemo(() => new Map(sites.map((s) => [s.id, cropsCurrentlyGrowing(logs, s)])), [logs])
+  const { logs, sites } = useLogs()
+  const growing = useMemo(() => new Map(sites.map((s) => [s.id, cropsCurrentlyGrowing(logs, s)])), [logs, sites])
 
   // Load the site page ahead of a click, so opening a site can morph its photo straight into the hero.
   useEffect(() => {

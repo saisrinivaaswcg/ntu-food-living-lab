@@ -2,7 +2,7 @@
  * Derived numbers, as pure functions over LogCollections.
  * Definitions live in docs/SPEC.md → Metric definitions.
  */
-import { crops, sites } from '../data'
+import { crops } from '../data'
 import type {
   Bed,
   CompostType,
@@ -22,10 +22,15 @@ import type {
   WeeklyInputLog,
 } from '../types'
 import { addDays, daysBetween, mondayOf, todayISO } from './dates'
+import { getSiteById, getSites } from './siteRegistry'
 
 const cropOrder = new Map(crops.map((c, i) => [c.id, i]))
-const siteById = new Map(sites.map((s) => [s.id, s]))
 const cropById = new Map(crops.map((c) => [c.id, c]))
+
+/** Plants a loss record takes away for good: lost minus any that recovered. */
+export function netLoss(f: Pick<FailureLog, 'estimatedLossPlants' | 'recoveredPlants'>): number {
+  return Math.max(0, f.estimatedLossPlants - (f.recoveredPlants ?? 0))
+}
 
 /** Latest first: by date, then by when the record was created. */
 function isLater(a: PlantingLog, b: PlantingLog): boolean {
@@ -52,7 +57,7 @@ export function currentPlantingByBed(
   for (const [bedId, planting] of latest) {
     const lost = logs.failures
       .filter((f) => f.bedId === bedId && f.cropId === planting.cropId && f.date >= planting.date)
-      .reduce((sum, f) => sum + f.estimatedLossPlants, 0)
+      .reduce((sum, f) => sum + netLoss(f), 0)
     if (lost >= planting.quantity) latest.delete(bedId)
   }
   return latest
@@ -147,7 +152,8 @@ function inPeriod(date: ISODate, period: Pick<Period, 'start' | 'end'>): boolean
 export function filterLogs(logs: LogCollections, period: Period, site: SiteFilter): LogCollections {
   const siteOk = (id: SiteId) => site === 'all' || id === site
   return {
-    plantings: logs.plantings.filter((p) => siteOk(p.siteId) && inPeriod(p.date, period)),
+    // Site-setup records describe a bed's contents, not a planting event, so they stay out of period activity.
+    plantings: logs.plantings.filter((p) => p.source !== 'setup' && siteOk(p.siteId) && inPeriod(p.date, period)),
     harvests: logs.harvests.filter((h) => siteOk(h.siteId) && inPeriod(h.date, period)),
     weeklyInputs: logs.weeklyInputs.filter((w) => siteOk(w.siteId) && inPeriod(w.weekStart, period)),
     failures: logs.failures.filter((f) => siteOk(f.siteId) && inPeriod(f.date, period)),
@@ -312,7 +318,7 @@ export function allocateInputsToCrops(
   const byCrop = new Map<CropId, CropInputs>()
   let unallocatedWaterLitres = 0
   for (const w of weeklyInputs) {
-    const site = siteById.get(w.siteId)
+    const site = getSiteById(w.siteId)
     const bedCrops = site ? bedCropsAt(site, allPlantings, addDays(w.weekStart, 6)) : []
     if (bedCrops.length === 0) {
       unallocatedWaterLitres += w.waterLitres
@@ -461,7 +467,7 @@ export function survivalRate(
 ): number | null {
   const standing = standingPlantings(allPlantings.filter((p) => p.siteId === siteId), period)
   const planted = sum(standing.map((p) => p.quantity))
-  const lost = sum(failures.filter((f) => f.siteId === siteId && inPeriod(f.date, period)).map((f) => f.estimatedLossPlants))
+  const lost = sum(failures.filter((f) => f.siteId === siteId && inPeriod(f.date, period)).map(netLoss))
   if (planted <= 0) return null
   return Math.min(1, Math.max(0, 1 - lost / planted))
 }
@@ -479,7 +485,7 @@ export interface SiteRow {
 
 /** All four sites side by side for one period (the site filter highlights, it doesn't hide). */
 export function siteComparison(logs: LogCollections, period: Period): SiteRow[] {
-  return sites.map((site) => {
+  return getSites().map((site) => {
     const own = filterLogs(logs, period, site.id)
     const kpis = computeKpis(own)
     return {
@@ -614,7 +620,7 @@ export interface HarvestSummary {
 /** Expects logs already filtered by period and site; `siteIds` are the sites in scope. */
 export function harvestSummary(logs: Pick<LogCollections, 'harvests'>, siteIds: SiteId[]): HarvestSummary {
   const totalKg = sum(logs.harvests.map((h) => h.weightKg))
-  const area = sum(siteIds.map((id) => siteById.get(id)?.areaSqm ?? 0))
+  const area = sum(siteIds.map((id) => getSiteById(id)?.areaSqm ?? 0))
   const top = harvestByCrop({ ...emptyLogs(), harvests: logs.harvests })[0]
   return { totalKg, harvests: logs.harvests.length, kgPerSqm: ratio(totalKg, area), topCrop: top ?? null }
 }
@@ -710,7 +716,7 @@ export function bedStatuses(
     const lost = sum(
       logs.failures
         .filter((f) => f.bedId === bed.id && f.cropId === planting.cropId && f.date >= planting.date)
-        .map((f) => f.estimatedLossPlants),
+        .map(netLoss),
     )
     const harvests = logs.harvests
       .filter((h) => h.bedId === bed.id && h.cropId === planting.cropId && h.date >= planting.date)
@@ -750,7 +756,7 @@ export function plantingSummary(
   siteIds: SiteId[],
   period: Period,
 ): PlantingSummary {
-  const scopeSites = siteIds.flatMap((id) => siteById.get(id) ?? [])
+  const scopeSites = siteIds.flatMap((id) => getSiteById(id) ?? [])
   const beds = scopeSites.flatMap((site) => bedStatuses(allLogs, site, period.end))
   const counts = survivalCounts(
     allLogs.plantings.filter((p) => siteIds.includes(p.siteId)),
@@ -774,7 +780,7 @@ function survivalCounts(
 ): { planted: number; lost: number } {
   return {
     planted: sum(standingPlantings(plantings, period).map((p) => p.quantity)),
-    lost: sum(failures.filter((f) => inPeriod(f.date, period)).map((f) => f.estimatedLossPlants)),
+    lost: sum(failures.filter((f) => inPeriod(f.date, period)).map(netLoss)),
   }
 }
 
@@ -886,7 +892,7 @@ export interface UpcomingHarvest {
 export function upcomingHarvests(allLogs: LogCollections, siteIds: SiteId[], anchor: ISODate): UpcomingHarvest[] {
   return siteIds
     .flatMap((id) => {
-      const site = siteById.get(id)
+      const site = getSiteById(id)
       if (!site) return []
       return bedStatuses(allLogs, site, anchor).flatMap((b) =>
         b.planting && !b.firstHarvest && b.expectedFirstHarvest
@@ -913,7 +919,7 @@ export function lossesByCause(
   return order
     .map((cause) => {
       const own = logs.failures.filter((f) => f.cause === cause)
-      return { cause, plants: sum(own.map((f) => f.estimatedLossPlants)), events: own.length }
+      return { cause, plants: sum(own.map(netLoss)), events: own.length }
     })
     .sort((a, b) => b.plants - a.plants)
 }
@@ -925,3 +931,15 @@ function median(values: number[]): number {
 }
 
 const emptyLogs = (): LogCollections => ({ plantings: [], harvests: [], weeklyInputs: [], failures: [] })
+
+/** Plants alive in one bed now (its current planting minus net losses), or null when nothing is growing. */
+export function plantsAliveInBed(
+  logs: Pick<LogCollections, 'plantings' | 'failures' | 'harvests'>,
+  site: Site,
+  bedId: string,
+): number | null {
+  const status = bedStatuses(logs, site, latestLogDate({ ...emptyLogs(), ...logs }) ?? todayISO()).find(
+    (b) => b.bed.id === bedId,
+  )
+  return status?.planting ? status.plantsAlive : null
+}

@@ -1,4 +1,4 @@
-import { useParams } from 'react-router-dom'
+import { Navigate, useParams } from 'react-router-dom'
 import Breadcrumbs from '../components/layout/Breadcrumbs'
 import { findLogFormKind } from '../components/log/logFormKinds'
 import { usePageTitle } from '../hooks/usePageTitle'
@@ -9,11 +9,14 @@ export default function LogFormPage() {
   const form = findLogFormKind(kind)
   usePageTitle(form ? `Log ${form.title.toLowerCase()}` : 'Form not found')
 
+  // The losses form used to be called "failure"; keep old links working.
+  if (kind === 'failure') return <Navigate to="/log/losses" replace />
+
   if (!form) {
     return (
       <NotFoundPage
         title="Form not found"
-        message={`There is no "${kind ?? ''}" form. You can log a harvest, planting, weekly inputs or a failure.`}
+        message={`There is no "${kind ?? ''}" form. You can log a harvest, planting, weekly inputs or plant losses.`}
       />
     )
   }

@@ -10,15 +10,17 @@ import RecordTable from '../components/dashboard/RecordTable'
 import SeriesTable from '../components/dashboard/SeriesTable'
 import StatRow from '../components/dashboard/StatRow'
 import UpcomingHarvestList from '../components/dashboard/UpcomingHarvestList'
+import EditedTag from '../components/ui/EditedTag'
 import EmptyState from '../components/ui/EmptyState'
 import type { Column } from '../components/ui/SortableTable'
-import { failureCauseOptions, propagationOptions, sites } from '../data'
+import { failureCauseOptions, propagationOptions } from '../data'
 import { useDashboard } from '../hooks/useDashboard'
 import { usePageTitle } from '../hooks/usePageTitle'
 import { downloadText, plantingsToCsv } from '../lib/csv'
 import { formatShortDate } from '../lib/dates'
 import { formatNumber, formatPercent } from '../lib/format'
 import { cropName, getBed, siteName } from '../lib/lookups'
+import { getSiteById } from '../lib/siteRegistry'
 import {
   bedStatuses,
   daysToFirstHarvestByCrop,
@@ -37,11 +39,27 @@ const propagationLabel = (value: PlantingLog['propagation']) =>
   propagationOptions.find((p) => p.value === value)?.label ?? value
 
 const columns: Column<PlantingLog>[] = [
-  { key: 'date', label: 'Date', sortValue: (p) => p.date + p.createdAt, render: (p) => formatShortDate(p.date) },
+  {
+    key: 'date',
+    label: 'Date',
+    sortValue: (p) => p.date + p.createdAt,
+    render: (p) => (
+      <>
+        {formatShortDate(p.date)}
+        {p.editedAt && <EditedTag />}
+      </>
+    ),
+  },
   { key: 'site', label: 'Site', sortValue: (p) => siteName(p.siteId, true), render: (p) => siteName(p.siteId, true) },
   { key: 'bed', label: 'Bed', sortValue: (p) => p.bedId, render: (p) => getBed(p.siteId, p.bedId)?.label ?? p.bedId },
   { key: 'crop', label: 'Crop', sortValue: (p) => cropName(p.cropId), render: (p) => cropName(p.cropId) },
-  { key: 'quantity', label: 'Plants', numeric: true, sortValue: (p) => p.quantity, render: (p) => formatNumber(p.quantity) },
+  {
+    key: 'quantity',
+    label: 'Plants',
+    numeric: true,
+    sortValue: (p) => p.quantity,
+    render: (p) => formatNumber(p.quantity),
+  },
   {
     key: 'propagation',
     label: 'Propagation',
@@ -60,7 +78,7 @@ export default function PlantingDashboardPage() {
     () => ({
       summary: plantingSummary(logs, filtered, siteIds, period),
       beds: siteIds.flatMap((id) => {
-        const s = sites.find((x) => x.id === id)
+        const s = getSiteById(id)
         return s ? [{ siteId: id, beds: bedStatuses(logs, s, period.end) }] : []
       }),
       weekly: weeklyPlantings(filtered, period),
@@ -150,7 +168,7 @@ export default function PlantingDashboardPage() {
             layout="stacked"
           >
             {view.beds.length === 0 ? <EmptyState title="No sites in this view" /> : <BedBoard sites={view.beds} />}
-            <p className="mt-4 text-sm text-ink-muted">{source('planting, harvest and failure logs')}</p>
+            <p className="mt-4 text-sm text-ink-muted">{source('planting, harvest and loss records')}</p>
           </DashboardSection>
 
           <DashboardSection id="planting-activity" title="Planting activity" layout="stacked">
@@ -164,7 +182,11 @@ export default function PlantingDashboardPage() {
                     : `${formatNumber(summary.plantingsInPeriod)} plantings, ${formatNumber(view.weekly.reduce((a, w) => a + w.plants, 0))} plants in all.`
                 }
                 source={source('planting logs')}
-                empty={noPlantings ? <EmptyState title="No plantings in this period" detail={`Nothing was planted at ${scope}.`} /> : null}
+                empty={
+                  noPlantings ? (
+                    <EmptyState title="No plantings in this period" detail={`Nothing was planted at ${scope}.`} />
+                  ) : null
+                }
                 chart={
                   <WeeklyCountChart
                     data={view.weekly}
@@ -216,7 +238,7 @@ export default function PlantingDashboardPage() {
                     ? `${cropName(lowestSurvival.cropId)} fared worst: ${formatPercent(lowestSurvival.survival)} survived (${formatNumber(lowestSurvival.lost)} of ${formatNumber(lowestSurvival.planted)} plants lost).`
                     : 'No plantings to measure.'
                 }
-                source={source('planting and failure logs')}
+                source={source('planting and loss records')}
                 empty={view.survival.length === 0 ? <EmptyState title="No plantings to measure" /> : null}
                 chart={
                   <BarList
@@ -234,14 +256,18 @@ export default function PlantingDashboardPage() {
               />
               <ChartFigure
                 title="Losses by cause"
-                subtitle="plants lost, from failure logs"
+                subtitle="plants lost (net of recoveries), from loss records"
                 summary={
                   topLoss && topLoss.plants > 0
                     ? `${failureCauseOptions.find((c) => c.value === topLoss.cause)?.label} caused the most losses: ${formatNumber(topLoss.plants)} plants in ${topLoss.events} ${topLoss.events === 1 ? 'event' : 'events'}.`
                     : 'No losses logged in this period.'
                 }
-                source={source('failure logs')}
-                empty={noFailures ? <EmptyState title="No losses logged in this period" detail="Good news, or nobody logged them." /> : null}
+                source={source('loss records')}
+                empty={
+                  noFailures ? (
+                    <EmptyState title="No losses logged in this period" detail="Good news, or nobody logged them." />
+                  ) : null
+                }
                 chart={
                   <BarList
                     ariaLabel="Plants lost by cause"

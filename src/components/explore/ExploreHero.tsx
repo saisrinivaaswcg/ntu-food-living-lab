@@ -2,26 +2,27 @@ import { ArrowDown, ClipboardPen } from 'lucide-react'
 import { motion, useReducedMotion, useScroll, useTransform } from 'motion/react'
 import { useRef, useState } from 'react'
 import { Link } from 'react-router-dom'
-import { crops, exploreHeroImage, exploreHeroVideo, imageAsset, sites, videoAsset } from '../../data'
+import { crops, exploreHeroImage, exploreHeroVideo, imageAsset, videoAsset } from '../../data'
+import { useLogs } from '../../hooks/useLogs'
 import { formatNumber } from '../../lib/format'
 import CountUp from '../ui/CountUp'
 import PhotoCaption from '../ui/PhotoCaption'
 import SlotImage from '../ui/SlotImage'
 
-const totalBeds = sites.reduce((n, s) => n + s.beds.length, 0)
-const totalArea = sites.reduce((n, s) => n + s.areaSqm, 0)
-const STATS = [
-  { value: sites.length, label: 'campus sites' },
-  { value: totalBeds, label: 'growing beds' },
-  { value: totalArea, label: 'm² under crops' },
-  { value: crops.length, label: 'crops tracked' },
-]
 
 const EASE = [0.22, 1, 0.36, 1] as const
 
 /** Full-width photo (or muted loop) with the headline over it. The photo drifts slower than the page. */
 export default function ExploreHero({ mapId }: { mapId: string }) {
   const reduce = useReducedMotion()
+  const { sites } = useLogs()
+  // Beds and areas follow any site setup edited on this device.
+  const stats = [
+    { value: sites.length, label: 'campus sites' },
+    { value: sites.reduce((n, s) => n + s.beds.length, 0), label: 'growing beds' },
+    { value: Math.round(sites.reduce((n, s) => n + s.areaSqm, 0)), label: 'm² under crops' },
+    { value: crops.length, label: 'crops tracked' },
+  ]
   const ref = useRef<HTMLElement>(null)
   const { scrollYProgress } = useScroll({ target: ref, offset: ['start start', 'end start'] })
   const imageY = useTransform(scrollYProgress, [0, 1], ['0%', '18%'])
@@ -103,7 +104,7 @@ export default function ExploreHero({ mapId }: { mapId: string }) {
           className="mt-12 grid grid-cols-2 gap-x-6 gap-y-5 border-t border-white/30 pt-6 sm:grid-cols-4 lg:mt-16"
           {...enter(0.55)}
         >
-          {STATS.map((s) => (
+          {stats.map((s) => (
             <div key={s.label}>
               <dt className="sr-only">{s.label}</dt>
               <dd>
