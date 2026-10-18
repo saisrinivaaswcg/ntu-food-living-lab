@@ -6,7 +6,7 @@ export default function BottomNav() {
   return (
     <nav
       aria-label="Main"
-      className="fixed inset-x-0 bottom-0 z-50 border-t border-line bg-surface pb-[env(safe-area-inset-bottom)] lg:hidden"
+      className="fixed inset-x-0 bottom-0 z-[1000] border-t border-line bg-surface pb-[env(safe-area-inset-bottom)] lg:hidden"
     >
       <ul className="grid h-16 grid-cols-4">
         {navItems.map(({ to, label, icon: Icon, end }) => (
@@ -15,16 +15,20 @@ export default function BottomNav() {
               to={to}
               end={end}
               className={({ isActive }) =>
-                `flex h-full flex-col items-center justify-center gap-1 text-xs font-medium ${
-                  isActive ? 'text-brand-700' : 'text-ink-muted'
+                `relative flex h-full flex-col items-center justify-center gap-1 text-xs font-medium transition-colors active:bg-sunken ${
+                  isActive ? 'text-ink' : 'text-ink-muted'
                 }`
               }
             >
               {({ isActive }) => (
                 <>
-                  <span className={`rounded-full px-4 py-1 ${isActive ? 'bg-brand-100' : ''}`}>
-                    <Icon className="size-5" aria-hidden />
-                  </span>
+                  <span
+                    className={`absolute inset-x-5 top-0 h-0.5 bg-brand-700 transition-transform duration-300 ${
+                      isActive ? 'scale-x-100' : 'scale-x-0'
+                    }`}
+                    aria-hidden
+                  />
+                  <Icon className="size-5" strokeWidth={isActive ? 2.25 : 1.75} aria-hidden />
                   {label}
                 </>
               )}

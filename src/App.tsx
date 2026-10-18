@@ -1,3 +1,4 @@
+import { MotionConfig } from 'motion/react'
 import { lazy } from 'react'
 import { BrowserRouter, Route, Routes } from 'react-router-dom'
 import AppShell from './components/layout/AppShell'
@@ -13,18 +14,21 @@ const NotFoundPage = lazy(() => import('./pages/NotFoundPage'))
 
 export default function App() {
   return (
-    <BrowserRouter>
-      <Routes>
-        <Route element={<AppShell />}>
-          <Route index element={<ExplorePage />} />
-          <Route path="log" element={<LogPage />} />
-          <Route path="log/:kind" element={<LogFormPage />} />
-          <Route path="dashboard" element={<DashboardPage />} />
-          <Route path="sites" element={<SitesPage />} />
-          <Route path="sites/:siteId" element={<SiteDetailPage />} />
-          <Route path="*" element={<NotFoundPage />} />
-        </Route>
-      </Routes>
-    </BrowserRouter>
+    // reducedMotion="user": every motion component follows the device's reduce-motion setting.
+    <MotionConfig reducedMotion="user">
+      <BrowserRouter>
+        <Routes>
+          <Route element={<AppShell />}>
+            <Route index element={<ExplorePage />} />
+            <Route path="log" element={<LogPage />} />
+            <Route path="log/:kind" element={<LogFormPage />} />
+            <Route path="dashboard" element={<DashboardPage />} />
+            <Route path="sites" element={<SitesPage />} />
+            <Route path="sites/:siteId" element={<SiteDetailPage />} />
+            <Route path="*" element={<NotFoundPage />} />
+          </Route>
+        </Routes>
+      </BrowserRouter>
+    </MotionConfig>
   )
 }

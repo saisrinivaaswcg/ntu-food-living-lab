@@ -8,12 +8,12 @@ interface Props {
 
 export default function CropChips({ cropIds, emptyText }: Props) {
   if (cropIds.length === 0) {
-    return <p className="text-sm text-ink-subtle">{emptyText}</p>
+    return <p className="text-sm text-ink-muted">{emptyText}</p>
   }
   return (
-    <ul className="flex flex-wrap gap-2">
+    <ul className="flex flex-wrap gap-1.5">
       {cropIds.map((id) => (
-        <li key={id} className="rounded-full border border-brand-200 bg-brand-50 px-3 py-1 text-sm text-brand-800">
+        <li key={id} className="rounded-sm bg-sunken px-2.5 py-1 text-sm text-ink">
           {cropName(id)}
         </li>
       ))}

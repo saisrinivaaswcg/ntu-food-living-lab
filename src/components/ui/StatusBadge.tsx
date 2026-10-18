@@ -1,13 +1,15 @@
 import { siteStatusLabels } from '../../data'
 import type { SiteStatus } from '../../types'
-import { statusBadgeClass, statusDotClass } from './statusStyles'
+import { statusDotClass } from './statusStyles'
 
-export default function StatusBadge({ status }: { status: SiteStatus }) {
+/** Status as a coloured square and its label (never colour alone). */
+export default function StatusBadge({ status, onDark = false }: { status: SiteStatus; onDark?: boolean }) {
   return (
-    <span
-      className={`inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-xs font-semibold ${statusBadgeClass[status]}`}
-    >
-      <span className={`size-2 rounded-full ${statusDotClass[status]}`} aria-hidden />
+    <span className={`inline-flex items-center gap-2 text-sm font-semibold ${onDark ? 'text-white' : 'text-ink'}`}>
+      <span
+        className={`size-2.5 rounded-[2px] ${statusDotClass[status]} ${onDark ? 'ring-2 ring-white/80' : ''}`}
+        aria-hidden
+      />
       {siteStatusLabels[status]}
     </span>
   )
