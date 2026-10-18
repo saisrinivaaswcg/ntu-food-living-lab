@@ -5,6 +5,19 @@ import { CAMPUS_MAP_VIEW, siteStatusLabels } from '../../data'
 import type { Site, SiteId, SiteStatus } from '../../types'
 import { statusDotClass } from '../ui/statusStyles'
 
+/**
+ * Basemap: OneMap by the Singapore Land Authority (no API key needed).
+ * Zoom limits, bounds and attribution follow onemap.gov.sg/docs/maps. The attribution
+ * (OneMap logo + credit) is required by the OneMap terms of use — do not remove it.
+ */
+const ONEMAP_TILES = 'https://www.onemap.gov.sg/maps/tiles/GreyLite/{z}/{x}/{y}.png'
+const ONEMAP_ATTRIBUTION =
+  '<img src="https://www.onemap.gov.sg/web-assets/images/logo/om_logo.png" style="height:20px;width:20px;"/>&nbsp;<a href="https://www.onemap.gov.sg/" target="_blank" rel="noopener noreferrer">OneMap</a>&nbsp;&copy;&nbsp;contributors&nbsp;&#124;&nbsp;<a href="https://www.sla.gov.sg/" target="_blank" rel="noopener noreferrer">Singapore Land Authority</a>'
+const ONEMAP_MIN_ZOOM = 11
+const ONEMAP_MAX_ZOOM = 19
+/** Singapore: south-west and north-east corners */
+const SINGAPORE_BOUNDS = L.latLngBounds([1.144, 103.535], [1.494, 104.502])
+
 interface Props {
   sites: Site[]
   selectedId: SiteId | null
@@ -57,13 +70,20 @@ export default function SiteMap({ sites, selectedId, onSelect }: Props) {
     <MapContainer
       center={CAMPUS_MAP_VIEW.center}
       zoom={CAMPUS_MAP_VIEW.zoom}
+      minZoom={ONEMAP_MIN_ZOOM}
+      maxZoom={ONEMAP_MAX_ZOOM}
+      maxBounds={SINGAPORE_BOUNDS}
+      maxBoundsViscosity={1}
       scrollWheelZoom={false}
       className="size-full"
       aria-label="Map of the NTU campus showing the four growing sites"
     >
       <TileLayer
-        attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-        url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+        url={ONEMAP_TILES}
+        attribution={ONEMAP_ATTRIBUTION}
+        detectRetina
+        minZoom={ONEMAP_MIN_ZOOM}
+        maxZoom={ONEMAP_MAX_ZOOM}
       />
       {sites.map((site) => {
         const selected = site.id === selectedId

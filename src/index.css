@@ -76,3 +76,9 @@
   outline-offset: 2px;
   border-radius: 9999px;
 }
+
+/* Tailwind makes images block-level; keep the required OneMap logo inline with its credit. */
+.leaflet-control-attribution img {
+  display: inline-block;
+  vertical-align: middle;
+}

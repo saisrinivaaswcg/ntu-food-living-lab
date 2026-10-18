@@ -12,7 +12,7 @@ Frontend prototype of a shared platform for four NTU food-growing sites, so grow
 
 ## Stack
 
-React 19 + TypeScript (strict) + Vite · Tailwind CSS v4 (CSS-first config in `src/index.css`; there is no tailwind.config) · React Router v7 · Recharts · Leaflet + react-leaflet + OpenStreetMap tiles · lucide-react.
+React 19 + TypeScript (strict) + Vite · Tailwind CSS v4 (CSS-first config in `src/index.css`; there is no tailwind.config) · React Router v7 · Recharts · Leaflet + react-leaflet + OneMap (SLA) basemap tiles · lucide-react.
 No backend, no auth, no database.
 
 ## Architecture
