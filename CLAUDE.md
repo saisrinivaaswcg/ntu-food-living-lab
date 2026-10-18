@@ -31,7 +31,7 @@ No backend, no auth, no database.
 2. [x] Explore — app shell (top nav + mobile bottom nav, breadcrumbs, demo-data banner), Leaflet map, site side panel
 3. [x] Log — four forms, harvest form first
 4. [x] Dashboard
-5. [ ] Sites — Knowledge and Handover sections
+5. [x] Sites — Knowledge and Handover sections
 
 Tick items here when a step is finished. Remove the `.gitkeep` from a folder once it has real files.
 

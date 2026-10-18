@@ -2,6 +2,8 @@ import type {
   CompostType,
   FailureCause,
   HarvestDestination,
+  OpenIssue,
+  ProblemEntry,
   PropagationType,
   ProtocolCategory,
   SiteStatus,
@@ -37,6 +39,24 @@ export const failureCauseOptions: { value: FailureCause; label: string }[] = [
   { value: 'disease', label: 'Disease' },
   { value: 'drought', label: 'Drought' },
   { value: 'unknown', label: 'Unknown' },
+]
+
+/** Problem-log causes: the failure causes plus "Other" for problems that aren't plant losses. */
+export const problemCauseOptions: { value: ProblemEntry['cause']; label: string }[] = [
+  ...failureCauseOptions,
+  { value: 'other', label: 'Other' },
+]
+
+export const problemStatusLabels: Record<ProblemEntry['status'], string> = {
+  open: 'Open',
+  resolved: 'Resolved',
+}
+
+/** Highest priority first. */
+export const issuePriorityOptions: { value: OpenIssue['priority']; label: string }[] = [
+  { value: 'high', label: 'High priority' },
+  { value: 'medium', label: 'Medium priority' },
+  { value: 'low', label: 'Low priority' },
 ]
 
 export const siteStatusLabels: Record<SiteStatus, string> = {

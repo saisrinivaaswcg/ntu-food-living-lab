@@ -1,12 +1,17 @@
 import { MapPin } from 'lucide-react'
 import { useMemo } from 'react'
-import { Link, useParams } from 'react-router-dom'
+import { Link, useParams, useSearchParams } from 'react-router-dom'
 import Breadcrumbs from '../components/layout/Breadcrumbs'
+import HandoverTab from '../components/sites/HandoverTab'
+import KnowledgeTab from '../components/sites/KnowledgeTab'
+import SiteTabs from '../components/sites/SiteTabs'
+import { SITE_TABS, panelId, tabId, type SiteTab } from '../components/sites/siteTabItems'
 import CropChips from '../components/ui/CropChips'
 import PhotoPlaceholder from '../components/ui/PhotoPlaceholder'
 import StatusBadge from '../components/ui/StatusBadge'
 import { useLogs } from '../hooks/useLogs'
 import { usePageTitle } from '../hooks/usePageTitle'
+import { DEMO_DATA_SHORT_NOTICE } from '../data'
 import { cropName, findSite } from '../lib/lookups'
 import { cropsCurrentlyGrowing, currentPlantingByBed } from '../lib/metrics'
 import type { PlantingLog } from '../types'
@@ -14,6 +19,12 @@ import NotFoundPage from './NotFoundPage'
 
 export default function SiteDetailPage() {
   const { siteId } = useParams()
+  const [searchParams, setSearchParams] = useSearchParams()
+  // The tab lives in the URL so it can be linked to and survives a reload.
+  const tab: SiteTab = SITE_TABS.find((t) => t.id === searchParams.get('tab'))?.id ?? 'knowledge'
+  function selectTab(next: SiteTab) {
+    setSearchParams(next === 'knowledge' ? {} : { tab: next }, { replace: true })
+  }
   const site = findSite(siteId)
   const { logs } = useLogs()
   const current = useMemo(
@@ -91,6 +102,14 @@ export default function SiteDetailPage() {
             Show on map
           </Link>
         </aside>
+      </div>
+
+      <div className="mt-8">
+        <SiteTabs active={tab} onChange={selectTab} />
+        <div role="tabpanel" id={panelId(tab)} aria-labelledby={tabId(tab)} tabIndex={0} className="pt-6 focus-visible:outline-none">
+          <p className="mb-6 text-sm text-demo">{DEMO_DATA_SHORT_NOTICE}</p>
+          {tab === 'knowledge' ? <KnowledgeTab site={site} /> : <HandoverTab site={site} />}
+        </div>
       </div>
     </div>
   )

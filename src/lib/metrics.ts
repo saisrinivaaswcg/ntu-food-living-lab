@@ -533,3 +533,39 @@ export function leaderboard(
     .sort((a, b) => b.score - a.score)
     .map((e, i, all) => ({ ...e, rank: i > 0 && Math.abs(all[i - 1].score - e.score) < 1e-9 ? i : i + 1 }))
 }
+
+/* ------------------------------------------------------------------ */
+/* Sites: knowledge                                                    */
+/* ------------------------------------------------------------------ */
+
+export interface CropYield {
+  cropId: CropId
+  harvests: number
+  /** Smallest and largest single harvest, in kg */
+  minKg: number
+  maxKg: number
+  totalKg: number
+}
+
+/** Per-crop yield range at one site, from every harvest log for that site. */
+export function cropYieldsAtSite(logs: Pick<LogCollections, 'harvests'>, siteId: SiteId): Map<CropId, CropYield> {
+  const yields = new Map<CropId, CropYield>()
+  for (const h of logs.harvests) {
+    if (h.siteId !== siteId) continue
+    const y = yields.get(h.cropId)
+    if (!y) {
+      yields.set(h.cropId, { cropId: h.cropId, harvests: 1, minKg: h.weightKg, maxKg: h.weightKg, totalKg: h.weightKg })
+    } else {
+      y.harvests += 1
+      y.minKg = Math.min(y.minKg, h.weightKg)
+      y.maxKg = Math.max(y.maxKg, h.weightKg)
+      y.totalKg += h.weightKg
+    }
+  }
+  return yields
+}
+
+/** Sorts crop ids into controlled-vocabulary order. */
+export function sortCropIds(ids: Iterable<CropId>): CropId[] {
+  return [...new Set(ids)].sort((a, b) => (cropOrder.get(a) ?? 0) - (cropOrder.get(b) ?? 0))
+}
