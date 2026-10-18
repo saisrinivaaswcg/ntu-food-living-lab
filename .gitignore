@@ -24,3 +24,8 @@ dist-ssr
 *.sw?
 # Playwright CLI output (may contain credentials)
 .playwright-cli/
+
+# Locally installed agent skills (not part of the app)
+.agents/
+.claude/
+skills-lock.json
