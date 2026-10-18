@@ -1,80 +1,51 @@
-import { ClipboardPen } from 'lucide-react'
 import { useMemo } from 'react'
-import { Link, useSearchParams } from 'react-router-dom'
 import ChartFigure from '../components/dashboard/ChartFigure'
 import CompletenessGrid from '../components/dashboard/CompletenessGrid'
 import CompletenessSummary from '../components/dashboard/CompletenessSummary'
 import CostTable from '../components/dashboard/CostTable'
 import CropBarChart from '../components/dashboard/CropBarChart'
+import DashboardHeader from '../components/dashboard/DashboardHeader'
 import DashboardSection from '../components/dashboard/DashboardSection'
 import EfficiencyTable from '../components/dashboard/EfficiencyTable'
-import FilterBar from '../components/dashboard/FilterBar'
 import HeadlineNumbers from '../components/dashboard/HeadlineNumbers'
 import Leaderboard from '../components/dashboard/Leaderboard'
-import { DEFAULT_PERIOD, isPeriodKey, PERIOD_LABELS } from '../components/dashboard/periods'
+import NoLogsNotice from '../components/dashboard/NoLogsNotice'
 import SeriesTable from '../components/dashboard/SeriesTable'
 import SiteComparison from '../components/dashboard/SiteComparison'
 import WeeklyLineChart from '../components/dashboard/WeeklyLineChart'
-import Breadcrumbs from '../components/layout/Breadcrumbs'
 import EmptyState from '../components/ui/EmptyState'
-import { costAssumptions, PRICE_SURVEY_DATE, sites, supermarketPrices } from '../data'
-import { useLogs } from '../hooks/useLogs'
+import { costAssumptions, PRICE_SURVEY_DATE, supermarketPrices } from '../data'
+import { useDashboard } from '../hooks/useDashboard'
 import { usePageTitle } from '../hooks/usePageTitle'
 import { downloadText, harvestsToCsv } from '../lib/csv'
-import { addDays, formatDate, formatShortDate } from '../lib/dates'
+import { addDays, formatShortDate } from '../lib/dates'
 import { formatNumber, formatPercent } from '../lib/format'
-import { setShowDemoData } from '../lib/logStore'
-import { cropName, findSite, siteName } from '../lib/lookups'
+import { cropName, siteName } from '../lib/lookups'
 import {
   computeCompleteness,
   computeKpis,
   cropCosts,
   cropEfficiency,
-  filterLogs,
   harvestByCrop,
   lastCompleteWeeks,
-  latestLogDate,
   LEADERBOARD_COMPONENTS,
   leaderboard,
   peakWeek,
-  resolvePeriod,
   siteComparison,
   sitesWithHarvests,
   weeklySeries,
-  type PeriodKey,
-  type SiteFilter,
 } from '../lib/metrics'
 
-/** Public dashboard. All numbers come from lib/metrics; this page only arranges them. */
+/** Public dashboard: the overview. All numbers come from lib/metrics; this page only arranges them. */
 export default function DashboardPage() {
   usePageTitle('Dashboard')
-  const { logs, showDemoData } = useLogs()
-  const [params, setParams] = useSearchParams()
-
-  // Filters live in the URL so a view can be shared or bookmarked.
-  const periodParam = params.get('period')
-  const period: PeriodKey = isPeriodKey(periodParam) ? periodParam : DEFAULT_PERIOD
-  const site: SiteFilter = findSite(params.get('site') ?? undefined)?.id ?? 'all'
-  const setFilter = (key: 'period' | 'site', value: string, defaultValue: string) =>
-    setParams(
-      (prev) => {
-        const next = new URLSearchParams(prev)
-        if (value === defaultValue) next.delete(key)
-        else next.set(key, value)
-        return next
-      },
-      { replace: true },
-    )
+  const dash = useDashboard()
+  const { logs, period: p, filtered, siteIds, site, scope, rangeText, since, showDemoData } = dash
 
   const view = useMemo(() => {
-    const p = resolvePeriod(period, logs)
-    const filtered = filterLogs(logs, p, site)
-    const siteIds = site === 'all' ? sites.map((s) => s.id) : [site]
     const headlineWeeks = lastCompleteWeeks(p.end, 4)
     const rows = siteComparison(logs, p)
     return {
-      period: p,
-      filtered,
       kpis: computeKpis(filtered),
       headlineWeeks,
       headline: computeCompleteness(
@@ -90,26 +61,21 @@ export default function DashboardPage() {
       board: leaderboard(rows),
       harvestSites: sitesWithHarvests(filtered),
     }
-  }, [logs, period, site])
-
-  const hasAnyLogs = latestLogDate(logs) !== null
-  const { period: p, filtered } = view
-  const firstWeek = p.weeks[0]
-  const rangeText = `${formatShortDate(firstWeek)} – ${formatDate(p.end)}`
-  const scope = site === 'all' ? 'all sites' : siteName(site)
+  }, [logs, p, filtered, siteIds])
 
   const exportCsv = () =>
-    downloadText(`ntu-harvests_${period}_${site}_${p.end}.csv`, harvestsToCsv(filtered.harvests))
+    downloadText(`ntu-harvests_${dash.periodKey}_${site}_${p.end}.csv`, harvestsToCsv(filtered.harvests))
 
   const noHarvests = filtered.harvests.length === 0
   const noWeekly = filtered.weeklyInputs.length === 0
 
   // Plain-language headline, e.g. "84.2 kg grown across 4 sites since 20 Jul".
-  const since = formatShortDate(firstWeek)
   const where = site === 'all' ? `across ${view.harvestSites} ${view.harvestSites === 1 ? 'site' : 'sites'}` : `at ${siteName(site)}`
-  const headline = noHarvests
-    ? `No harvests logged ${site === 'all' ? 'at any site' : `at ${siteName(site)}`} since ${since}`
-    : `${formatNumber(view.kpis.totalKg, 1)} kg grown ${where} since ${since}`
+  const headline = !dash.hasAnyLogs
+    ? 'Campus harvest dashboard'
+    : noHarvests
+      ? `No harvests logged ${site === 'all' ? 'at any site' : `at ${siteName(site)}`} since ${since}`
+      : `${formatNumber(view.kpis.totalKg, 1)}\u00a0kg grown ${where} since ${since}`
 
   const harvestPeak = peakWeek(view.series, 'harvestKg')
   const waterPeak = peakWeek(view.series, 'waterLitres')
@@ -124,48 +90,16 @@ export default function DashboardPage() {
 
   return (
     <div className="mx-auto max-w-7xl px-4 pt-5 pb-10 lg:px-8 lg:pt-8">
-      <Breadcrumbs items={[{ label: 'Dashboard' }]} className="mb-4" />
+      <DashboardHeader
+        dash={dash}
+        headline={headline}
+        onExport={noHarvests ? null : exportCsv}
+        exportCount={filtered.harvests.length}
+        exportNoun="harvests"
+      />
 
-      <header className="max-w-4xl">
-        <h1 className="font-display text-display font-medium">{hasAnyLogs ? `${headline}.` : 'Campus harvest dashboard'}</h1>
-        <p className="mt-3 max-w-2xl text-ink-muted lg:text-lg">
-          {hasAnyLogs ? (
-            <>
-              {PERIOD_LABELS[period]}, {scope}: {rangeText}. Periods end on the latest log, not today.{demoNote}
-            </>
-          ) : (
-            'Open to anyone. Every number comes from the logs at the four sites.'
-          )}
-        </p>
-      </header>
-
-      <div className="mt-8">
-        <FilterBar
-          period={period}
-          onPeriod={(v) => setFilter('period', v, DEFAULT_PERIOD)}
-          site={site}
-          onSite={(v) => setFilter('site', v, 'all')}
-          showDemo={showDemoData}
-          onShowDemo={setShowDemoData}
-          onExport={noHarvests ? null : exportCsv}
-          exportCount={filtered.harvests.length}
-        />
-      </div>
-
-      {!hasAnyLogs ? (
-        <div className="mt-8 max-w-2xl">
-          <EmptyState
-            title="No logs to show"
-            detail="Demo data is switched off and nothing has been logged on this device yet. Turn on demo data above, or log a harvest."
-          />
-          <Link
-            to="/log"
-            className="mt-4 inline-flex min-h-12 items-center gap-2 rounded-sm bg-accent px-5 font-semibold text-white transition-colors hover:bg-accent-strong"
-          >
-            <ClipboardPen className="size-4" aria-hidden />
-            Log a harvest
-          </Link>
-        </div>
+      {!dash.hasAnyLogs ? (
+        <NoLogsNotice />
       ) : (
         <>
           <div className="grid gap-10 py-10 lg:grid-cols-12 lg:gap-x-10 lg:py-14">

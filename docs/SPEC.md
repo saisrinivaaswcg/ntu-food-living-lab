@@ -60,6 +60,14 @@ Controls: period (last 4 weeks / last 3 months / all), site filter (all or one),
 - **CSV export** of the raw harvest log (respects the current filters): `id, date, site, bed, crop, weight_kg, destination, labour_hours, has_photo, notes, source`. Photos are not exported.
 - **Inter-hall challenge leaderboard:** ranks sites on a blended score, not yield alone. Show each component so the ranking is transparent.
 
+### Harvest and Planting dashboards (`/dashboard/harvest`, `/dashboard/planting`)
+
+Tabs beside the Overview (`/dashboard`). Period and site filters are shared through the URL.
+
+- **Harvest:** headline (total kg, number of harvests, kg per m², top crop); kg per week by site (small multiples on a shared scale); kg by crop; where the harvest went (destination); a gallery of harvest photos (select to enlarge); a sortable recent-harvests table with photo thumbnails; CSV export.
+- **Planting:** headline (plants in the ground now, plantings this period, survival rate, beds in use); a bed-by-bed view per site of what is growing now; plantings per week; survival rate by crop; propagation method breakdown; median days from planting to first harvest by crop against the crop's typical days; expected upcoming first harvests; losses by cause; a sortable recent-plantings table; CSV export (`id, date, site, bed, crop, quantity, propagation, notes, source`).
+- Every chart has an empty state, a "what this shows" line and a source line with the demo-data note.
+
 ## 4. Sites (`/sites`, `/sites/:siteId`)
 
 `/sites` lists the four sites as cards. Each site page has two tabs:

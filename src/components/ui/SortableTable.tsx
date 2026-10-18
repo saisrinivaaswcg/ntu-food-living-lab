@@ -16,10 +16,12 @@ interface Props<T> {
   rows: T[]
   rowKey: (row: T) => string
   initialSort: { key: string; direction: 'asc' | 'desc' }
+  /** Show only the first rows after sorting */
+  limit?: number
 }
 
 /** Table sortable by any column. Header buttons announce the sort order via aria-sort. */
-export default function SortableTable<T>({ caption, columns, rows, rowKey, initialSort }: Props<T>) {
+export default function SortableTable<T>({ caption, columns, rows, rowKey, initialSort, limit }: Props<T>) {
   const [sort, setSort] = useState(initialSort)
   const column = columns.find((c) => c.key === sort.key) ?? columns[0]
 
@@ -70,7 +72,7 @@ export default function SortableTable<T>({ caption, columns, rows, rowKey, initi
           </tr>
         </thead>
         <tbody>
-          {sorted.map((row) => (
+          {(limit === undefined ? sorted : sorted.slice(0, limit)).map((row) => (
             <tr key={rowKey(row)} className="border-b border-line last:border-0">
               {columns.map((c, i) => {
                 const Cell = i === 0 ? 'th' : 'td'

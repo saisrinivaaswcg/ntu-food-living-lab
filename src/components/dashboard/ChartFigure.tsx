@@ -1,4 +1,5 @@
-import { useId, useState, type ReactNode } from 'react'
+import { useInView } from 'motion/react'
+import { useId, useRef, useState, type ReactNode } from 'react'
 
 interface Props {
   title: string
@@ -8,16 +9,24 @@ interface Props {
   summary: ReactNode
   /** Where the numbers come from. */
   source: ReactNode
-  /** Rendered when there is data; `empty` replaces both. */
+  /** Rendered when there is data; `empty` replaces it. */
   chart: ReactNode
-  table: ReactNode
+  /** Table twin, so every value is readable without hovering. Omit when the chart's values are already text. */
+  table?: ReactNode
   empty: ReactNode | null
+  /** Space reserved before the chart mounts, so the page doesn't jump. */
+  minHeight?: string
 }
 
-/** A chart with a table twin (every value readable without hovering), a plain-language summary and a source line. */
-export default function ChartFigure({ title, subtitle, summary, source, chart, table, empty }: Props) {
+/**
+ * A chart with an optional table twin, a plain-language summary and a source line. The chart mounts
+ * when it scrolls into view, so its entrance animation plays where it can be seen.
+ */
+export default function ChartFigure({ title, subtitle, summary, source, chart, table, empty, minHeight = '16rem' }: Props) {
   const [view, setView] = useState<'chart' | 'table'>('chart')
   const headingId = useId()
+  const ref = useRef<HTMLDivElement>(null)
+  const inView = useInView(ref, { once: true, amount: 0.25 })
 
   return (
     <figure aria-labelledby={headingId} className="min-w-0">
@@ -28,7 +37,7 @@ export default function ChartFigure({ title, subtitle, summary, source, chart, t
           </h3>
           {subtitle && <p className="text-sm text-ink-muted">{subtitle}</p>}
         </div>
-        {!empty && (
+        {!empty && table && (
           <div className="flex shrink-0 border border-line-strong" role="group" aria-label={`${title}: view as`}>
             {(['chart', 'table'] as const).map((v) => (
               <button
@@ -46,7 +55,9 @@ export default function ChartFigure({ title, subtitle, summary, source, chart, t
           </div>
         )}
       </div>
-      {empty ?? (view === 'chart' ? chart : table)}
+      <div ref={ref} style={empty || inView ? undefined : { minHeight }}>
+        {empty ?? (view === 'table' && table ? table : inView ? chart : null)}
+      </div>
       {!empty && (
         <figcaption className="mt-4 border-t border-line pt-3 text-sm">
           <p>

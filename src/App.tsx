@@ -8,6 +8,8 @@ const ExplorePage = lazy(() => import('./pages/ExplorePage'))
 const LogPage = lazy(() => import('./pages/LogPage'))
 const LogFormPage = lazy(() => import('./pages/LogFormPage'))
 const DashboardPage = lazy(() => import('./pages/DashboardPage'))
+const HarvestDashboardPage = lazy(() => import('./pages/HarvestDashboardPage'))
+const PlantingDashboardPage = lazy(() => import('./pages/PlantingDashboardPage'))
 const SitesPage = lazy(() => import('./pages/SitesPage'))
 const SiteDetailPage = lazy(() => import('./pages/SiteDetailPage'))
 const NotFoundPage = lazy(() => import('./pages/NotFoundPage'))
@@ -23,6 +25,8 @@ export default function App() {
             <Route path="log" element={<LogPage />} />
             <Route path="log/:kind" element={<LogFormPage />} />
             <Route path="dashboard" element={<DashboardPage />} />
+            <Route path="dashboard/harvest" element={<HarvestDashboardPage />} />
+            <Route path="dashboard/planting" element={<PlantingDashboardPage />} />
             <Route path="sites" element={<SitesPage />} />
             <Route path="sites/:siteId" element={<SiteDetailPage />} />
             <Route path="*" element={<NotFoundPage />} />

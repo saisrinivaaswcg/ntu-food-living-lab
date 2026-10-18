@@ -14,10 +14,22 @@ interface Props {
   /** null when there is nothing to export */
   onExport: (() => void) | null
   exportCount: number
+  /** What the CSV holds, e.g. "harvests" */
+  exportNoun: string
 }
 
 /** One row of filters above everything they scope. */
-export default function FilterBar({ period, onPeriod, site, onSite, showDemo, onShowDemo, onExport, exportCount }: Props) {
+export default function FilterBar({
+  period,
+  onPeriod,
+  site,
+  onSite,
+  showDemo,
+  onShowDemo,
+  onExport,
+  exportCount,
+  exportNoun,
+}: Props) {
   return (
     <div className="flex flex-col gap-4 border-y border-line py-4 lg:flex-row lg:flex-wrap lg:items-end lg:gap-6">
       <fieldset>
@@ -107,10 +119,12 @@ export default function FilterBar({ period, onPeriod, site, onSite, showDemo, on
             {onExport ? (
               <>
                 <span className="sm:hidden">Export CSV ({exportCount})</span>
-                <span className="hidden sm:inline">Export harvests ({exportCount}) as CSV</span>
+                <span className="hidden sm:inline">
+                  Export {exportNoun} ({exportCount}) as CSV
+                </span>
               </>
             ) : (
-              'Nothing to export'
+              `No ${exportNoun} to export`
             )}
           </button>
         </div>

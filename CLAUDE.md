@@ -37,7 +37,7 @@ Tick items here when a step is finished. Remove the `.gitkeep` from a folder onc
 
 ## Routes
 
-`/` Explore · `/log` (form picker) · `/log/:kind` (`harvest`, `planting`, `weekly`, `failure`) · `/dashboard` · `/sites` · `/sites/:siteId` (Knowledge / Handover tabs). Unknown routes and unknown site IDs show a not-found page with a way back. Hidden helper: `/?editPins=1` makes the map pins draggable and shows their coordinates with Copy buttons (nothing is saved; paste the values into `src/data/sites.ts`).
+`/` Explore · `/log` (form picker) · `/log/:kind` (`harvest`, `planting`, `weekly`, `failure`) · `/dashboard` (Overview) · `/dashboard/harvest` · `/dashboard/planting` (period and site filters shared via the query string) · `/sites` · `/sites/:siteId` (Knowledge / Handover tabs). Unknown routes and unknown site IDs show a not-found page with a way back. Hidden helper: `/?editPins=1` makes the map pins draggable and shows their coordinates with Copy buttons (nothing is saved; paste the values into `src/data/sites.ts`).
 
 ## Non-negotiable rules
 

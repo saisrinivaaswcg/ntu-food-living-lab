@@ -51,3 +51,8 @@ export function formatDate(iso: ISODate): string {
 export function formatShortDate(iso: ISODate): string {
   return parseISODate(iso).toLocaleDateString('en-SG', { day: 'numeric', month: 'short' })
 }
+
+/** Whole days from `from` to `to` (negative when `to` is earlier). */
+export function daysBetween(from: ISODate, to: ISODate): number {
+  return Math.round((parseISODate(to).getTime() - parseISODate(from).getTime()) / 86_400_000)
+}

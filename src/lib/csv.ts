@@ -1,5 +1,5 @@
-/** CSV export of the raw harvest log. Photos are not exported, only whether one exists. */
-import type { HarvestLog } from '../types'
+/** CSV exports of the raw logs. Photos are not exported, only whether one exists. */
+import type { HarvestLog, PlantingLog } from '../types'
 import { cropName, siteName } from './lookups'
 
 const HEADER = ['id', 'date', 'site', 'bed', 'crop', 'weight_kg', 'destination', 'labour_hours', 'has_photo', 'notes', 'source']
@@ -33,6 +33,19 @@ export function harvestsToCsv(harvests: HarvestLog[]): string {
     )
   // CRLF + byte-order mark so Excel opens it as UTF-8 with the right line breaks.
   return '﻿' + [HEADER.join(','), ...rows].join('\r\n') + '\r\n'
+}
+
+const PLANTING_HEADER = ['id', 'date', 'site', 'bed', 'crop', 'quantity', 'propagation', 'notes', 'source']
+
+export function plantingsToCsv(plantings: PlantingLog[]): string {
+  const rows = [...plantings]
+    .sort((a, b) => (a.date !== b.date ? (a.date < b.date ? -1 : 1) : a.createdAt < b.createdAt ? -1 : 1))
+    .map((p) =>
+      [p.id, p.date, siteName(p.siteId), p.bedId, cropName(p.cropId), p.quantity, p.propagation, p.notes ?? '', p.source]
+        .map(cell)
+        .join(','),
+    )
+  return '\uFEFF' + [PLANTING_HEADER.join(','), ...rows].join('\r\n') + '\r\n'
 }
 
 export function downloadText(fileName: string, text: string, type = 'text/csv;charset=utf-8'): void {
