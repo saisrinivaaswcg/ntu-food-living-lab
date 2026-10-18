@@ -27,12 +27,12 @@ export default function DateField({ id, value, onChange, error }: Props) {
         type="button"
         onClick={() => setOpen(true)}
         aria-label={`Date: ${value === today ? 'today' : formatDate(value)}. Change date`}
-        className="-mr-2 inline-flex min-h-12 items-center gap-1.5 rounded-lg px-2 text-sm text-ink-muted hover:bg-surface"
+        className="-mr-2 inline-flex min-h-12 items-center gap-1.5 rounded-sm px-2 text-sm text-ink-muted hover:bg-sunken"
       >
         <CalendarDays className="size-4" aria-hidden />
         <span className="font-medium text-ink">{value === today ? 'Today' : formatDate(value)}</span>
         <span aria-hidden>·</span>
-        <span className="text-brand-700 underline underline-offset-2">change</span>
+        <span className="font-semibold text-ink underline underline-offset-4">change</span>
       </button>
     )
   }
@@ -52,7 +52,7 @@ export default function DateField({ id, value, onChange, error }: Props) {
           onChange={(e) => onChange(e.target.value)}
           aria-invalid={error ? true : undefined}
           aria-describedby={describedBy(id, undefined, error)}
-          className="min-h-12 rounded-xl border border-line bg-surface px-3 text-base text-ink focus:border-brand-600 focus:outline-none focus:ring-2 focus:ring-brand-600/30 aria-[invalid=true]:border-danger"
+          className="min-h-12 rounded-sm border border-line-strong bg-surface px-3 text-base text-ink focus:border-brand-700 focus:outline-2 focus:outline-offset-0 focus:outline-focus aria-[invalid=true]:border-danger"
         />
       </div>
       {error && (

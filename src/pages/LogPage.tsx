@@ -1,4 +1,4 @@
-import { ArrowRight, ChevronRight } from 'lucide-react'
+import { ArrowRight } from 'lucide-react'
 import { Link } from 'react-router-dom'
 import Breadcrumbs from '../components/layout/Breadcrumbs'
 import { logFormKinds } from '../components/log/logFormKinds'
@@ -12,39 +12,41 @@ export default function LogPage() {
   const HarvestIcon = harvest.icon
 
   return (
-    <div className="mx-auto max-w-xl px-4 py-5 lg:py-8">
+    <div className="mx-auto max-w-2xl px-4 py-5 lg:py-10">
       <Breadcrumbs items={[{ label: 'Log' }]} />
-      <h1 className="text-2xl font-semibold tracking-tight">What are you logging?</h1>
-      <p className="mt-1 text-ink-muted">Every site uses the same four forms, so the numbers can be compared.</p>
+      <h1 className="font-display text-display font-medium">What are you logging?</h1>
+      <p className="mt-3 text-lg text-ink-muted">Every site uses the same four forms, so the numbers can be compared.</p>
 
       <Link
         to={`/log/${harvest.slug}`}
-        className="mt-5 flex items-center gap-4 rounded-card bg-brand-700 p-5 text-white shadow-card hover:bg-brand-800"
+        className="group mt-8 flex items-center gap-5 rounded-2xl bg-brand-800 p-6 text-white shadow-float transition-[background-color,transform] duration-200 hover:-translate-y-0.5 hover:bg-brand-900 active:translate-y-0 lg:p-8"
       >
-        <span className="flex size-14 shrink-0 items-center justify-center rounded-2xl bg-white/15">
-          <HarvestIcon className="size-7" aria-hidden />
-        </span>
+        <HarvestIcon className="size-9 shrink-0 text-brand-200" strokeWidth={1.5} aria-hidden />
         <span className="min-w-0 flex-1">
-          <span className="block text-xl font-semibold">Log a harvest</span>
-          <span className="mt-0.5 block text-sm text-brand-100">{harvest.description}</span>
+          <span className="block font-display text-3xl font-medium lg:text-4xl">Log a harvest</span>
+          <span className="mt-1 block text-white/85">{harvest.description}</span>
         </span>
-        <ArrowRight className="size-6 shrink-0" aria-hidden />
+        <span className="flex size-12 shrink-0 items-center justify-center rounded-full bg-accent transition-transform duration-200 group-hover:translate-x-1">
+          <ArrowRight className="size-5" aria-hidden />
+        </span>
       </Link>
 
-      <h2 className="mt-6 mb-2 text-sm font-semibold text-ink-muted">Other forms</h2>
-      <ul className="space-y-2">
+      <h2 className="mt-10 mb-1 text-sm font-semibold text-ink-muted">Other forms</h2>
+      <ul className="border-t border-ink">
         {others.map(({ slug, title, description, icon: Icon }) => (
-          <li key={slug}>
-            <Link
-              to={`/log/${slug}`}
-              className="flex min-h-12 items-center gap-3 rounded-card bg-surface p-4 shadow-card hover:bg-brand-50"
-            >
-              <Icon className="size-6 shrink-0 text-brand-700" aria-hidden />
+          <li key={slug} className="border-b border-line">
+            <Link to={`/log/${slug}`} className="group flex min-h-12 items-center gap-4 py-4">
+              <Icon className="size-6 shrink-0 text-brand-700" strokeWidth={1.75} aria-hidden />
               <span className="min-w-0 flex-1">
-                <span className="block font-semibold">{title}</span>
-                <span className="block text-sm text-ink-muted">{description}</span>
+                <span className="block font-display text-xl font-medium decoration-brand-700 decoration-2 underline-offset-4 group-hover:underline">
+                  {title}
+                </span>
+                <span className="block text-ink-muted">{description}</span>
               </span>
-              <ChevronRight className="size-5 shrink-0 text-ink-subtle" aria-hidden />
+              <ArrowRight
+                className="size-5 shrink-0 text-ink-muted transition-transform duration-200 group-hover:translate-x-1 group-hover:text-ink"
+                aria-hidden
+              />
             </Link>
           </li>
         ))}

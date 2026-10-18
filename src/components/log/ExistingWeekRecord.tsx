@@ -10,7 +10,7 @@ interface Props {
 /** The record already saved on this device for the chosen site-week. Saving replaces it. */
 export default function ExistingWeekRecord({ record, onEdit }: Props) {
   return (
-    <section aria-labelledby="existing-week-heading" className="rounded-xl border border-brand-200 bg-brand-50 p-3">
+    <section aria-labelledby="existing-week-heading" className="rounded-sm bg-sunken p-3">
       <h2 id="existing-week-heading" className="flex items-center gap-2 text-sm font-semibold text-brand-800">
         <History className="size-4" aria-hidden />
         Already logged on this device
@@ -34,7 +34,7 @@ export default function ExistingWeekRecord({ record, onEdit }: Props) {
       <button
         type="button"
         onClick={() => onEdit(record)}
-        className="mt-2 flex min-h-12 w-full items-center justify-center gap-2 rounded-xl border border-brand-300 bg-surface px-3 text-sm font-semibold text-brand-800 hover:bg-brand-100"
+        className="mt-2 flex min-h-12 w-full items-center justify-center gap-2 rounded-sm border border-line-strong bg-surface px-3 text-sm font-semibold text-brand-800 hover:bg-brand-100"
       >
         <PencilLine className="size-4" aria-hidden />
         Copy these values into the form

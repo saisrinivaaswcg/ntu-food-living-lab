@@ -1,6 +1,8 @@
 import { BarChart3, CircleCheck, Plus, Undo2 } from 'lucide-react'
+import { motion, useReducedMotion } from 'motion/react'
 import { useEffect, useRef } from 'react'
 import { Link } from 'react-router-dom'
+import { jumpToTop } from '../../lib/smoothScroll'
 
 interface Props {
   title: string
@@ -14,17 +16,26 @@ interface Props {
 /** Shown after a successful save: summary, Undo, log another, view dashboard. */
 export default function SavedConfirmation({ title, rows, photoUrl, anotherLabel, onAnother, onUndo }: Props) {
   const headingRef = useRef<HTMLHeadingElement>(null)
+  const reduce = useReducedMotion()
 
   useEffect(() => {
-    window.scrollTo(0, 0)
+    jumpToTop()
     headingRef.current?.focus({ preventScroll: true })
   }, [])
 
   return (
-    <section aria-labelledby="saved-heading" className="rounded-card bg-surface p-5 shadow-card">
+    <section aria-labelledby="saved-heading" className="rounded-2xl bg-surface p-5 shadow-float lg:p-6">
       <div className="flex items-center gap-3">
-        <CircleCheck className="size-8 shrink-0 text-brand-600" aria-hidden />
-        <h1 id="saved-heading" ref={headingRef} tabIndex={-1} className="text-xl font-semibold outline-none">
+        <motion.span
+          className="shrink-0 text-brand-700"
+          initial={reduce ? false : { scale: 0.4, opacity: 0 }}
+          animate={{ scale: 1, opacity: 1 }}
+          transition={{ type: 'spring', stiffness: 420, damping: 18 }}
+          aria-hidden
+        >
+          <CircleCheck className="size-9" />
+        </motion.span>
+        <h1 id="saved-heading" ref={headingRef} tabIndex={-1} className="font-display text-3xl font-medium outline-none">
           {title}
         </h1>
       </div>
@@ -39,14 +50,14 @@ export default function SavedConfirmation({ title, rows, photoUrl, anotherLabel,
             </div>
           ))}
         </dl>
-        {photoUrl && <img src={photoUrl} alt="Saved photo" className="size-20 shrink-0 rounded-lg object-cover" />}
+        {photoUrl && <img src={photoUrl} alt="Saved photo" className="size-20 shrink-0 rounded-sm object-cover" />}
       </div>
 
       <div className="mt-5 grid gap-2">
         <button
           type="button"
           onClick={onAnother}
-          className="flex min-h-12 items-center justify-center gap-2 rounded-xl bg-brand-700 px-4 font-semibold text-white hover:bg-brand-800"
+          className="flex min-h-12 items-center justify-center gap-2 rounded-full bg-accent px-4 font-semibold text-white transition-[background-color,transform] duration-150 hover:bg-accent-strong active:scale-[0.98] motion-reduce:active:scale-100"
         >
           <Plus className="size-5" aria-hidden />
           {anotherLabel}
@@ -55,14 +66,14 @@ export default function SavedConfirmation({ title, rows, photoUrl, anotherLabel,
           <button
             type="button"
             onClick={onUndo}
-            className="flex min-h-12 items-center justify-center gap-2 rounded-xl border border-line px-3 font-semibold text-ink hover:bg-canvas"
+            className="flex min-h-12 items-center justify-center gap-2 rounded-full border border-line-strong px-3 font-semibold text-ink transition-colors hover:bg-sunken"
           >
             <Undo2 className="size-4" aria-hidden />
             Undo
           </button>
           <Link
             to="/dashboard"
-            className="flex min-h-12 items-center justify-center gap-2 rounded-xl border border-line px-3 font-semibold text-ink hover:bg-canvas"
+            className="flex min-h-12 items-center justify-center gap-2 rounded-full border border-line-strong px-3 font-semibold text-ink transition-colors hover:bg-sunken"
           >
             <BarChart3 className="size-4" aria-hidden />
             View dashboard

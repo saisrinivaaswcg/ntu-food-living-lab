@@ -43,7 +43,7 @@ export default function NumberField({
   }
 
   const stepLabel = `${formatDecimal(step, decimals)} ${unit}`
-  const buttonClass = `flex shrink-0 items-center justify-center rounded-xl border border-line bg-surface text-ink hover:bg-canvas active:bg-brand-50 disabled:text-ink-subtle disabled:hover:bg-surface ${
+  const buttonClass = `flex shrink-0 items-center justify-center rounded-sm border border-line-strong bg-surface text-ink transition-[background-color,transform] duration-150 hover:bg-sunken active:scale-95 active:bg-sunken disabled:border-line disabled:text-ink-subtle disabled:hover:bg-surface motion-reduce:active:scale-100 ${
     large ? 'size-14' : 'size-12'
   }`
 

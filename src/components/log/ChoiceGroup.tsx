@@ -28,8 +28,8 @@ export default function ChoiceGroup<T extends string | number>({
 }: Props<T>) {
   return (
     <fieldset aria-describedby={error ? `${id}-error` : undefined}>
-      <legend className="mb-1 text-sm font-medium text-ink">{legend}</legend>
-      <div className={`grid gap-2 ${columnsClass}`}>
+      <legend className="mb-1 text-sm font-semibold text-ink">{legend}</legend>
+      <div className={`grid gap-1.5 ${columnsClass}`}>
         {choices.map((choice, i) => (
           <label key={String(choice.value)} className="block cursor-pointer">
             <input
@@ -42,8 +42,8 @@ export default function ChoiceGroup<T extends string | number>({
               aria-invalid={error ? true : undefined}
             />
             <span
-              className={`flex min-h-12 flex-col items-center justify-center rounded-xl border-2 bg-surface px-1.5 py-1.5 text-center text-sm font-medium leading-tight text-ink transition-colors peer-checked:border-brand-600 peer-checked:bg-brand-50 peer-checked:text-brand-800 peer-focus-visible:ring-2 peer-focus-visible:ring-brand-600 peer-focus-visible:ring-offset-2 ${
-                error ? 'border-danger/60' : 'border-line hover:border-brand-300'
+              className={`flex min-h-12 flex-col items-center justify-center rounded-sm border bg-surface px-1 py-1.5 text-center text-sm font-medium leading-tight whitespace-nowrap text-ink transition-[background-color,border-color,color,transform] duration-150 active:scale-[0.97] peer-checked:border-brand-700 peer-checked:bg-brand-700 peer-checked:text-white peer-focus-visible:outline-2 peer-focus-visible:outline-offset-2 peer-focus-visible:outline-focus motion-reduce:active:scale-100 ${
+                error ? 'border-danger' : 'border-line-strong hover:border-ink'
               }`}
             >
               {choice.label}

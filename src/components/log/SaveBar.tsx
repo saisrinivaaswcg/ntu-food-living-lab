@@ -19,22 +19,22 @@ export default function SaveBar({ label, missing, error }: Props) {
       : missing.join(', ')
 
   return (
-    <div className="sticky bottom-[calc(4rem+env(safe-area-inset-bottom))] z-30 -mx-4 mt-2 border-t border-line bg-surface/95 px-4 py-3 backdrop-blur lg:bottom-4 lg:mx-0 lg:rounded-card lg:border lg:shadow-card">
+    <div className="sticky bottom-[calc(4rem+env(safe-area-inset-bottom))] z-30 -mx-4 mt-2 border-t border-line bg-surface/90 px-4 py-3 backdrop-blur-md lg:bottom-4 lg:mx-0 lg:rounded-2xl lg:border-0 lg:shadow-float">
       {error && (
-        <p role="alert" className="mb-2 rounded-lg bg-danger-bg px-3 py-2 text-sm font-medium text-danger">
+        <p role="alert" className="mb-2 rounded-sm bg-danger-bg px-3 py-2 text-sm font-medium text-danger">
           {error}
         </p>
       )}
       <button
         type="submit"
-        className="flex min-h-14 w-full flex-col items-center justify-center rounded-xl bg-brand-700 px-4 py-1.5 font-semibold text-white transition-colors hover:bg-brand-800"
+        className="flex min-h-14 w-full flex-col items-center justify-center rounded-full bg-accent px-4 py-1.5 font-semibold text-white transition-[background-color,transform] duration-150 hover:bg-accent-strong active:scale-[0.98] motion-reduce:active:scale-100"
       >
         <span className="flex items-center gap-2">
           {missing.length === 0 && <Check className="size-5" aria-hidden />}
           {label}
         </span>
         {missing.length > 0 && (
-          <span className="text-xs font-normal text-brand-50">Still needed: {missingText}</span>
+          <span className="text-xs font-normal text-white/90">Still needed: {missingText}</span>
         )}
       </button>
     </div>

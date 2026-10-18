@@ -53,15 +53,15 @@ export default function PhotoField({ id, value, onChange, required, error }: Pro
         className="peer sr-only"
       />
       {value ? (
-        <div className="flex items-center gap-3 rounded-xl border border-brand-200 bg-brand-50 p-1">
-          <img src={value.dataUrl} alt="Preview of the photo you took" className="size-12 shrink-0 rounded-lg object-cover" />
+        <div className="flex items-center gap-3 rounded-sm bg-sunken p-1">
+          <img src={value.dataUrl} alt="Preview of the photo you took" className="size-12 shrink-0 rounded-sm object-cover" />
           <p className="min-w-0 flex-1 truncate text-sm">
-            <span className="block font-medium text-brand-800">Photo added</span>
+            <span className="block font-semibold text-ink">Photo added</span>
             <span className="text-xs text-ink-muted">{Math.round(dataUrlBytes(value.dataUrl) / 1024)} KB, compressed</span>
           </p>
           <label
             htmlFor={id}
-            className="flex min-h-12 cursor-pointer items-center rounded-lg px-3 text-sm font-medium text-brand-700 hover:bg-surface"
+            className="flex min-h-12 cursor-pointer items-center rounded-sm px-3 text-sm font-semibold text-ink underline underline-offset-4 hover:bg-surface"
           >
             {buttonText}
           </label>
@@ -69,7 +69,7 @@ export default function PhotoField({ id, value, onChange, required, error }: Pro
             type="button"
             onClick={() => onChange(null)}
             aria-label="Remove photo"
-            className="flex size-12 shrink-0 items-center justify-center rounded-lg text-ink-muted hover:bg-surface hover:text-danger"
+            className="flex size-12 shrink-0 items-center justify-center rounded-sm text-ink-muted hover:bg-surface hover:text-danger"
           >
             <Trash2 className="size-5" aria-hidden />
           </button>
@@ -77,10 +77,10 @@ export default function PhotoField({ id, value, onChange, required, error }: Pro
       ) : (
         <label
           htmlFor={id}
-          className={`flex min-h-14 w-full cursor-pointer items-center justify-center gap-2 rounded-xl border-2 border-dashed px-4 font-semibold transition-colors peer-focus-visible:ring-2 peer-focus-visible:ring-brand-600 peer-focus-visible:ring-offset-2 ${
+          className={`flex min-h-14 w-full cursor-pointer items-center justify-center gap-2 rounded-sm border-2 border-dashed px-4 font-semibold transition-[background-color,border-color,transform] duration-150 active:scale-[0.99] peer-focus-visible:outline-2 peer-focus-visible:outline-offset-2 peer-focus-visible:outline-focus motion-reduce:active:scale-100 ${
             shownError
               ? 'border-danger/60 bg-danger-bg text-danger'
-              : 'border-brand-300 bg-brand-50 text-brand-800 hover:border-brand-500'
+              : 'border-line-strong bg-surface text-ink hover:border-ink hover:bg-sunken'
           }`}
         >
           {busy ? <LoaderCircle className="size-5 animate-spin" aria-hidden /> : <Camera className="size-5" aria-hidden />}
