@@ -1,17 +1,16 @@
-import { MapPin } from 'lucide-react'
 import { useMemo } from 'react'
-import { Link, useParams, useSearchParams } from 'react-router-dom'
-import Breadcrumbs from '../components/layout/Breadcrumbs'
+import { useParams, useSearchParams } from 'react-router-dom'
 import HandoverTab from '../components/sites/HandoverTab'
 import KnowledgeTab from '../components/sites/KnowledgeTab'
+import SiteHero from '../components/sites/SiteHero'
 import SiteTabs from '../components/sites/SiteTabs'
 import { SITE_TABS, panelId, tabId, type SiteTab } from '../components/sites/siteTabItems'
 import CropChips from '../components/ui/CropChips'
-import PhotoPlaceholder from '../components/ui/PhotoPlaceholder'
-import StatusBadge from '../components/ui/StatusBadge'
+import Reveal from '../components/ui/Reveal'
+import { DEMO_DATA_SHORT_NOTICE } from '../data'
 import { useLogs } from '../hooks/useLogs'
 import { usePageTitle } from '../hooks/usePageTitle'
-import { DEMO_DATA_SHORT_NOTICE } from '../data'
+import { formatDate } from '../lib/dates'
 import { cropName, findSite } from '../lib/lookups'
 import { cropsCurrentlyGrowing, currentPlantingByBed } from '../lib/metrics'
 import type { PlantingLog } from '../types'
@@ -44,73 +43,78 @@ export default function SiteDetailPage() {
   }
 
   return (
-    <div className="mx-auto max-w-7xl px-4 py-5 lg:px-8 lg:py-8">
-      <Breadcrumbs items={[{ label: 'Sites', to: '/sites' }, { label: site.shortName }]} />
+    <>
+      <SiteHero site={site} growing={growing} />
 
-      <div className="grid gap-6 lg:grid-cols-[minmax(0,1fr)_22rem]">
-        <section className="rounded-card bg-surface p-5 shadow-card lg:p-6">
-          <h1 className="text-2xl font-semibold tracking-tight lg:text-3xl">{site.name}</h1>
-          <p className="mt-1 flex items-start gap-1.5 text-sm text-ink-muted">
-            <MapPin className="mt-0.5 size-4 shrink-0" aria-hidden />
-            {site.locationNote}
-          </p>
-          <div className="mt-4 flex flex-wrap items-center gap-3">
-            <StatusBadge status={site.status} />
-            <span className="text-sm">{site.statusNote}</span>
-          </div>
-          <p className="mt-4 text-ink-muted">{site.description}</p>
-
-          <dl className="mt-5 grid grid-cols-2 gap-3 sm:grid-cols-4">
-            {[
-              ['Beds', String(site.beds.length)],
-              ['Growing area', `${site.areaSqm} m²`],
-              ['Established', site.established.slice(0, 4)],
-              ['Run by', site.managedBy],
-            ].map(([label, value]) => (
-              <div key={label} className="rounded-xl bg-canvas p-3">
-                <dt className="text-xs text-ink-muted">{label}</dt>
-                <dd className="font-semibold">{value}</dd>
+      <div className="mx-auto max-w-7xl px-4 lg:px-8">
+        <Reveal className="grid gap-10 py-12 lg:grid-cols-12 lg:gap-x-10 lg:py-16">
+          <section aria-labelledby="about-heading" className="lg:col-span-5">
+            <h2 id="about-heading" className="font-display text-section font-medium">
+              About this site
+            </h2>
+            <p className="mt-4 text-lg text-ink-muted">{site.description}</p>
+            <dl className="mt-6 grid grid-cols-2 gap-x-6 border-t border-line pt-4">
+              <div>
+                <dt className="text-sm text-ink-muted">Run by</dt>
+                <dd className="font-semibold">{site.managedBy}</dd>
               </div>
-            ))}
-          </dl>
+              <div>
+                <dt className="text-sm text-ink-muted">Established</dt>
+                <dd className="font-semibold">{site.established.slice(0, 4)}</dd>
+              </div>
+            </dl>
+            <h3 className="mt-8 mb-2 font-semibold">Crops currently growing</h3>
+            <CropChips cropIds={growing} emptyText="No crops currently growing — no live plantings logged for this site." />
+          </section>
 
-          <h2 className="mt-6 mb-2 text-sm font-semibold">Crops currently growing</h2>
-          <CropChips cropIds={growing} emptyText="No crops currently growing — no live plantings logged for this site." />
+          <section aria-labelledby="beds-heading" className="lg:col-span-7">
+            <h2 id="beds-heading" className="font-display text-section font-medium">
+              Beds
+            </h2>
+            {site.beds.length === 0 ? (
+              <p className="mt-4 bg-sunken p-4 text-ink-muted">No beds recorded for this site.</p>
+            ) : (
+              <ul className="mt-4 border-t border-ink">
+                {site.beds.map((bed) => {
+                  const planting = current.get(bed.id)
+                  return (
+                    <li
+                      key={bed.id}
+                      className="flex flex-wrap items-baseline justify-between gap-x-4 gap-y-1 border-b border-line py-3"
+                    >
+                      <span className="font-semibold">{bed.label}</span>
+                      <span className={planting ? 'text-ink' : 'text-ink-muted'}>
+                        {planting ? (
+                          <>
+                            {cropName(planting.cropId)}
+                            <span className="text-ink-muted"> · planted {formatDate(planting.date)}</span>
+                          </>
+                        ) : (
+                          'Nothing growing'
+                        )}
+                      </span>
+                    </li>
+                  )
+                })}
+              </ul>
+            )}
+          </section>
+        </Reveal>
 
-          <h2 className="mt-6 mb-2 text-sm font-semibold">Beds</h2>
-          <ul className="divide-y divide-line rounded-xl border border-line">
-            {site.beds.map((bed) => {
-              const planting = current.get(bed.id)
-              return (
-                <li key={bed.id} className="flex flex-wrap items-center justify-between gap-2 px-4 py-3 text-sm">
-                  <span>{bed.label}</span>
-                  <span className={planting ? 'text-brand-800' : 'text-ink-subtle'}>
-                    {planting ? `${cropName(planting.cropId)} · planted ${planting.date}` : 'Nothing growing'}
-                  </span>
-                </li>
-              )
-            })}
-          </ul>
-        </section>
-
-        <aside className="space-y-4">
-          <PhotoPlaceholder alt={site.photoAlt} />
-          <Link
-            to={`/?site=${site.id}`}
-            className="flex min-h-12 items-center justify-center rounded-xl border border-line bg-surface px-4 font-semibold text-ink hover:bg-canvas"
+        <div className="border-t border-line pt-8 pb-12 lg:pb-16">
+          <SiteTabs active={tab} onChange={selectTab} />
+          <div
+            role="tabpanel"
+            id={panelId(tab)}
+            aria-labelledby={tabId(tab)}
+            tabIndex={0}
+            className="pt-6"
           >
-            Show on map
-          </Link>
-        </aside>
-      </div>
-
-      <div className="mt-8">
-        <SiteTabs active={tab} onChange={selectTab} />
-        <div role="tabpanel" id={panelId(tab)} aria-labelledby={tabId(tab)} tabIndex={0} className="pt-6 focus-visible:outline-none">
-          <p className="mb-6 text-sm text-demo">{DEMO_DATA_SHORT_NOTICE}</p>
-          {tab === 'knowledge' ? <KnowledgeTab site={site} /> : <HandoverTab site={site} />}
+            <p className="mb-6 text-sm text-demo">{DEMO_DATA_SHORT_NOTICE}</p>
+            {tab === 'knowledge' ? <KnowledgeTab site={site} /> : <HandoverTab site={site} />}
+          </div>
         </div>
       </div>
-    </div>
+    </>
   )
 }

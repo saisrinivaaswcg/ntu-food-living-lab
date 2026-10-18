@@ -20,6 +20,8 @@ interface Props {
   priority?: boolean
   /** Where the "Photo placeholder" label sits; top-right keeps it clear of text laid over the slot. */
   labelAt?: 'bottom-left' | 'top-right'
+  /** Extra classes for the placeholder, e.g. more padding when the slot is oversized for zooming. */
+  placeholderClassName?: string
   className?: string
 }
 
@@ -34,6 +36,7 @@ export default function SlotImage({
   zoomOnHover = false,
   priority = false,
   labelAt = 'bottom-left',
+  placeholderClassName = '',
   className = '',
 }: Props) {
   const [state, setState] = useState<'loading' | 'loaded' | 'missing'>('loading')
@@ -47,7 +50,7 @@ export default function SlotImage({
         <div
           role={state === 'missing' ? 'img' : undefined}
           aria-label={state === 'missing' ? `Photo placeholder: ${slot.alt}` : undefined}
-          className={`absolute inset-0 flex flex-col bg-linear-to-tr p-5 ${labelAt === 'top-right' ? 'items-end justify-start' : 'justify-end'} ${PLACEHOLDER_TONES[tone % PLACEHOLDER_TONES.length]} ${zoom}`}
+          className={`absolute inset-0 flex flex-col bg-linear-to-tr p-5 ${labelAt === 'top-right' ? 'items-end justify-start' : 'justify-end'} ${PLACEHOLDER_TONES[tone % PLACEHOLDER_TONES.length]} ${zoom} ${placeholderClassName}`}
         >
           {title && (
             <span className="max-w-[16ch] font-display text-2xl leading-tight font-medium text-white sm:text-3xl" aria-hidden>
