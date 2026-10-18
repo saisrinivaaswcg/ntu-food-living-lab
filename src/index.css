@@ -82,11 +82,7 @@
     -webkit-tap-highlight-color: transparent;
     touch-action: manipulation;
   }
-  @media (prefers-reduced-motion: no-preference) {
-    html {
-      scroll-behavior: smooth;
-    }
-  }
+  /* Smooth scrolling comes from Lenis (src/lib/smoothScroll.ts), which needs native smooth scrolling off. */
   body {
     @apply bg-canvas text-ink font-sans antialiased;
     font-feature-settings: "kern";

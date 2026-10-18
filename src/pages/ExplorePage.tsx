@@ -11,6 +11,7 @@ import Reveal from '../components/ui/Reveal'
 import { sites } from '../data'
 import { usePageTitle } from '../hooks/usePageTitle'
 import { findSite } from '../lib/lookups'
+import { scrollToElement } from '../lib/smoothScroll'
 import type { SiteId } from '../types'
 
 const MAP_ID = 'map'
@@ -54,8 +55,7 @@ export default function ExplorePage() {
   const selectFromList = useCallback(
     (id: SiteId) => {
       select(id)
-      const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches
-      mapRef.current?.scrollIntoView({ behavior: reduce ? 'auto' : 'smooth', block: 'start' })
+      if (mapRef.current) scrollToElement(mapRef.current)
     },
     [select],
   )

@@ -1,6 +1,7 @@
 import { motion } from 'motion/react'
 import { Suspense, useEffect } from 'react'
 import { Outlet, useLocation } from 'react-router-dom'
+import { jumpToTop, startSmoothScroll } from '../../lib/smoothScroll'
 import BottomNav from './BottomNav'
 import DemoBanner from './DemoBanner'
 import PageLoading from './PageLoading'
@@ -11,9 +12,11 @@ export default function AppShell() {
   // Log pages are used outdoors against the clock: keep their transition short.
   const quick = pathname.startsWith('/log')
 
+  useEffect(() => startSmoothScroll(), [])
+
   // New page → start at the top (query-string changes, like selecting a site, keep the scroll).
   useEffect(() => {
-    window.scrollTo({ top: 0, behavior: 'instant' })
+    jumpToTop()
   }, [pathname])
 
   return (
