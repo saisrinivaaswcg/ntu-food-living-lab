@@ -1,4 +1,5 @@
 import { useMemo, useState } from 'react'
+import { crops } from '../data'
 import { findSite } from '../lib/lookups'
 import { currentPlantingByBed } from '../lib/metrics'
 import { getLastSiteId } from '../lib/preferences'
@@ -10,12 +11,25 @@ import { useLogs } from './useLogs'
  * Preselects the site last used on this device; the bed list follows the site;
  * with autoFillCrop, choosing a bed fills in the crop from that bed's current planting.
  */
-export function useSiteBedCrop({ autoFillCrop }: { autoFillCrop: boolean }) {
+export function useSiteBedCrop({
+  autoFillCrop,
+  initial,
+}: {
+  autoFillCrop: boolean
+  /** Pre-fill, e.g. from a "Ready soon" card. Ignored unless the site, bed and crop all exist. */
+  initial?: { siteId?: string | null; bedId?: string | null; cropId?: string | null }
+}) {
   const { logs } = useLogs()
-  const [siteId, setSiteId] = useState<SiteId | ''>(() => getLastSiteId() ?? '')
-  const [bedId, setBedId] = useState('')
-  const [cropId, setCropId] = useState<CropId | ''>('')
-  const [cropFromBed, setCropFromBed] = useState(false)
+  const [start] = useState(() => {
+    const site = findSite(initial?.siteId ?? undefined)
+    const bed = site?.beds.find((b) => b.id === initial?.bedId)
+    const crop = crops.find((c) => c.id === initial?.cropId)
+    return site && bed && crop ? { siteId: site.id, bedId: bed.id, cropId: crop.id } : null
+  })
+  const [siteId, setSiteId] = useState<SiteId | ''>(() => start?.siteId ?? getLastSiteId() ?? '')
+  const [bedId, setBedId] = useState(start?.bedId ?? '')
+  const [cropId, setCropId] = useState<CropId | ''>(start?.cropId ?? '')
+  const [cropFromBed, setCropFromBed] = useState(Boolean(start))
 
   const site = findSite(siteId || undefined)
   const currentByBed = useMemo(

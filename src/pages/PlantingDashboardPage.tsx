@@ -1,6 +1,5 @@
 import { useMemo } from 'react'
 import BarList from '../components/dashboard/BarList'
-import BedBoard from '../components/dashboard/BedBoard'
 import ChartFigure from '../components/dashboard/ChartFigure'
 import DashboardHeader from '../components/dashboard/DashboardHeader'
 import DashboardSection from '../components/dashboard/DashboardSection'
@@ -11,6 +10,8 @@ import SeriesTable from '../components/dashboard/SeriesTable'
 import StatRow from '../components/dashboard/StatRow'
 import UpcomingHarvestList from '../components/dashboard/UpcomingHarvestList'
 import EditedTag from '../components/ui/EditedTag'
+import BedMap from '../components/sites/BedMap'
+import GrowthTimeline from '../components/sites/GrowthTimeline'
 import EmptyState from '../components/ui/EmptyState'
 import type { Column } from '../components/ui/SortableTable'
 import { failureCauseOptions, propagationOptions } from '../data'
@@ -22,8 +23,9 @@ import { formatNumber, formatPercent } from '../lib/format'
 import { cropName, getBed, siteName } from '../lib/lookups'
 import { getSiteById } from '../lib/siteRegistry'
 import {
-  bedStatuses,
   daysToFirstHarvestByCrop,
+  growthAsOf,
+  growthTimelines,
   lossesByCause,
   newestFirst,
   plantingSummary,
@@ -77,10 +79,11 @@ export default function PlantingDashboardPage() {
   const view = useMemo(
     () => ({
       summary: plantingSummary(logs, filtered, siteIds, period),
-      beds: siteIds.flatMap((id) => {
+      sites: siteIds.flatMap((id) => {
         const s = getSiteById(id)
-        return s ? [{ siteId: id, beds: bedStatuses(logs, s, period.end) }] : []
+        return s ? [s] : []
       }),
+      timelines: growthTimelines(logs, siteIds, growthAsOf(logs)),
       weekly: weeklyPlantings(filtered, period),
       survival: survivalByCrop(logs, siteIds, period),
       propagation: propagationBreakdown(filtered),
@@ -164,11 +167,44 @@ export default function PlantingDashboardPage() {
           <DashboardSection
             id="beds-now"
             title="What’s growing in each bed"
-            intro={`As of ${formatShortDate(period.end)}. The bar shows progress towards the crop’s typical first harvest.`}
+            intro="Each site’s beds from above. Wider beds are larger, bigger plants are further along; select a bed for its plantings and losses."
             layout="stacked"
           >
-            {view.beds.length === 0 ? <EmptyState title="No sites in this view" /> : <BedBoard sites={view.beds} />}
+            {view.sites.length === 0 ? (
+              <EmptyState title="No sites in this view" />
+            ) : (
+              <div className="space-y-10">
+                {view.sites.map((s) => (
+                  <section key={s.id} aria-labelledby={`map-${s.id}`}>
+                    <h3 id={`map-${s.id}`} className="mb-3 font-display text-xl font-medium">
+                      {s.name}
+                    </h3>
+                    <BedMap site={s} asOf={growthAsOf(logs)} />
+                  </section>
+                ))}
+              </div>
+            )}
             <p className="mt-4 text-sm text-ink-muted">{source('planting, harvest and loss records')}</p>
+          </DashboardSection>
+
+          <DashboardSection
+            id="growth"
+            title="Growth timelines"
+            intro="Every planting growing now, from planting to its expected first harvest. Soonest first."
+            layout="stacked"
+          >
+            {view.timelines.length === 0 ? (
+              <EmptyState title="Nothing is growing in this view" detail="Plantings appear here once they are logged." />
+            ) : (
+              <ul className="grid gap-x-10 gap-y-8 lg:grid-cols-2">
+                {view.timelines.map((t) => (
+                  <li key={t.status.bed.id}>
+                    <GrowthTimeline timeline={t} showSite={siteIds.length > 1} />
+                  </li>
+                ))}
+              </ul>
+            )}
+            <p className="mt-6 text-sm text-ink-muted">{source('planting and harvest logs, with each crop’s typical days to harvest')}</p>
           </DashboardSection>
 
           <DashboardSection id="planting-activity" title="Planting activity" layout="stacked">

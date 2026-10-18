@@ -943,3 +943,135 @@ export function plantsAliveInBed(
   )
   return status?.planting ? status.plantsAlive : null
 }
+
+/* ------------------------------------------------------------------ */
+/* Growth (timelines, bed map, Log page)                               */
+/* ------------------------------------------------------------------ */
+
+export type GrowthStage = 'seedling' | 'growing' | 'ready' | 'harvesting'
+
+export const GROWTH_STAGES: { stage: GrowthStage; label: string; from: number }[] = [
+  { stage: 'seedling', label: 'Seedling', from: 0 },
+  { stage: 'growing', label: 'Growing', from: 0.25 },
+  { stage: 'ready', label: 'Ready', from: 0.9 },
+  { stage: 'harvesting', label: 'Harvesting', from: 1 },
+]
+
+/** Days before the expected first harvest when a bed counts as ready. */
+const READY_WINDOW_DAYS = 7
+
+/**
+ * "Today" for growth: the real date while logs are recent (within 30 days), otherwise the latest log,
+ * so demo data still reads sensibly long after it was made.
+ */
+export function growthAsOf(logs: LogCollections, today: ISODate = todayISO()): ISODate {
+  const latest = latestLogDate(logs)
+  if (!latest) return today
+  return daysBetween(latest, today) > 30 ? latest : today > latest ? today : latest
+}
+
+/** Stage of a bed's current planting; null when nothing is growing. */
+export function growthStage(status: BedStatus, asOf: ISODate): GrowthStage | null {
+  if (!status.planting) return null
+  if (status.firstHarvest) return 'harvesting'
+  if (status.expectedFirstHarvest && daysBetween(asOf, status.expectedFirstHarvest) <= READY_WINDOW_DAYS) return 'ready'
+  return status.growthProgress >= 0.9 ? 'ready' : status.growthProgress >= 0.25 ? 'growing' : 'seedling'
+}
+
+export interface GrowthTimeline {
+  siteId: SiteId
+  status: BedStatus
+  stage: GrowthStage
+  /** Days since planting ÷ typical days to first harvest (can pass 1 when late) */
+  progress: number
+  /** Days until the expected first harvest; negative when it has passed */
+  daysToExpected: number | null
+  lastHarvest: ISODate | null
+}
+
+/** One timeline per bed that is growing something, at the sites in scope, soonest harvest first. */
+export function growthTimelines(logs: LogCollections, siteIds: SiteId[], asOf: ISODate): GrowthTimeline[] {
+  return siteIds
+    .flatMap((siteId) => {
+      const site = getSiteById(siteId)
+      if (!site) return []
+      return bedStatuses(logs, site, asOf).flatMap((status): GrowthTimeline[] => {
+        const stage = growthStage(status, asOf)
+        if (!stage || !status.planting) return []
+        const typical = cropById.get(status.planting.cropId)?.daysToFirstHarvest ?? 0
+        const lastHarvest =
+          logs.harvests
+            .filter((h) => h.bedId === status.bed.id && h.cropId === status.planting!.cropId && h.date >= status.planting!.date)
+            .map((h) => h.date)
+            .sort()
+            .at(-1) ?? null
+        return [
+          {
+            siteId,
+            status,
+            stage,
+            progress: typical > 0 ? (status.daysSincePlanting ?? 0) / typical : 0,
+            daysToExpected: status.expectedFirstHarvest ? daysBetween(asOf, status.expectedFirstHarvest) : null,
+            lastHarvest,
+          },
+        ]
+      })
+    })
+    .sort((a, b) => (a.daysToExpected ?? 9999) - (b.daysToExpected ?? 9999))
+}
+
+export interface LogOverview {
+  /** Beds with a planting growing now */
+  growing: number
+  /** Beds not yet harvested whose first harvest is due within a week (or overdue) */
+  readyThisWeek: number
+  /** Days since the latest harvest, or null when none */
+  lastHarvestDaysAgo: number | null
+}
+
+export function logOverview(logs: LogCollections, siteIds: SiteId[], asOf: ISODate): LogOverview {
+  const timelines = growthTimelines(logs, siteIds, asOf)
+  const latestHarvest = logs.harvests.map((h) => h.date).sort().at(-1)
+  return {
+    growing: timelines.length,
+    readyThisWeek: timelines.filter((t) => t.stage === 'ready').length,
+    lastHarvestDaysAgo: latestHarvest ? Math.max(0, daysBetween(latestHarvest, asOf)) : null,
+  }
+}
+
+/**
+ * Beds worth harvesting soon, for the Log page: first harvests due within two weeks (or overdue), then
+ * beds already cropping, longest since their last harvest first.
+ */
+export function readySoon(logs: LogCollections, siteIds: SiteId[], asOf: ISODate, limit = 8): GrowthTimeline[] {
+  const timelines = growthTimelines(logs, siteIds, asOf)
+  const due = timelines.filter((t) => t.stage !== 'harvesting' && t.daysToExpected !== null && t.daysToExpected <= 14)
+  const cropping = timelines
+    .filter((t) => t.stage === 'harvesting')
+    .sort((a, b) => (a.lastHarvest ?? '').localeCompare(b.lastHarvest ?? ''))
+  return [...due, ...cropping].slice(0, limit)
+}
+
+export interface BedHistory {
+  /** Newest first (site-setup records included, as "set by hand") */
+  plantings: PlantingLog[]
+  /** Newest first */
+  losses: FailureLog[]
+  harvests: number
+  harvestKg: number
+  /** Losses in the 14 days up to asOf */
+  recentLoss: boolean
+}
+
+/** What has happened in one bed, for the bed map's detail view. */
+export function bedHistory(logs: LogCollections, bedId: string, asOf: ISODate): BedHistory {
+  const harvests = logs.harvests.filter((h) => h.bedId === bedId)
+  const losses = newestFirst(logs.failures.filter((f) => f.bedId === bedId))
+  return {
+    plantings: newestFirst(logs.plantings.filter((p) => p.bedId === bedId)),
+    losses,
+    harvests: harvests.length,
+    harvestKg: sum(harvests.map((h) => h.weightKg)),
+    recentLoss: losses.some((f) => f.date <= asOf && daysBetween(f.date, asOf) <= 14 && netLoss(f) > 0),
+  }
+}

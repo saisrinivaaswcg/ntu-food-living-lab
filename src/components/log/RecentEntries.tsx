@@ -30,11 +30,12 @@ export default function RecentEntries() {
 
   return (
     <div>
-      <fieldset>
+      {/* min-w-0: a fieldset otherwise grows to its content, defeating the scrollable chip row. */}
+      <fieldset className="min-w-0">
         <legend className="sr-only">Show</legend>
         <div className="-mx-4 flex gap-1.5 overflow-x-auto px-4 pb-1 sm:mx-0 sm:px-0">
           {FILTERS.map((f) => (
-            <label key={f} className="shrink-0 cursor-pointer">
+            <label key={f} className="relative shrink-0 cursor-pointer">
               <input
                 type="radio"
                 name="recent-filter"

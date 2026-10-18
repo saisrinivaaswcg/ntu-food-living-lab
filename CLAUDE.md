@@ -23,7 +23,7 @@ No backend, no auth, no database.
 - `src/hooks/useLogs.ts` — `useLogs()` returns live logs. Components using it re-render the moment a log is saved, which is how the dashboard updates immediately.
 - `src/lib/lookups.ts` — `getSite`, `findSite` (for URL params), `getCrop`, `getBed`, `cropName`, `siteName`.
 - Derived numbers (KPIs, completeness, survival, efficiency, cost per kg, leaderboard) go in `src/lib/metrics.ts` as pure functions over `LogCollections`, not inside components. Definitions are in `docs/SPEC.md` → Metric definitions.
-- `src/pages/` — one file per route. `src/components/{layout,ui,explore,log,dashboard,sites}/` — one component per file.
+- `src/pages/` — one file per route. `src/components/{layout,ui,explore,log,dashboard,sites,illustrations}/` — one component per file. Illustrations are hand-drawn-style line SVGs drawn in code (1.75 stroke, round caps), not icon-library glyphs.
 
 ## Build order and status
 

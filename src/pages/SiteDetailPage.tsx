@@ -2,6 +2,8 @@ import { useMemo } from 'react'
 import { useParams, useSearchParams } from 'react-router-dom'
 import HandoverTab from '../components/sites/HandoverTab'
 import KnowledgeTab from '../components/sites/KnowledgeTab'
+import BedMap from '../components/sites/BedMap'
+import GrowthTimeline from '../components/sites/GrowthTimeline'
 import SiteHero from '../components/sites/SiteHero'
 import SiteSetupEditor from '../components/sites/SiteSetupEditor'
 import SiteTabs from '../components/sites/SiteTabs'
@@ -13,7 +15,7 @@ import { useLogs } from '../hooks/useLogs'
 import { usePageTitle } from '../hooks/usePageTitle'
 import { formatDate } from '../lib/dates'
 import { cropName, findSite } from '../lib/lookups'
-import { bedStatuses, cropsCurrentlyGrowing, latestLogDate } from '../lib/metrics'
+import { bedStatuses, cropsCurrentlyGrowing, growthAsOf, growthTimelines, latestLogDate } from '../lib/metrics'
 import { todayISO } from '../lib/dates'
 import NotFoundPage from './NotFoundPage'
 
@@ -28,6 +30,8 @@ export default function SiteDetailPage() {
   const site = findSite(siteId)
   const { logs } = useLogs()
   const beds = useMemo(() => (site ? bedStatuses(logs, site, latestLogDate(logs) ?? todayISO()) : []), [logs, site])
+  const asOf = growthAsOf(logs)
+  const timelines = useMemo(() => (site ? growthTimelines(logs, [site.id], asOf) : []), [logs, site, asOf])
   const growing = useMemo(() => (site ? cropsCurrentlyGrowing(logs, site) : []), [logs, site])
   usePageTitle(site?.name ?? 'Site not found')
 
@@ -106,6 +110,33 @@ export default function SiteDetailPage() {
               {/* key: a fresh editor when the site changes */}
               <SiteSetupEditor key={site.id} site={site} />
             </div>
+          </section>
+        </Reveal>
+
+        <Reveal className="grid gap-10 border-t border-line py-12 lg:grid-cols-12 lg:gap-x-10 lg:py-16">
+          <section aria-labelledby="map-heading" className="lg:col-span-7">
+            <h2 id="map-heading" className="font-display text-section font-medium">
+              Bed map
+            </h2>
+            <p className="mt-2 mb-5 text-ink-muted">Seen from above. Wider beds are larger; select one for its history.</p>
+            <BedMap site={site} asOf={asOf} />
+          </section>
+          <section aria-labelledby="growth-heading" className="lg:col-span-5">
+            <h2 id="growth-heading" className="font-display text-section font-medium">
+              Growth
+            </h2>
+            <p className="mt-2 mb-6 text-ink-muted">From planting to first harvest, using each crop’s typical days.</p>
+            {timelines.length === 0 ? (
+              <p className="bg-sunken p-4 text-ink-muted">Nothing is growing here right now.</p>
+            ) : (
+              <ul className="space-y-8">
+                {timelines.map((t) => (
+                  <li key={t.status.bed.id}>
+                    <GrowthTimeline timeline={t} />
+                  </li>
+                ))}
+              </ul>
+            )}
           </section>
         </Reveal>
 

@@ -1,4 +1,5 @@
 import { useState, type FormEvent } from 'react'
+import { useSearchParams } from 'react-router-dom'
 import { destinationOptions } from '../../data'
 import { useSiteBedCrop } from '../../hooks/useSiteBedCrop'
 import { formatDate, todayISO } from '../../lib/dates'
@@ -37,7 +38,12 @@ const ID = {
 
 /** The priority form: built to be finished in under a minute, one-handed, outdoors. */
 export default function HarvestForm() {
-  const loc = useSiteBedCrop({ autoFillCrop: true })
+  // ?site=…&bed=…&crop=… (from a "Ready soon" card on the Log page) pre-fills where the harvest came from.
+  const [params] = useSearchParams()
+  const loc = useSiteBedCrop({
+    autoFillCrop: true,
+    initial: { siteId: params.get('site'), bedId: params.get('bed'), cropId: params.get('crop') },
+  })
   const [date, setDate] = useState(todayISO)
   const [weight, setWeight] = useState('')
   const [destination, setDestination] = useState<HarvestDestination | null>(null)
