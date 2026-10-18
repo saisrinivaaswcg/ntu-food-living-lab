@@ -17,7 +17,7 @@ Crops (controlled list): Thai basil, mint, lemongrass, pandan, chilli padi, turm
 
 ## 1. Explore (`/`)
 
-- Leaflet map of the NTU campus (OneMap GreyLite tiles from the Singapore Land Authority, with the OneMap logo and attribution visible as their terms of use require) with the four sites as markers. Marker colour reflects site status.
+- Leaflet map of the NTU campus with a Map / Satellite toggle: OneMap Default HD tiles from the Singapore Land Authority (OneMap logo and attribution visible, as their terms of use require) and Esri World Imagery (with "Powered by Esri" and its source credit) with the four sites as markers. Marker colour reflects site status.
 - Clicking a marker opens a side panel (desktop: right-hand panel; mobile: bottom sheet) with: site name, photo placeholder (labelled, uses `photoAlt`), status badge + status note, number of beds, crops currently growing, and a **View site** button → `/sites/:siteId`.
 - "Crops currently growing" = for each bed, the crop of its most recent planting, unless a failure on that bed wiped out all plants since then. Show as chips.
 - A list of the four sites under or beside the map, so the page works without using the map (keyboard and screen-reader friendly). Selecting a site in the list opens the same panel and pans the map.
