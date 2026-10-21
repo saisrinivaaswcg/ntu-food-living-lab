@@ -3,8 +3,10 @@ import { motion, useReducedMotion, useScroll, useTransform } from 'motion/react'
 import { useRef, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { crops, exploreHeroImage, exploreHeroVideo, imageAsset, videoAsset } from '../../data'
+import { useRole } from '../../hooks/useCommunity'
 import { useLogs } from '../../hooks/useLogs'
 import { formatNumber } from '../../lib/format'
+import { usesWorkspace } from '../../lib/roles'
 import CountUp from '../ui/CountUp'
 import PhotoCaption from '../ui/PhotoCaption'
 import SlotImage from '../ui/SlotImage'
@@ -16,6 +18,7 @@ const EASE = [0.22, 1, 0.36, 1] as const
 export default function ExploreHero({ mapId }: { mapId: string }) {
   const reduce = useReducedMotion()
   const { sites } = useLogs()
+  const role = useRole()
   // Beds and areas follow any site setup edited on this device.
   const stats = [
     { value: sites.length, label: 'campus sites' },
@@ -90,13 +93,15 @@ export default function ExploreHero({ mapId }: { mapId: string }) {
               Find a site on the map
               <ArrowDown className="size-4 transition-transform group-hover:translate-y-0.5" aria-hidden />
             </a>
-            <Link
-              to="/log/harvest"
-              className="inline-flex min-h-12 items-center gap-2 rounded-sm border border-white/70 px-5 font-semibold text-white transition-[background-color,transform] hover:-translate-y-0.5 hover:bg-white/10 active:translate-y-0"
-            >
-              <ClipboardPen className="size-4" aria-hidden />
-              Log a harvest
-            </Link>
+            {usesWorkspace(role) && (
+              <Link
+                to="/log/harvest"
+                className="inline-flex min-h-12 items-center gap-2 rounded-sm border border-white/70 px-5 font-semibold text-white transition-[background-color,transform] hover:-translate-y-0.5 hover:bg-white/10 active:translate-y-0"
+              >
+                <ClipboardPen className="size-4" aria-hidden />
+                Log a harvest
+              </Link>
+            )}
           </motion.div>
         </div>
 

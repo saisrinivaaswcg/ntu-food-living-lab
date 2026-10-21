@@ -3,6 +3,8 @@ import { crops } from '../data'
 import { findSite } from '../lib/lookups'
 import { currentPlantingByBed } from '../lib/metrics'
 import { getLastSiteId } from '../lib/preferences'
+import { getCommunitySnapshot } from '../lib/communityStore'
+import { canEditSite } from '../lib/roles'
 import type { CropId, PlantingLog, SiteId } from '../types'
 import { useLogs } from './useLogs'
 
@@ -22,11 +24,19 @@ export function useSiteBedCrop({
   const { logs } = useLogs()
   const [start] = useState(() => {
     const site = findSite(initial?.siteId ?? undefined)
+    if (site && !canEditSite(getCommunitySnapshot().role, site.id)) return null
     const bed = site?.beds.find((b) => b.id === initial?.bedId)
     const crop = crops.find((c) => c.id === initial?.cropId)
     return site && bed && crop ? { siteId: site.id, bedId: bed.id, cropId: crop.id } : null
   })
-  const [siteId, setSiteId] = useState<SiteId | ''>(() => start?.siteId ?? getLastSiteId() ?? '')
+  const [siteId, setSiteId] = useState<SiteId | ''>(() => {
+    if (start) return start.siteId
+    // A committee logs for its own site; Admin starts on the site last used on this device.
+    const role = getCommunitySnapshot().role
+    if (role.kind === 'committee') return role.siteId
+    const last = getLastSiteId()
+    return last && canEditSite(role, last) ? last : ''
+  })
   const [bedId, setBedId] = useState(start?.bedId ?? '')
   const [cropId, setCropId] = useState<CropId | ''>(start?.cropId ?? '')
   const [cropFromBed, setCropFromBed] = useState(Boolean(start))

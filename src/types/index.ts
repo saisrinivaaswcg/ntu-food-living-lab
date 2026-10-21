@@ -10,20 +10,14 @@
 /* Controlled vocabularies                                             */
 /* ------------------------------------------------------------------ */
 
-export type SiteId =
-  | 'yunnan-culinary-trail'
-  | 'hall-12-herb-spice'
-  | 'earthlink-yunnan-corner'
-  | 'community-herb-garden'
+/**
+ * Site and crop ids are slugs (e.g. "hall-12-herb-spice", "chilli-padi"). They are plain strings because
+ * the lists can grow on a device: Admin approves new hall sites and committees add crops. The vocabulary
+ * is still controlled: forms only offer ids from the site and crop registries, never free text.
+ */
+export type SiteId = string
 
-export type CropId =
-  | 'basil'
-  | 'mint'
-  | 'lemongrass'
-  | 'pandan'
-  | 'chilli-padi'
-  | 'turmeric'
-  | 'kangkong'
+export type CropId = string
 
 export type SiteStatus = 'active' | 'needs-attention' | 'establishing' | 'dormant'
 
@@ -288,4 +282,36 @@ export interface CostAssumptions {
   /** Volunteer labour is unpaid; set a shadow wage to see its value. */
   labourPerHour: number
   notes: string[]
+}
+
+/* ------------------------------------------------------------------ */
+/* Demo roles and community                                            */
+/* ------------------------------------------------------------------ */
+
+/**
+ * Who the visitor is pretending to be. Demo only: anyone can switch, and nothing is secured.
+ * A committee member always belongs to one site.
+ */
+export type DemoRole =
+  | { kind: 'visitor' }
+  | { kind: 'student' }
+  | { kind: 'committee'; siteId: SiteId }
+  | { kind: 'admin' }
+
+export type RoleKind = DemoRole['kind']
+
+export type ContactMethod = 'email' | 'telegram' | 'phone'
+
+/** A student's local profile, made when they join a community. Lives only in this browser. */
+export interface StudentProfile {
+  name: string
+  /** One of the halls in src/data/halls.ts */
+  hall: string
+  contactMethod: ContactMethod
+  contact: string
+  /** Agreed that the site's committee may contact them */
+  consent: boolean
+  createdAt: string
+  /** 'demo' for the ready-made profile (Mei Tan) */
+  source: RecordSource
 }

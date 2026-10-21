@@ -6,11 +6,13 @@ export interface NavItem {
   icon: LucideIcon
   /** Only match the exact path (for "/"). */
   end?: boolean
+  /** Only shown to roles that use the workspace (committee, admin). */
+  workspace?: boolean
 }
 
 export const navItems: NavItem[] = [
   { to: '/', label: 'Explore', icon: Map, end: true },
-  { to: '/log', label: 'Log', icon: ClipboardPen },
+  { to: '/log', label: 'Log', icon: ClipboardPen, workspace: true },
   { to: '/dashboard', label: 'Dashboard', icon: BarChart3 },
   { to: '/sites', label: 'Sites', icon: Sprout },
 ]

@@ -1,15 +1,19 @@
 import { NavLink } from 'react-router-dom'
+import { useRole } from '../../hooks/useCommunity'
+import { usesWorkspace } from '../../lib/roles'
 import { navItems } from './navItems'
 
 /** Mobile tab bar — within thumb reach. Hidden on large screens, where TopNav shows the links. */
 export default function BottomNav() {
+  const role = useRole()
+  const items = navItems.filter((item) => !item.workspace || usesWorkspace(role))
   return (
     <nav
       aria-label="Main"
       className="fixed inset-x-0 bottom-0 z-[1000] border-t border-line bg-surface pb-[env(safe-area-inset-bottom)] lg:hidden"
     >
-      <ul className="grid h-16 grid-cols-4">
-        {navItems.map(({ to, label, icon: Icon, end }) => (
+      <ul className="grid h-16" style={{ gridTemplateColumns: `repeat(${items.length}, minmax(0, 1fr))` }}>
+        {items.map(({ to, label, icon: Icon, end }) => (
           <li key={to}>
             <NavLink
               to={to}

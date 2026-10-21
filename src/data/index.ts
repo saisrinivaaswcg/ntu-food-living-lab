@@ -22,6 +22,8 @@ export { protocols } from './protocols'
 export { handovers, HANDOVER_CHECKLIST_TEMPLATE } from './handovers'
 export { supermarketPrices, costAssumptions, PRICE_SURVEY_DATE } from './prices'
 export * from './vocabulary'
+export { halls, NO_HALL, CAMPUS } from './halls'
+export { DEMO_LOGIN_NOTICE, DEMO_COMMITTEE_PIN, DEMO_ADMIN_PIN, DEMO_STUDENT, ADMIN_TEAM, contactMethodOptions } from './access'
 
 /** All demo log records, grouped by form type. */
 export const demoLogs: LogCollections = {

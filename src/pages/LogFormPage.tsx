@@ -1,4 +1,5 @@
 import { Navigate, useParams } from 'react-router-dom'
+import RoleGate from '../components/access/RoleGate'
 import Breadcrumbs from '../components/layout/Breadcrumbs'
 import { findLogFormKind } from '../components/log/logFormKinds'
 import { usePageTitle } from '../hooks/usePageTitle'
@@ -25,8 +26,14 @@ export default function LogFormPage() {
   return (
     <div className="mx-auto max-w-xl px-4 pt-1 lg:py-6">
       <Breadcrumbs items={[{ label: 'Log', to: '/log' }, { label: form.title }]} className="mb-0" />
-      {/* key: switching between forms starts a fresh one */}
-      <Form key={form.slug} />
+      <RoleGate
+        allow={['committee', 'admin']}
+        what={`Logging ${form.title.toLowerCase()}`}
+        why="Each site's committee logs for its own site, so the records stay trustworthy."
+      >
+        {/* key: switching between forms starts a fresh one */}
+        <Form key={form.slug} />
+      </RoleGate>
     </div>
   )
 }

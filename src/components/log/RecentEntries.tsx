@@ -5,7 +5,7 @@ import { formatDate } from '../../lib/dates'
 import { allEntries, ENTRY_KIND_LABELS, entryDate, entryDetail, entryTitle, type Entry } from '../../lib/entries'
 import { deleteLog, resetAllDemoChanges, resetDemoRecord } from '../../lib/logStore'
 import { notifyChange } from '../../lib/notify'
-import type { LogKind } from '../../types'
+import type { LogKind, SiteId } from '../../types'
 import EditedTag from '../ui/EditedTag'
 import EmptyState from '../ui/EmptyState'
 import EditEntryDialog from './EditEntryDialog'
@@ -15,13 +15,20 @@ type Filter = LogKind | 'all'
 const FILTERS: Filter[] = ['all', 'harvests', 'plantings', 'weeklyInputs', 'failures']
 
 /** Every log entry, newest first, each with Edit and Delete (Undo in the toast). Demo entries can be reset. */
-export default function RecentEntries() {
+export default function RecentEntries({ siteIds }: { siteIds: SiteId[] }) {
   const { logs, demoChangeCount } = useLogs()
   const [filter, setFilter] = useState<Filter>('all')
   const [shown, setShown] = useState(PAGE)
   const [editing, setEditing] = useState<Entry | null>(null)
 
-  const entries = useMemo(() => allEntries(logs).filter((e) => filter === 'all' || e.kind === filter), [logs, filter])
+  // Only the sites this role can edit: a committee sees its own site's entries.
+  const entries = useMemo(
+    () =>
+      allEntries(logs).filter(
+        (e) => siteIds.includes(e.record.siteId) && (filter === 'all' || e.kind === filter),
+      ),
+    [logs, filter, siteIds],
+  )
 
   function remove(e: Entry) {
     const undo = deleteLog(e.kind, e.record.id)

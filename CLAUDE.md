@@ -25,7 +25,7 @@ No backend, no real auth, no database: everything a visitor does is saved in thi
 - `src/hooks/useLogs.ts` — `useLogs()` returns live logs. Components using it re-render the moment a log is saved, which is how the dashboard updates immediately.
 - `src/lib/lookups.ts` — `getSite`, `findSite` (for URL params), `getCrop`, `getBed`, `cropName`, `siteName`.
 - Derived numbers (KPIs, completeness, survival, efficiency, cost per kg, leaderboard) go in `src/lib/metrics.ts` as pure functions over `LogCollections`, not inside components. Definitions are in `docs/SPEC.md` → Metric definitions.
-- `src/pages/` — one file per route (`src/pages/workspace/` for the committee workspace). `src/components/{layout,ui,explore,log,dashboard,sites,learn,community,workspace,illustrations}/` — one component per file. Illustrations are hand-drawn-style line SVGs drawn in code (1.75 stroke, round caps), not icon-library glyphs. Learn's growth stages are SVG built from shared parts (stem, leaf, fruit, soil line) with per-crop variations, in `src/components/learn/`; crop data and care guides stay in `src/data/crops.ts`.
+- `src/pages/` — one file per route (`src/pages/workspace/` for the committee workspace). `src/components/{layout,ui,access,explore,log,dashboard,sites,learn,community,workspace,illustrations}/` — one component per file. Illustrations are hand-drawn-style line SVGs drawn in code (1.75 stroke, round caps), not icon-library glyphs. Learn's growth stages are SVG built from shared parts (stem, leaf, fruit, soil line) with per-crop variations, in `src/components/learn/`; crop data and care guides stay in `src/data/crops.ts`.
 - Two layouts: the public side (`AppShell`: editorial, image-led, top nav + phone tab bar) and the committee workspace (`WorkspaceShell`: denser, sidebar). `/live` has no shell.
 
 ## Build order and status
@@ -35,7 +35,7 @@ No backend, no real auth, no database: everything a visitor does is saved in thi
 3. [x] Log — four forms, harvest form first
 4. [x] Dashboard
 5. [x] Sites — Knowledge and Handover sections
-6. [ ] Access and demo roles — `/login`, "Viewing as" pill, role store
+6. [x] Access and demo roles — `/login`, "Viewing as" pill, role store
 7. [ ] Two sides — public shell and committee workspace with sidebar; old URLs redirect
 8. [ ] Learn to grow — `/learn`, `/learn/:cropId` scroll journeys (scroll-craft rules; working files in `docs/scrollcraft/`)
 9. [ ] Join a community — `/join`, `/join/:siteId`, My gardens

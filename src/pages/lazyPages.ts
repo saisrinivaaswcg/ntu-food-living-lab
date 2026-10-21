@@ -12,4 +12,5 @@ export const SitesPage = lazy(() => import('./SitesPage'))
 /** Preloaded from the Sites list so the photo can morph into the site page's hero. */
 export const SiteDetailPage = lazyWithPreload(() => import('./SiteDetailPage'))
 export const CreditsPage = lazy(() => import('./CreditsPage'))
+export const LoginPage = lazy(() => import('./LoginPage'))
 export const NotFoundPage = lazy(() => import('./NotFoundPage'))

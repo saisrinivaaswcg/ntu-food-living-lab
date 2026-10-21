@@ -1,6 +1,7 @@
 import { ArrowRight } from 'lucide-react'
 import { useMemo } from 'react'
 import { Link } from 'react-router-dom'
+import RoleGate from '../components/access/RoleGate'
 import FormIllustration from '../components/illustrations/FormIllustration'
 import Breadcrumbs from '../components/layout/Breadcrumbs'
 import { logFormKinds } from '../components/log/logFormKinds'
@@ -9,21 +10,39 @@ import ReadySoonCard from '../components/log/ReadySoonCard'
 import RecentEntries from '../components/log/RecentEntries'
 import SlotImage from '../components/ui/SlotImage'
 import { useLogs } from '../hooks/useLogs'
+import { useRole } from '../hooks/useCommunity'
 import { usePageTitle } from '../hooks/usePageTitle'
 import { growthAsOf, logOverview, readySoon } from '../lib/metrics'
+import { editableSites } from '../lib/roles'
 
 export default function LogPage() {
   usePageTitle('Log')
+  return (
+    <div className="mx-auto max-w-5xl px-4 py-5 lg:px-8 lg:py-10">
+      <Breadcrumbs items={[{ label: 'Log' }]} />
+      <RoleGate
+        allow={['committee', 'admin']}
+        what="The Log"
+        why="Harvests, plantings, weekly inputs and plant losses are logged by each site's committee."
+      >
+        <LogHome />
+      </RoleGate>
+    </div>
+  )
+}
+
+function LogHome() {
   const { logs, sites, userLogCount } = useLogs()
+  const role = useRole()
   const [harvest, ...others] = logFormKinds
-  const siteIds = useMemo(() => sites.map((s) => s.id), [sites])
+  // A committee sees its own site; Admin sees every site.
+  const siteIds = useMemo(() => editableSites(role, sites).map((s) => s.id), [role, sites])
   const asOf = growthAsOf(logs)
   const overview = useMemo(() => logOverview(logs, siteIds, asOf), [logs, siteIds, asOf])
   const soon = useMemo(() => readySoon(logs, siteIds, asOf), [logs, siteIds, asOf])
 
   return (
-    <div className="mx-auto max-w-5xl px-4 py-5 lg:px-8 lg:py-10">
-      <Breadcrumbs items={[{ label: 'Log' }]} />
+    <>
       <h1 className="font-display text-display font-medium">What are you logging?</h1>
       <p className="mt-3 max-w-2xl text-lg text-ink-muted">
         Every site uses the same four forms, so the numbers can be compared.
@@ -104,7 +123,7 @@ export default function LogPage() {
         <p className="mt-2 mb-5 text-ink-muted">
           Fix a typo or remove a duplicate. Changes show on every dashboard straight away.
         </p>
-        <RecentEntries />
+        <RecentEntries siteIds={siteIds} />
       </section>
 
       <p className="mt-6 text-sm text-ink-muted">
@@ -112,6 +131,6 @@ export default function LogPage() {
           ? 'Nothing logged on this device yet. Logs are saved in this browser only.'
           : `${userLogCount} ${userLogCount === 1 ? 'log' : 'logs'} saved on this device. Logs are saved in this browser only.`}
       </p>
-    </div>
+    </>
   )
 }

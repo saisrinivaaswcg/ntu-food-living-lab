@@ -11,12 +11,14 @@ import { SITE_TABS, panelId, tabId, type SiteTab } from '../components/sites/sit
 import CropChips from '../components/ui/CropChips'
 import Reveal from '../components/ui/Reveal'
 import { DEMO_DATA_SHORT_NOTICE } from '../data'
+import { useRole } from '../hooks/useCommunity'
 import { useLogs } from '../hooks/useLogs'
 import { usePageTitle } from '../hooks/usePageTitle'
 import { formatDate } from '../lib/dates'
 import { cropName, findSite } from '../lib/lookups'
 import { bedStatuses, cropsCurrentlyGrowing, growthAsOf, growthTimelines, latestLogDate } from '../lib/metrics'
 import { todayISO } from '../lib/dates'
+import { canEditSite } from '../lib/roles'
 import NotFoundPage from './NotFoundPage'
 
 export default function SiteDetailPage() {
@@ -29,6 +31,7 @@ export default function SiteDetailPage() {
   }
   const site = findSite(siteId)
   const { logs } = useLogs()
+  const role = useRole()
   const beds = useMemo(() => (site ? bedStatuses(logs, site, latestLogDate(logs) ?? todayISO()) : []), [logs, site])
   const asOf = growthAsOf(logs)
   const timelines = useMemo(() => (site ? growthTimelines(logs, [site.id], asOf) : []), [logs, site, asOf])
@@ -106,10 +109,12 @@ export default function SiteDetailPage() {
                 ))}
               </ul>
             )}
-            <div className="mt-5">
-              {/* key: a fresh editor when the site changes */}
-              <SiteSetupEditor key={site.id} site={site} />
-            </div>
+            {canEditSite(role, site.id) && (
+              <div className="mt-5">
+                {/* key: a fresh editor when the site changes */}
+                <SiteSetupEditor key={site.id} site={site} />
+              </div>
+            )}
           </section>
         </Reveal>
 
