@@ -113,6 +113,18 @@ Tabs beside the Overview (`/workspace/dashboard`). Period and site filters are s
 - **Handover checklist** — interactive; ticks persist in localStorage per handover record, with a progress count.
 - **History** — previous handover records stay visible as a list (newest first), each expandable to show its full details.
 
+## 5. Learn to grow (`/learn`, `/learn/:cropId`) — public
+
+Built with the scroll-craft skill's rules (brief, grammar and verification in `docs/scrollcraft/builds/learn-to-grow/`), using `motion`, not its engine.
+
+- **Crop library (`/learn`):** every crop as a specimen plate (drawn fully grown) with one label schema: name, botanical name, local name, days to first harvest, light, survival at NTU, beginner rating. Easiest first. An index of crop names at the top jumps to each plate.
+- **Crop journey (`/learn/:cropId`):** a split stage that pins while you scroll. Left: the plant, drawn as SVG from shared parts (stem, leaf, blade, fruit, soil line, roots) with a per-crop form, grows from seed to harvest. Middle: a ruler of the crop's real days to first harvest, the day the drawing is at, and the five stages (Sow, Seedling, Growing, Ready, Harvest). Right: two or three practical steps per stage (`careGuide.steps`). Ready shows a real, credited photo of the crop when it's ready. At Harvest the split collapses: the steps leave, the plant moves to the centre, the harvest goes in a basket, and the **At NTU** numbers arrive as specimen tags tied to the plant (keyed with letters on phones).
+- **At NTU** (pure functions in `metrics.ts`, `cropAtNtu`): survival (1 − net losses ÷ plants planted, all sites, all time), median days to first harvest, best site (most kg per plant planted, at least two harvests), and a beginner rating (Beginner-friendly / Some care needed / Takes patience) from survival, speed to first harvest and problems logged, with the reasons shown. Numbers appear; they never count up. Labelled as demonstration data.
+- **What went wrong here** (`cropTroubles`): the crop's problem-log entries (with what was done and whether it's fixed) and plant-loss records ("3 of 20 plants lost", recovered), newest first. Beside it, **In Singapore's weather** (`careGuide.climate`).
+- **Grow this with us:** beginner-friendly help-wanted sessions for this crop, or at sites growing it now, with spots left; NParks edible-gardening resources; and one closing action (meet the garden).
+- Motion: transform and opacity only. One CSS custom property (`--grow`) drives every part of the drawing. With reduced motion nothing pins or moves: five still plates beside their steps, and the harvest plate with the tags.
+- Crop chips on a site page link to that crop's guide.
+
 ---
 
 ### Editing and site setup

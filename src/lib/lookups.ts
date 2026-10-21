@@ -21,6 +21,11 @@ export function getCrop(id: CropId): Crop {
   return crop
 }
 
+/** For URL params, which may be anything a user types. */
+export function findCrop(id: string | undefined): Crop | undefined {
+  return id ? cropMap.get(id) : undefined
+}
+
 export function getBed(siteId: SiteId, bedId: string): Bed | undefined {
   return getSiteById(siteId)?.beds.find((b) => b.id === bedId)
 }

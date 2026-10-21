@@ -1,4 +1,4 @@
-import type { SiteId } from '../types'
+import type { CropId, SiteId } from '../types'
 
 /**
  * Every image slot in the app. Drop a file at `src` (under public/) and it appears; until then the
@@ -16,7 +16,7 @@ export interface PhotoCredit {
   author: string
   /** Where the original lives (file page) */
   sourceUrl: string
-  license: 'CC0' | 'CC BY 2.0' | 'CC BY 4.0' | 'CC BY-SA 2.0' | 'CC BY-SA 3.0' | 'CC BY-SA 4.0'
+  license: 'CC0' | 'CC BY 2.0' | 'CC BY 3.0' | 'CC BY 4.0' | 'CC BY-SA 2.0' | 'CC BY-SA 3.0' | 'CC BY-SA 4.0'
   licenseUrl: string
   /** What we changed, as CC licences ask */
   changes: string
@@ -47,6 +47,8 @@ const CHANGES = 'Resized, cropped to fit and converted to WebP'
 const CC_BY_SA_4 = { license: 'CC BY-SA 4.0', licenseUrl: 'https://creativecommons.org/licenses/by-sa/4.0/' } as const
 const CC_BY_SA_3 = { license: 'CC BY-SA 3.0', licenseUrl: 'https://creativecommons.org/licenses/by-sa/3.0/' } as const
 const CC_BY_SA_2 = { license: 'CC BY-SA 2.0', licenseUrl: 'https://creativecommons.org/licenses/by-sa/2.0/' } as const
+const CC_BY_3 = { license: 'CC BY 3.0', licenseUrl: 'https://creativecommons.org/licenses/by/3.0/' } as const
+const CC0 = { license: 'CC0', licenseUrl: 'https://creativecommons.org/publicdomain/zero/1.0/' } as const
 
 export const exploreHeroImage: ImageSlot = {
   src: '/images/hero/explore-hero.jpg',
@@ -210,6 +212,113 @@ export const emptyGalleryImage: ImageSlot = {
   },
 }
 
+/**
+ * Learn: one close-up per crop, shown at the "Ready" stage so a beginner knows what ready looks like.
+ * Freely licensed (Wikimedia Commons); none is AI-generated and none shows NTU places or people.
+ * A crop without a photo here (e.g. one a committee added) shows its drawing instead.
+ */
+const LEARN_CHANGES = 'Resized to 1600 px, cropped to fit and converted to WebP; metadata removed'
+export const learnImages: Partial<Record<CropId, ImageSlot>> = {
+  basil: {
+    src: '/images/learn/basil.jpg',
+    alt: 'Thai basil plants with purple flower spikes rising above the leaves',
+    width: 1600,
+    height: 1067,
+    focus: 'center',
+    credit: {
+      title: 'Thai basil with flowers',
+      author: 'Risacher',
+      sourceUrl: 'https://commons.wikimedia.org/wiki/File:Thai_basil_with_flowers.jpg',
+      ...CC_BY_SA_3,
+      changes: LEARN_CHANGES,
+    },
+  },
+  mint: {
+    src: '/images/learn/mint.jpg',
+    alt: 'Dense upright mint stems with bright green serrated leaves',
+    width: 1600,
+    height: 1224,
+    focus: 'center',
+    credit: {
+      title: 'Mint leaves (Mentha spicata)',
+      author: 'Commonists',
+      sourceUrl: 'https://commons.wikimedia.org/wiki/File:Mint_leaves_(Mentha_spicata).jpg',
+      ...CC_BY_SA_4,
+      changes: LEARN_CHANGES,
+    },
+  },
+  lemongrass: {
+    src: '/images/learn/lemongrass.jpg',
+    alt: 'A large, full clump of lemongrass growing in bare soil',
+    width: 1600,
+    height: 900,
+    focus: 'center',
+    credit: {
+      title: 'Tanglad (lemongrass, Cymbopogon citratus) - Philippines',
+      author: 'Obsidian Soul',
+      sourceUrl: 'https://commons.wikimedia.org/wiki/File:Tanglad_(lemongrass,_Cymbopogon_citratus)_-_Philippines.jpg',
+      ...CC0,
+      changes: LEARN_CHANGES,
+    },
+  },
+  pandan: {
+    src: '/images/learn/pandan.jpg',
+    alt: 'A clump of pandan with long, glossy, strap-shaped leaves',
+    width: 1600,
+    height: 1200,
+    focus: 'center',
+    credit: {
+      title: 'Pandanus amaryllifolius Malaysia',
+      author: 'Tu7uh',
+      sourceUrl: 'https://commons.wikimedia.org/wiki/File:Pandanus_amaryllifolius_Malaysia.jpg',
+      ...CC_BY_3,
+      changes: LEARN_CHANGES,
+    },
+  },
+  'chilli-padi': {
+    src: '/images/learn/chilli-padi.jpg',
+    alt: 'A bird’s eye chilli plant with small upright red and green chillies',
+    width: 1600,
+    height: 1067,
+    focus: 'center',
+    credit: {
+      title: 'Thai peppers',
+      author: 'Daniel Risacher',
+      sourceUrl: 'https://commons.wikimedia.org/wiki/File:Thai_peppers.jpg',
+      ...CC_BY_SA_3,
+      changes: LEARN_CHANGES,
+    },
+  },
+  turmeric: {
+    src: '/images/learn/turmeric.jpg',
+    alt: 'A heap of freshly lifted turmeric rhizomes',
+    width: 1600,
+    height: 1200,
+    focus: 'center',
+    credit: {
+      title: 'Zingiberales - Curcuma longa - 1',
+      author: 'Emőke Dénes',
+      sourceUrl: 'https://commons.wikimedia.org/wiki/File:Zingiberales_-_Curcuma_longa_-_1.jpg',
+      ...CC_BY_SA_4,
+      changes: LEARN_CHANGES,
+    },
+  },
+  kangkong: {
+    src: '/images/learn/kangkong.jpg',
+    alt: 'A bed of tall, leafy kangkong with arrow-shaped leaves',
+    width: 1600,
+    height: 1200,
+    focus: 'center',
+    credit: {
+      title: 'Ipomoea aquatica at Organic Unit, FP, UPM',
+      author: 'Wee Hong',
+      sourceUrl: 'https://commons.wikimedia.org/wiki/File:Ipomoea_aquatica_at_Organic_Unit,_FP,_UPM.jpg',
+      ...CC_BY_SA_4,
+      changes: LEARN_CHANGES,
+    },
+  },
+}
+
 /** Every slot, for the Photo credits page. */
 export const allImageSlots: { use: string; slot: ImageSlot }[] = [
   { use: 'Explore page header', slot: exploreHeroImage },
@@ -222,4 +331,7 @@ export const allImageSlots: { use: string; slot: ImageSlot }[] = [
   { use: 'Log: weekly inputs', slot: logImages.weekly },
   { use: 'Log: plant losses', slot: logImages.losses },
   { use: 'Dashboard: empty photo gallery', slot: emptyGalleryImage },
+  ...Object.entries(learnImages).flatMap(([cropId, slot]) =>
+    slot ? [{ use: `Learn: ${cropId.replace('-', ' ')} when ready`, slot }] : [],
+  ),
 ]

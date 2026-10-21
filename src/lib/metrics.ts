@@ -15,6 +15,7 @@ import type {
   ISODate,
   LogCollections,
   PlantingLog,
+  ProblemEntry,
   PropagationType,
   Site,
   SiteId,
@@ -1121,4 +1122,162 @@ export function workspaceSummary(logs: LogCollections, siteIds: SiteId[], anchor
     missingWeeks,
     lastLogBySite,
   }
+}
+
+/* ------------------------------------------------------------------ */
+/* Learn: a crop at NTU                                                */
+/* ------------------------------------------------------------------ */
+
+export type BeginnerRating = 'easy' | 'moderate' | 'patient'
+
+export const BEGINNER_RATING_LABELS: Record<BeginnerRating, string> = {
+  easy: 'Beginner-friendly',
+  moderate: 'Some care needed',
+  patient: 'Takes patience',
+}
+
+export interface CropAtNtu {
+  cropId: CropId
+  /** Plantings logged for this crop, every site, all time (site-setup records left out) */
+  plantings: number
+  plantsPlanted: number
+  /** Sites that have planted it */
+  siteIds: SiteId[]
+  /** 1 − net losses ÷ plants planted, as for a site's survival; null when nothing was planted */
+  survival: number | null
+  /** Median days from planting to first harvest at NTU; null when no planting has been harvested yet */
+  medianDays: number | null
+  /** How many plantings the median is based on */
+  medianFrom: number
+  harvestKg: number
+  /** The site getting the most kg per plant (at least two harvests), or null */
+  bestSite: { siteId: SiteId; kgPerPlant: number; harvests: number } | null
+  rating: BeginnerRating
+  /** Why it got that rating, in plain words */
+  ratingReasons: string[]
+}
+
+/**
+ * How a crop has done across NTU's sites: survival, median days to first harvest, the best site and a
+ * beginner-friendly rating. Uses every log (all time), so the numbers grow with the record.
+ */
+export function cropAtNtu(allLogs: LogCollections, cropId: CropId, problemsLogged = 0): CropAtNtu {
+  const allTime = { start: null, end: anchorDate(allLogs) }
+  const plantings = allLogs.plantings.filter((p) => p.cropId === cropId && p.source !== 'setup' && p.quantity > 0)
+  const failures = allLogs.failures.filter((f) => f.cropId === cropId)
+  const harvests = allLogs.harvests.filter((h) => h.cropId === cropId)
+  const siteIds = [...new Set(plantings.map((p) => p.siteId))]
+
+  const counts = survivalCounts(plantings, failures, allTime)
+  const survival = counts.planted > 0 ? Math.min(1, Math.max(0, 1 - counts.lost / counts.planted)) : null
+
+  const period: Period = { key: 'all', start: null, end: allTime.end, weeks: [], completeWeeks: [] }
+  const days = daysToFirstHarvestByCrop(allLogs, getSites().map((s) => s.id), period).find((d) => d.cropId === cropId)
+
+  const bestSite =
+    siteIds
+      .map((siteId) => {
+        const plants = sum(plantings.filter((p) => p.siteId === siteId).map((p) => p.quantity))
+        const own = harvests.filter((h) => h.siteId === siteId)
+        return { siteId, kgPerPlant: plants > 0 ? sum(own.map((h) => h.weightKg)) / plants : 0, harvests: own.length }
+      })
+      .filter((s) => s.harvests >= 2 && s.kgPerPlant > 0)
+      .sort((a, b) => b.kgPerPlant - a.kgPerPlant)[0] ?? null
+
+  // Beginner rating: points for survival, speed to first harvest and few logged problems.
+  const typical = cropById.get(cropId)?.daysToFirstHarvest ?? 0
+  const speed = days?.medianDays ?? typical
+  const reasons: string[] = []
+  let points = 0
+  if (survival !== null) {
+    if (survival >= 0.9) points += 2
+    else if (survival >= 0.75) points += 1
+    reasons.push(`${Math.round(survival * 100)}% of plants survived`)
+  }
+  if (speed <= 60) points += 2
+  else if (speed <= 120) points += 1
+  reasons.push(`first harvest in about ${Math.round(speed)} days`)
+  const troubleRate = plantings.length ? (problemsLogged + failures.length) / plantings.length : 0
+  if (troubleRate <= 0.34) {
+    points += 1
+    reasons.push('few problems logged')
+  } else {
+    reasons.push(`${problemsLogged + failures.length} problems and losses logged`)
+  }
+  const rating: BeginnerRating = points >= 4 ? 'easy' : points >= 2 ? 'moderate' : 'patient'
+
+  return {
+    cropId,
+    plantings: plantings.length,
+    plantsPlanted: counts.planted,
+    siteIds,
+    survival,
+    medianDays: days ? days.medianDays : null,
+    medianFrom: days?.plantings ?? 0,
+    harvestKg: sum(harvests.map((h) => h.weightKg)),
+    bestSite,
+    rating,
+    ratingReasons: reasons,
+  }
+}
+
+export type CropTrouble =
+  | {
+      kind: 'problem'
+      id: string
+      date: ISODate
+      siteId: SiteId
+      title: string
+      what: string
+      cause: ProblemEntry['cause']
+      fix: string
+      outcome: string
+      resolved: boolean
+    }
+  | {
+      kind: 'loss'
+      id: string
+      date: ISODate
+      siteId: SiteId
+      cause: FailureCause
+      lost: number
+      inBed: number | null
+      recovered: number
+      what: string
+    }
+
+/** What went wrong with a crop at NTU: problem-log entries (with their fixes) and plant losses, newest first. */
+export function cropTroubles(allLogs: LogCollections, problems: ProblemEntry[], cropId: CropId): CropTrouble[] {
+  const fromProblems = problems
+    .filter((p) => p.cropId === cropId)
+    .map(
+      (p): CropTrouble => ({
+        kind: 'problem',
+        id: p.id,
+        date: p.date,
+        siteId: p.siteId,
+        title: p.title,
+        what: p.symptoms,
+        cause: p.cause,
+        fix: p.actionTaken,
+        outcome: p.outcome,
+        resolved: p.status === 'resolved',
+      }),
+    )
+  const fromLosses = allLogs.failures
+    .filter((f) => f.cropId === cropId)
+    .map(
+      (f): CropTrouble => ({
+        kind: 'loss',
+        id: f.id,
+        date: f.date,
+        siteId: f.siteId,
+        cause: f.cause,
+        lost: f.estimatedLossPlants,
+        inBed: f.plantsInBed ?? null,
+        recovered: f.recoveredPlants ?? 0,
+        what: f.description,
+      }),
+    )
+  return [...fromProblems, ...fromLosses].sort((a, b) => b.date.localeCompare(a.date))
 }

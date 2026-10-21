@@ -13,6 +13,8 @@ export const SitesPage = lazy(() => import('./SitesPage'))
 export const SiteDetailPage = lazyWithPreload(() => import('./SiteDetailPage'))
 export const CreditsPage = lazy(() => import('./CreditsPage'))
 export const LoginPage = lazy(() => import('./LoginPage'))
+export const LearnPage = lazy(() => import('./learn/LearnPage'))
+export const LearnCropPage = lazy(() => import('./learn/LearnCropPage'))
 
 // Committee workspace
 export const WorkspaceShell = lazy(() => import('../components/workspace/WorkspaceShell'))

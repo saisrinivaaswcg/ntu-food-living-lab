@@ -1,0 +1,141 @@
+import type { HelpTask, ISODate, TaskClaim } from '../types'
+
+/**
+ * DEMONSTRATION DATA: help-wanted tasks posted by the (fictional) site committees, and the helpers who
+ * claimed them. Dates are set relative to this week so the demo always shows upcoming sessions.
+ */
+
+const pad = (n: number) => String(n).padStart(2, '0')
+const iso = (d: Date): ISODate => `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`
+
+/** The next given weekday (0 = Sunday … 6 = Saturday) on or after today, plus `weeks` weeks. */
+function next(weekday: number, weeks = 0): ISODate {
+  const d = new Date()
+  d.setHours(12, 0, 0, 0)
+  d.setDate(d.getDate() + ((weekday - d.getDay() + 7) % 7) + weeks * 7)
+  return iso(d)
+}
+
+const created = '2026-10-12T09:00:00+08:00'
+
+export const demoTasks: HelpTask[] = [
+  {
+    id: 'demo-task-h12-basil',
+    siteId: 'hall-12-herb-spice',
+    title: 'Pinch and harvest the basil box',
+    detail: 'Learn to pinch flower spikes and cut stems above a leaf pair. Scissors provided; bring a water bottle.',
+    date: next(6),
+    start: '09:00',
+    end: '10:00',
+    helpersNeeded: 3,
+    beginnerFriendly: true,
+    cropId: 'basil',
+    source: 'demo',
+    createdAt: created,
+  },
+  {
+    id: 'demo-task-h12-chilli',
+    siteId: 'hall-12-herb-spice',
+    title: 'Stake and pick the chilli padi',
+    detail: 'Tie up the tall plants and pick the red fruit. Gloves provided.',
+    date: next(3, 1),
+    start: '18:00',
+    end: '19:00',
+    helpersNeeded: 2,
+    beginnerFriendly: true,
+    cropId: 'chilli-padi',
+    source: 'demo',
+    createdAt: created,
+  },
+  {
+    id: 'demo-task-yct-turmeric',
+    siteId: 'yunnan-culinary-trail',
+    title: 'Lift turmeric, bed 4',
+    detail: 'Fork around the clumps and lift the rhizomes. Wear shoes you can get muddy.',
+    date: next(6),
+    start: '08:00',
+    end: '10:00',
+    helpersNeeded: 4,
+    beginnerFriendly: true,
+    cropId: 'turmeric',
+    source: 'demo',
+    createdAt: created,
+  },
+  {
+    id: 'demo-task-yct-lemongrass',
+    siteId: 'yunnan-culinary-trail',
+    title: 'Divide the lemongrass clumps',
+    detail: 'Split congested clumps and replant the outer pieces. Some digging.',
+    date: next(0, 1),
+    start: '08:30',
+    end: '10:30',
+    helpersNeeded: 3,
+    beginnerFriendly: false,
+    cropId: 'lemongrass',
+    source: 'demo',
+    createdAt: created,
+  },
+  {
+    id: 'demo-task-eyc-kangkong',
+    siteId: 'earthlink-yunnan-corner',
+    title: 'Sow kangkong in the wicking beds',
+    detail: 'Soaked seed, 1 cm deep, 10 cm apart. A good first job: you will see it sprout within a week.',
+    date: next(2, 1),
+    start: '17:30',
+    end: '18:30',
+    helpersNeeded: 2,
+    beginnerFriendly: true,
+    cropId: 'kangkong',
+    source: 'demo',
+    createdAt: created,
+  },
+  {
+    id: 'demo-task-eyc-water',
+    siteId: 'earthlink-yunnan-corner',
+    title: 'Evening watering round',
+    detail: 'Fill the wicking reservoirs and water the grow bags. Ten minutes of training on the day.',
+    date: next(4),
+    start: '18:00',
+    end: '18:45',
+    helpersNeeded: 1,
+    beginnerFriendly: true,
+    source: 'demo',
+    createdAt: created,
+  },
+  {
+    id: 'demo-task-chg-pandan',
+    siteId: 'community-herb-garden',
+    title: 'Pot up pandan side shoots',
+    detail: 'Cut side shoots from the mother plants and pot them for the plant swap.',
+    date: next(6, 1),
+    start: '09:30',
+    end: '11:00',
+    helpersNeeded: 4,
+    beginnerFriendly: true,
+    cropId: 'pandan',
+    source: 'demo',
+    createdAt: created,
+  },
+  {
+    id: 'demo-task-chg-mint',
+    siteId: 'community-herb-garden',
+    title: 'Cut back and repot the mint',
+    detail: 'Hard cut-back of the mint terrace, then repot the crowded boxes.',
+    date: next(0),
+    start: '16:00',
+    end: '17:30',
+    helpersNeeded: 3,
+    beginnerFriendly: true,
+    cropId: 'mint',
+    source: 'demo',
+    createdAt: created,
+  },
+]
+
+export const demoClaims: TaskClaim[] = [
+  { id: 'demo-claim-1', taskId: 'demo-task-h12-basil', name: 'Arjun Nair', hall: 'Hall 12', claimedAt: created, source: 'demo' },
+  { id: 'demo-claim-2', taskId: 'demo-task-yct-turmeric', name: 'Chloe Lim', hall: 'Hall 4', claimedAt: created, source: 'demo' },
+  { id: 'demo-claim-3', taskId: 'demo-task-yct-turmeric', name: 'Hafiz Rahman', hall: 'Crescent Hall', claimedAt: created, source: 'demo' },
+  { id: 'demo-claim-4', taskId: 'demo-task-chg-mint', name: 'Wei Ling Goh', hall: 'Hall 9', claimedAt: created, source: 'demo' },
+  { id: 'demo-claim-5', taskId: 'demo-task-yct-lemongrass', name: 'Priya Menon', hall: 'Pioneer Hall', claimedAt: created, source: 'demo' },
+]

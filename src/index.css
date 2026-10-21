@@ -65,6 +65,14 @@
   --color-dormant: #55534d;
   --color-dormant-bg: #ebe9e3;
 
+  /* Botanical drawings (Learn): forest line on paper, one warm accent for fruit and the harvest. */
+  --color-plant-line: var(--color-brand-700);
+  --color-plant-leaf: var(--color-brand-100);
+  --color-plant-dry: #ecdba6;
+  --color-plant-dry-line: #7d6420;
+  --color-plant-rhizome: #f1c98a;
+  --color-plant-rhizome-line: #8a5a1c;
+
   /* Chart series: one highlighted series per chart; others muted. */
   --color-series-harvest: var(--color-brand-700);
   --color-series-water: #3f6a8a;
@@ -159,3 +167,26 @@
     animation: none !important;
   }
 }
+
+/*
+ * Botanical drawings (src/components/learn): every part grows in from its own origin over its own window
+ * of one number, --grow (0 to 1), set on the <svg>. Transform and opacity only, so scrolling the Learn
+ * journey never triggers layout. --a/--b: grow-in window; --fa/--fb: optional fade-out window.
+ */
+.plant-part {
+  --t: clamp(0, (var(--grow, 1) - var(--a)) / (var(--b) - var(--a)), 1);
+  --f: clamp(0, (var(--grow, 1) - var(--fa, 9)) / (var(--fb, 10) - var(--fa, 9)), 1);
+  transform-box: view-box;
+  transform: scale(calc(0.06 + 0.94 * var(--t)));
+  opacity: calc(min(1, var(--t) * 4) * (1 - var(--f)));
+}
+.plant-stem { fill: none; stroke: var(--color-plant-line); }
+.plant-leaf { fill: var(--color-plant-leaf); stroke: var(--color-plant-line); }
+.plant-leaf-dry { fill: var(--color-plant-dry); stroke: var(--color-plant-dry-line); }
+.plant-fruit { fill: var(--color-accent); stroke: var(--color-accent-strong); }
+.plant-flower { fill: var(--color-accent-bg); stroke: var(--color-accent); }
+.plant-root { fill: none; stroke: var(--color-ink-subtle); }
+.plant-rhizome { fill: var(--color-plant-rhizome); stroke: var(--color-plant-rhizome-line); }
+.plant-seed { fill: var(--color-ink); stroke: var(--color-ink); }
+.plant-mark { fill: none; stroke: var(--color-accent); stroke-width: 2.25; }
+.plant-basket { fill: var(--color-sunken); stroke: var(--color-ink-muted); }

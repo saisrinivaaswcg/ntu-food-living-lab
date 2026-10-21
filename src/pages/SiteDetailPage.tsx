@@ -63,7 +63,7 @@ export default function SiteDetailPage() {
               </div>
             </dl>
             <h3 className="mt-8 mb-2 font-semibold">Crops currently growing</h3>
-            <CropChips cropIds={growing} emptyText="No crops currently growing — no live plantings logged for this site." />
+            <CropChips cropIds={growing} linkToLearn emptyText="No crops currently growing: no live plantings logged for this site." />
           </section>
 
           <section aria-labelledby="beds-heading" className="lg:col-span-7">

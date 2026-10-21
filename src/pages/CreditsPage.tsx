@@ -15,7 +15,11 @@ export default function CreditsPage() {
       <h1 className="font-display text-display font-medium">Photo credits</h1>
       <p className="mt-4 max-w-2xl text-lg text-ink-muted">
         Photos are freely licensed from Wikimedia Commons. Photos marked “Representative” show a similar place or
-        activity, not the site itself. We resized them, cropped them to fit and converted them to WebP.
+        activity, not the site itself. We resized them, cropped them to fit and converted them to WebP. None is
+        AI-generated.
+      </p>
+      <p className="mt-3 max-w-2xl text-ink-muted">
+        Illustration: the plant drawings on the Learn pages and elsewhere are drawn in code for this project.
       </p>
 
       <ul className="mt-10 border-t border-ink">

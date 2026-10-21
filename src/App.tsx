@@ -10,6 +10,8 @@ import {
   ExplorePage,
   HandoverPage,
   HarvestDashboardPage,
+  LearnCropPage,
+  LearnPage,
   LogFormPage,
   LoginPage,
   LogPage,
@@ -33,6 +35,8 @@ const router = createBrowserRouter([
       { index: true, element: <ExplorePage /> },
       { path: 'sites', element: <SitesPage /> },
       { path: 'sites/:siteId', element: <SiteDetailPage /> },
+      { path: 'learn', element: <LearnPage /> },
+      { path: 'learn/:cropId', element: <LearnCropPage /> },
       { path: 'login', element: <LoginPage /> },
       { path: 'credits', element: <CreditsPage /> },
       // Old URLs: Log and Dashboards moved into the workspace.

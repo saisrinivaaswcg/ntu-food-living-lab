@@ -73,6 +73,44 @@ export interface Crop {
   scientificName: string
   /** Typical days from planting to first harvest in Singapore conditions */
   daysToFirstHarvest: number
+  /** How the plant is drawn (shared parts, per-crop shape) */
+  form: PlantForm
+  careGuide: CareGuide
+}
+
+/** The five stages of the Learn journey, from sowing to the first harvest. */
+export type LearnStage = 'sow' | 'seedling' | 'growing' | 'ready' | 'harvest'
+
+/** Plant shapes the illustration can draw. A committee adding a crop picks the closest. */
+export type PlantForm =
+  | 'upright-herb' // Thai basil
+  | 'spreading-herb' // mint
+  | 'grass-clump' // lemongrass
+  | 'rosette' // pandan
+  | 'fruiting-shrub' // chilli padi
+  | 'broadleaf-rhizome' // turmeric
+  | 'leafy-vine' // kangkong
+
+/** How to grow a crop at NTU, in Singapore's climate. Shown on Learn, bed pages and Grow more. */
+export interface CareGuide {
+  /** One line for the crop library */
+  summary: string
+  /** e.g. "Full sun", "Part shade" */
+  light: string
+  /** How it is usually started */
+  startFrom: PropagationType
+  /** Day (after planting) each stage begins; sowing is day 0. harvest = first harvest. */
+  stageDays: Record<Exclude<LearnStage, 'sow'>, number>
+  /** Two or three short, practical steps per stage */
+  steps: Record<LearnStage, string[]>
+  /** What "ready" looks like, in one line */
+  readySign: string
+  /** Notes for Singapore's heat, rain and monsoons */
+  climate: string[]
+  /** The three-line care card on bed pages */
+  quickCare: [string, string, string]
+  /** Plants per m² at the spacing NTU beds use (for planning) */
+  plantsPerSqm: number
 }
 
 /* ------------------------------------------------------------------ */
@@ -313,5 +351,39 @@ export interface StudentProfile {
   consent: boolean
   createdAt: string
   /** 'demo' for the ready-made profile (Mei Tan) */
+  source: RecordSource
+}
+
+/* ------------------------------------------------------------------ */
+/* Help wanted                                                         */
+/* ------------------------------------------------------------------ */
+
+/** A job a site's committee needs hands for, in one time slot. */
+export interface HelpTask {
+  id: string
+  siteId: SiteId
+  title: string
+  /** What helpers will do, and what to bring */
+  detail: string
+  date: ISODate
+  /** "HH:MM", 24-hour */
+  start: string
+  end: string
+  helpersNeeded: number
+  /** Fine for someone who has never gardened */
+  beginnerFriendly: boolean
+  /** The crop the task is about, if any (Learn lists tasks for its crop) */
+  cropId?: CropId
+  source: RecordSource
+  createdAt: string
+}
+
+/** One helper's spot on a task. */
+export interface TaskClaim {
+  id: string
+  taskId: string
+  name: string
+  hall?: string
+  claimedAt: string
   source: RecordSource
 }

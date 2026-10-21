@@ -1,4 +1,4 @@
-import { LayoutDashboard, Map, Sprout, type LucideIcon } from 'lucide-react'
+import { BookOpen, LayoutDashboard, Map, Sprout, type LucideIcon } from 'lucide-react'
 import { paths } from '../../lib/paths'
 
 export interface NavItem {
@@ -15,5 +15,6 @@ export interface NavItem {
 export const navItems: NavItem[] = [
   { to: paths.explore, label: 'Explore', icon: Map, end: true },
   { to: paths.sites, label: 'Sites', icon: Sprout },
+  { to: paths.learn, label: 'Learn', icon: BookOpen },
   { to: paths.workspace, label: 'Workspace', icon: LayoutDashboard, workspace: true },
 ]

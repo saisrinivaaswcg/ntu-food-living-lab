@@ -12,7 +12,7 @@ import { demoPlantings } from './plantings'
 import { demoWeeklyInputs } from './weeklyInputs'
 
 export { sites, CAMPUS_MAP_VIEW } from './sites'
-export { allImageSlots, emptyGalleryImage, exploreHeroImage, exploreHeroVideo, logImages, siteImages } from './images'
+export { allImageSlots, emptyGalleryImage, exploreHeroImage, exploreHeroVideo, learnImages, logImages, siteImages } from './images'
 export type { ImageSlot, PhotoCredit, VideoSlot } from './images'
 export { imageAsset, videoAsset } from './imageAssets'
 export type { ImageAsset } from './imageAssets'
@@ -23,6 +23,8 @@ export { handovers, HANDOVER_CHECKLIST_TEMPLATE } from './handovers'
 export { supermarketPrices, costAssumptions, PRICE_SURVEY_DATE } from './prices'
 export * from './vocabulary'
 export { halls, NO_HALL, CAMPUS } from './halls'
+export { demoTasks, demoClaims } from './tasks'
+export { nparksResources } from './learnResources'
 export { DEMO_LOGIN_NOTICE, DEMO_COMMITTEE_PIN, DEMO_ADMIN_PIN, DEMO_STUDENT, ADMIN_TEAM, contactMethodOptions } from './access'
 
 /** All demo log records, grouped by form type. */

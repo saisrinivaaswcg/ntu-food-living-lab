@@ -11,6 +11,8 @@ export const paths = {
   explore: '/',
   sites: '/sites',
   site: (siteId: SiteId) => `/sites/${siteId}`,
+  learn: '/learn',
+  learnCrop: (cropId: string) => `/learn/${cropId}`,
   login: '/login',
   credits: '/credits',
 
