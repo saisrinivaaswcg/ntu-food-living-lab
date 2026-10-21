@@ -11,6 +11,7 @@
 import { demoLogs, sites as baseSites } from '../data'
 import type { Bed, LogCollections, LogKind, PlantingLog, Site, SiteId, SiteSetup } from '../types'
 import { latestLogDate } from './metrics'
+import { getCommunitySnapshot, subscribeCommunity } from './communityStore'
 import { setSites } from './siteRegistry'
 import { todayISO } from './dates'
 
@@ -176,7 +177,8 @@ function buildSnapshot(s: StoredState): LogSnapshot {
   const asOf = latestLogDate(logs) ?? todayISO()
   logs.plantings = [...logs.plantings, ...setupPlantings(s.siteSetup, asOf)]
 
-  const sites = baseSites.map((site) => applySetup(site, s.siteSetup[site.id]))
+  // Demo sites plus hall sites Admin approved on this device (kept in the community store).
+  const sites = [...baseSites, ...getCommunitySnapshot().approvedSites].map((site) => applySetup(site, s.siteSetup[site.id]))
   // Lookups and metrics read the registry; update it before anyone re-renders.
   setSites(sites)
 
@@ -190,6 +192,16 @@ function buildSnapshot(s: StoredState): LogSnapshot {
     demoChangeCount: Object.keys(s.demoEdits).length + s.demoDeleted.length,
   }
 }
+
+/** Approving a hall site changes the site list: rebuild when the approved sites change (not on every role switch). */
+let approvedKey = JSON.stringify(getCommunitySnapshot().approvedSites)
+subscribeCommunity(() => {
+  const key = JSON.stringify(getCommunitySnapshot().approvedSites)
+  if (key === approvedKey) return
+  approvedKey = key
+  snapshot = buildSnapshot(state)
+  listeners.forEach((l) => l())
+})
 
 function commit(next: StoredState): SaveResult | null {
   const failure = writeStorage(next)

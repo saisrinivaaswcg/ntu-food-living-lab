@@ -41,7 +41,7 @@ No backend, no real auth, no database: everything a visitor does is saved in thi
 9. [x] Join a community — `/join`, `/join/:siteId`, My gardens
 10. [x] Get involved — help wanted, ready to pick, bed pages, printable QR cards
 11. [x] Hall Garden Cup — `/hall-cup`, demo hall sites, spotlight challenges
-12. [ ] New hall sites — start-a-garden guide, request, Admin approval
+12. [x] New hall sites — start-a-garden guide, request, Admin approval
 13. [ ] Committee tools — manage site, grow more, handover wizard, impact report
 14. [ ] Engaging demo — guided tour, showcase mode, `/live` board
 

@@ -7,6 +7,7 @@ const links = [
   { to: paths.join, label: 'Join a community' },
   { to: paths.getInvolved, label: 'Get involved' },
   { to: paths.hallCup, label: 'Hall Garden Cup' },
+  { to: paths.startGarden, label: 'Start a hall garden' },
   { to: paths.myGardens, label: 'My gardens' },
   { to: paths.credits, label: 'Photo credits' },
 ]

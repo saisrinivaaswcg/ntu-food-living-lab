@@ -233,6 +233,9 @@ export default function HallCupPage() {
           </p>
         </div>
         <div className="flex flex-wrap gap-2">
+          <Link to={paths.startGarden} className="inline-flex min-h-12 items-center rounded-sm border border-line-strong px-5 font-semibold hover:bg-sunken">
+            Start a hall garden
+          </Link>
           <Link to={paths.join} className="group inline-flex min-h-12 items-center gap-1.5 rounded-sm bg-accent px-5 font-semibold text-white hover:bg-accent-strong">
             Join a garden
             <ArrowRight className="size-4 transition-transform group-hover:translate-x-0.5" aria-hidden />

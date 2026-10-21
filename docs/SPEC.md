@@ -140,6 +140,12 @@ Built with the scroll-craft skill's rules (brief, grammar and verification in `d
 - **Bed page** (`/bed/:siteId/:bedId`, the QR target): crop, stage and progress, planted / plants / first harvest, the crop's three-line care card (`careGuide.quickCare`), pick policy when ready, and big **Log harvest** (harvest form pre-filled with site, bed, crop) and **Log watering** (weekly inputs form pre-filled with the site) buttons. Bed names on site pages link here.
 - **QR cards** (`/workspace/sites/:siteId/qr`): one printable card per bed (site, bed, crop, first care line, QR to the bed page). Codes use `VITE_PUBLIC_SITE_URL` when set, else the page origin. Printing hides the workspace chrome.
 
+## 9. New hall sites (`/start-a-garden`, `/start-a-garden/request`, Admin: `/workspace/approvals`)
+
+- **Guide (public):** beginner crops ranked by survival at NTU (`cropAtNtu`, then days to first harvest), with plants needed for the chosen bed size; bed sizes (trough, planter box, three boxes, in-ground bed) with an indicative starter kit and total cost (`src/data/startGarden.ts`); six steps.
+- **Request (Student, Committee, Admin):** hall (controlled list), garden name, description, map pin (tap the OneMap map or type coordinates; must be in Singapore), beds (name + m²), requester name, contact, optional photo (compressed). Saved as pending in the community store; the requester sees status and can withdraw a pending request.
+- **Approvals (Admin):** each pending request with photo, pin (Open in OneMap), beds and contact; Approve or Decline with a note (Undo). An approved request becomes a site (status Establishing, beds as requested, `hall` set) that the log store adds to the site registry, so it appears on the map, Sites, Join and the Hall Garden Cup straight away.
+
 ## 7. Hall Garden Cup (`/hall-cup`, Admin: `/workspace/competition`)
 
 - Every site has a `hall` (one of `src/data/halls.ts`, or "Campus"). Only hall sites compete, as teams. Three invented hall gardens (`src/data/hallSites.ts`, `fictional: true`, generated demo logs) are always tagged **Demo hall site**.

@@ -468,3 +468,34 @@ export interface JoinRequest {
   createdAt: string
   source: RecordSource
 }
+
+/* ------------------------------------------------------------------ */
+/* New hall sites                                                      */
+/* ------------------------------------------------------------------ */
+
+export type SiteRequestStatus = 'pending' | 'approved' | 'declined'
+
+/** A request to start a hall garden. Pending until Admin approves it; then it becomes a site. */
+export interface SiteRequest {
+  id: string
+  /** One of src/data/halls.ts */
+  hall: string
+  name: string
+  description: string
+  coordinates: [number, number]
+  locationNote: string
+  beds: { label: string; areaSqm: number }[]
+  requesterName: string
+  /** 'student' or 'committee': who asked */
+  requesterRole: RoleKind
+  contactMethod: ContactMethod
+  contact: string
+  photo?: Extract<PhotoRef, { kind: 'upload' }>
+  status: SiteRequestStatus
+  createdAt: string
+  decidedAt?: string
+  /** Admin's note when declining */
+  decisionNote?: string
+  /** The site id it became, once approved */
+  siteId?: SiteId
+}

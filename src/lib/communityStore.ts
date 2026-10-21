@@ -9,7 +9,7 @@
  * via the "storage" event. useCommunity() reads it. Nothing here is secure; it is a demo login.
  */
 import { DEMO_COMMITTEE_PIN, DEMO_STUDENT, defaultSpotlights, demoClaims, demoCommunities, demoJoins, demoTasks } from '../data'
-import type { DemoRole, HelpTask, JoinRequest, JoinStatus, SiteCommunity, SiteId, SpotlightId, StudentProfile, TaskClaim } from '../types'
+import type { DemoRole, HelpTask, JoinRequest, JoinStatus, SiteCommunity, Site, SiteId, SiteRequest, SpotlightId, StudentProfile, TaskClaim } from '../types'
 
 const STORAGE_KEY = 'ntu-food-living-lab:community:v1'
 
@@ -34,6 +34,8 @@ interface StoredCommunity {
   claims: TaskClaim[]
   /** Hall Cup spotlight challenges Admin chose on this device, by month "YYYY-MM" */
   spotlights: Record<string, SpotlightId>
+  /** Requests for new hall sites made (and decided) on this device */
+  siteRequests: SiteRequest[]
 }
 
 export interface CommunitySnapshot {
@@ -56,6 +58,10 @@ export interface CommunitySnapshot {
   myClaims: TaskClaim[]
   /** Spotlight challenge by month "YYYY-MM": demo choices with Admin's changes */
   spotlights: Record<string, SpotlightId>
+  /** New hall site requests, newest first */
+  siteRequests: SiteRequest[]
+  /** Sites Admin approved on this device (the log store adds them to the map, Sites and the Hall Cup) */
+  approvedSites: Site[]
 }
 
 export type CommunitySaveResult = { ok: true } | { ok: false; error: string }
@@ -76,6 +82,7 @@ const fallback = (): StoredCommunity => ({
   removedTaskIds: [],
   claims: [],
   spotlights: {},
+  siteRequests: [],
 })
 
 function parseRole(v: unknown): DemoRole {
@@ -123,6 +130,7 @@ function readStorage(): StoredCommunity {
       removedTaskIds: Array.isArray(parsed.removedTaskIds) ? parsed.removedTaskIds.filter((v): v is string => typeof v === 'string') : [],
       claims: listOf<TaskClaim>(parsed.claims),
       spotlights: recordOf<SpotlightId>(parsed.spotlights),
+      siteRequests: listOf<SiteRequest>(parsed.siteRequests),
     }
   } catch {
     // Private mode, blocked storage or corrupted JSON: start as a visitor rather than crash.
@@ -165,6 +173,8 @@ function buildSnapshot(s: StoredCommunity): CommunitySnapshot {
     claims: [...demoClaims, ...s.claims].filter((c) => live.has(c.taskId)),
     myClaims: s.claims.filter((c) => live.has(c.taskId)),
     spotlights: { ...defaultSpotlights, ...s.spotlights },
+    siteRequests: [...s.siteRequests].sort((a, b) => b.createdAt.localeCompare(a.createdAt)),
+    approvedSites: s.siteRequests.filter((r) => r.status === 'approved' && r.siteId).map(siteFromRequest),
   }
 }
 
@@ -341,6 +351,62 @@ export function unclaimTask(claimId: string): CommunitySaveResult {
 /** Admin: choose a month's spotlight challenge (from the fixed list). */
 export function setSpotlight(month: string, challenge: SpotlightId): CommunitySaveResult {
   return commit({ ...state, spotlights: { ...state.spotlights, [month]: challenge } })
+}
+
+/* ------------------------------------------------------------------ */
+/* New hall sites                                                      */
+/* ------------------------------------------------------------------ */
+
+export type NewSiteRequest = Omit<SiteRequest, 'id' | 'status' | 'createdAt' | 'decidedAt' | 'decisionNote' | 'siteId'>
+
+/** The site an approved request becomes: establishing, in the Hall Cup, beds as requested. */
+export function siteFromRequest(r: SiteRequest): Site {
+  const id = r.siteId ?? r.id
+  const prefix = r.hall.replace(/[^A-Za-z0-9]/g, '').slice(0, 6).toUpperCase() || 'NEW'
+  const decided = (r.decidedAt ?? r.createdAt).slice(0, 10)
+  return {
+    id,
+    name: r.name,
+    shortName: r.hall,
+    description: r.description,
+    coordinates: r.coordinates,
+    locationNote: r.locationNote,
+    status: 'establishing',
+    statusNote: `New hall garden, approved ${decided}. Beds being set up.`,
+    managedBy: `${r.hall} garden team`,
+    hall: r.hall,
+    established: decided,
+    areaSqm: Math.round(r.beds.reduce((n, b) => n + b.areaSqm, 0) * 10) / 10,
+    beds: r.beds.map((b, i) => ({ id: `${prefix}-${id.slice(-4).toUpperCase()}-B${i + 1}`, label: b.label, areaSqm: b.areaSqm })),
+    photoAlt: `The proposed garden spot at ${r.hall}`,
+  }
+}
+
+/** Student or committee: ask for a new hall site. It stays pending until Admin decides. */
+export function requestSite(input: NewSiteRequest): CommunitySaveResult {
+  const request: SiteRequest = { ...input, id: newId('site-request'), status: 'pending', createdAt: new Date().toISOString() }
+  return commit({ ...state, siteRequests: [...state.siteRequests, request] })
+}
+
+/** Withdraw a pending request. */
+export function withdrawSiteRequest(id: string): CommunitySaveResult {
+  return commit({ ...state, siteRequests: state.siteRequests.filter((r) => r.id !== id) })
+}
+
+/** Admin: approve (the request becomes a site) or decline (with a note). Returns an undo. */
+export function decideSiteRequest(id: string, status: 'approved' | 'declined', taken: string[], note?: string): () => void {
+  const before = state.siteRequests
+  const request = before.find((r) => r.id === id)
+  if (!request) return () => {}
+  let siteId: string | undefined
+  if (status === 'approved') {
+    const base = request.name.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '') || 'hall-garden'
+    siteId = base
+    for (let i = 2; taken.includes(siteId); i++) siteId = `${base}-${i}`
+  }
+  const decided: SiteRequest = { ...request, status, decidedAt: new Date().toISOString(), decisionNote: note, siteId }
+  commit({ ...state, siteRequests: before.map((r) => (r.id === id ? decided : r)) })
+  return () => commit({ ...state, siteRequests: before })
 }
 
 /**
