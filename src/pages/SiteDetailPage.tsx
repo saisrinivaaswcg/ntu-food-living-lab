@@ -1,5 +1,5 @@
 import { useMemo } from 'react'
-import { Handshake, Shovel } from 'lucide-react'
+import { Handshake, HeartHandshake, Shovel } from 'lucide-react'
 import { Link, Navigate, useParams, useSearchParams } from 'react-router-dom'
 import BedList from '../components/sites/BedList'
 import KnowledgeTab from '../components/sites/KnowledgeTab'
@@ -64,6 +64,13 @@ export default function SiteDetailPage() {
             </dl>
             <h3 className="mt-8 mb-2 font-semibold">Crops currently growing</h3>
             <CropChips cropIds={growing} linkToLearn emptyText="No crops currently growing: no live plantings logged for this site." />
+            <Link
+              to={paths.joinSite(site.id)}
+              className="mt-8 inline-flex min-h-12 items-center gap-2 rounded-sm bg-accent px-5 font-semibold text-white hover:bg-accent-strong"
+            >
+              <HeartHandshake className="size-4" aria-hidden />
+              Join this community
+            </Link>
           </section>
 
           <section aria-labelledby="beds-heading" className="lg:col-span-7">

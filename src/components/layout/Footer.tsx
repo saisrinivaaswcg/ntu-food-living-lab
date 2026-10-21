@@ -1,5 +1,13 @@
 import { Link } from 'react-router-dom'
 import { DEMO_DATA_SHORT_NOTICE } from '../../data'
+import { paths } from '../../lib/paths'
+
+const links = [
+  { to: paths.sites, label: 'Sites' },
+  { to: paths.join, label: 'Join a community' },
+  { to: paths.myGardens, label: 'My gardens' },
+  { to: paths.credits, label: 'Photo credits' },
+]
 
 /** Site footer: credits and the demo-data reminder. Leaves room for the phone tab bar. */
 export default function Footer() {
@@ -11,11 +19,13 @@ export default function Footer() {
         </p>
         <nav aria-label="Footer">
           <ul className="flex flex-wrap gap-x-4">
-            <li>
-              <Link to="/credits" className="inline-flex min-h-12 items-center font-semibold text-ink underline underline-offset-4 hover:text-brand-700">
-                Photo credits
-              </Link>
-            </li>
+            {links.map((l) => (
+              <li key={l.to}>
+                <Link to={l.to} className="inline-flex min-h-12 items-center font-semibold text-ink underline underline-offset-4 hover:text-brand-700">
+                  {l.label}
+                </Link>
+              </li>
+            ))}
           </ul>
         </nav>
       </div>

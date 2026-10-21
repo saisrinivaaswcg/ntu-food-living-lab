@@ -125,6 +125,14 @@ Built with the scroll-craft skill's rules (brief, grammar and verification in `d
 - Motion: transform and opacity only. One CSS custom property (`--grow`) drives every part of the drawing. With reduced motion nothing pins or moves: five still plates beside their steps, and the harvest plate with the tags.
 - Crop chips on a site page link to that crop's guide.
 
+## 6. Join a community (`/join`, `/join/:siteId`, `/my-gardens`) — public
+
+- **`/join`:** the newcomer path (learn a crop → claim a beginner task → meet the committee) and every site's community: welcome, what it grows now, workdays, open roles, picking policy, "You asked to join" when joined.
+- **`/join/:siteId`:** what the site grows, workdays and meeting point, open roles ("I'd like this role" pre-selects it), beginner tasks with **Claim a slot** (name pre-filled) and **Add to calendar** (.ics), and the **Join this community** form: name, hall (controlled list), preferred contact (email / Telegram / phone), role, optional note, consent (required), with a short privacy note. Joining creates or updates the Student profile, switches to Student, appears in the site's **Interest inbox** and on **My gardens**. Joining the same site again replaces the earlier request.
+- **Community profile** (`SiteCommunity`): welcome, workdays, meeting point, open roles, pick policy. Edited by that site's committee (or Admin) in Manage site → Community; Reset to original values.
+- **Interest inbox** (`/workspace/sites/:siteId/inbox`): requests newest first, filter by status, move New → Contacted → Welcomed (with Undo). Contact details show only with consent and only to that site's committee.
+- **My gardens:** communities joined (status, role, next workday, leave with Undo), slots claimed (give back), and the profile (change, or delete everything from this device).
+
 ---
 
 ### Editing and site setup

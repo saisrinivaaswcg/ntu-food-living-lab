@@ -387,3 +387,56 @@ export interface TaskClaim {
   claimedAt: string
   source: RecordSource
 }
+
+/* ------------------------------------------------------------------ */
+/* Communities: site profiles and joining                              */
+/* ------------------------------------------------------------------ */
+
+/** A regular weekly session at a site. weekday: 0 = Sunday … 6 = Saturday. Times "HH:MM". */
+export interface Workday {
+  weekday: number
+  start: string
+  end: string
+}
+
+/** A way to help that a site's committee is looking for. */
+export interface CommunityRole {
+  id: string
+  title: string
+  detail: string
+}
+
+/** Whether students may take some of what is ready to pick. */
+export type PickPolicy = 'help-yourself' | 'ask-first' | 'committee-only'
+
+/** What a site's community is like: shown on Join, edited by that site's committee. */
+export interface SiteCommunity {
+  siteId: SiteId
+  /** A line or two in the committee's own voice */
+  welcome: string
+  workdays: Workday[]
+  /** Where newcomers meet the committee */
+  meetingPoint: string
+  roles: CommunityRole[]
+  pickPolicy: PickPolicy
+}
+
+export type JoinStatus = 'new' | 'contacted' | 'welcomed'
+
+/** Someone asking to join a site's community. Shows in that site's Interest inbox. */
+export interface JoinRequest {
+  id: string
+  siteId: SiteId
+  name: string
+  hall: string
+  contactMethod: ContactMethod
+  contact: string
+  /** One of the site's open roles, or 'any' */
+  roleId: string
+  note?: string
+  /** Agreed that the committee may contact them */
+  consent: boolean
+  status: JoinStatus
+  createdAt: string
+  source: RecordSource
+}

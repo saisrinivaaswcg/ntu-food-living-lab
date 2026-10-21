@@ -25,6 +25,7 @@ export * from './vocabulary'
 export { halls, NO_HALL, CAMPUS } from './halls'
 export { demoTasks, demoClaims } from './tasks'
 export { nparksResources } from './learnResources'
+export { demoCommunities, demoJoins, JOIN_PRIVACY_NOTE, pickPolicyOptions, WEEKDAY_NAMES } from './community'
 export { DEMO_LOGIN_NOTICE, DEMO_COMMITTEE_PIN, DEMO_ADMIN_PIN, DEMO_STUDENT, ADMIN_TEAM, contactMethodOptions } from './access'
 
 /** All demo log records, grouped by form type. */

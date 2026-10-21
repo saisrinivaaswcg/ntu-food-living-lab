@@ -2,6 +2,7 @@ import { ChevronDown, Info, UserRound } from 'lucide-react'
 import { useEffect, useId, useRef, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { DEMO_LOGIN_NOTICE } from '../../data'
+import { paths } from '../../lib/paths'
 import { useCommunity } from '../../hooks/useCommunity'
 import { roleName, roleShortName } from '../../lib/roles'
 import RoleChooser from './RoleChooser'
@@ -74,6 +75,15 @@ export default function RolePill() {
             {DEMO_LOGIN_NOTICE}
           </p>
           <RoleChooser compact onChosen={() => close()} />
+          {role.kind === 'student' && profile && (
+            <Link
+              to={paths.myGardens}
+              onClick={() => close(false)}
+              className="mt-4 flex min-h-12 items-center justify-center rounded-sm bg-brand-700 font-semibold text-white hover:bg-brand-800"
+            >
+              My gardens
+            </Link>
+          )}
           <Link
             to="/login"
             onClick={() => close(false)}
