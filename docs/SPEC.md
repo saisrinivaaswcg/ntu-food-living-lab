@@ -1,6 +1,33 @@
 # Product spec — NTU Campus Food Systems Living Lab
 
-A shared platform connecting four campus food-growing sites so that growing data is recorded consistently and knowledge persists across student committees. Frontend prototype only: mock data in `src/data/`, submissions in localStorage.
+A shared platform connecting NTU's campus and hall food-growing sites so that growing data is recorded consistently, knowledge persists across student committees, students can learn to grow and join a garden community, and halls compete as teams in the Hall Garden Cup. Frontend prototype only: mock data in `src/data/`, everything a visitor does in localStorage. No backend, no real login.
+
+## Routes and roles
+
+### Roles (demo only)
+
+Anyone can switch roles from `/login` or the header pill ("Viewing as: … · Switch"). A note says: "Demo login: anyone can switch roles. No real security." The role is stored in localStorage.
+
+| Role | Who | Can do |
+| --- | --- | --- |
+| Visitor (default) | Anyone | Browse every public page: map, sites, beds, photos, what's growing, Learn, Join, Get involved, Hall Cup. Joining a community makes them a Student. |
+| Student | Local profile (name, hall, contact, consent), created when they join a community. Demo: "Mei Tan, Hall 12". | Join communities, claim help-wanted slots, My gardens, request a new hall site. |
+| Committee member | Picks a site; demo PIN pre-filled | Workspace for their own site: Log, Dashboards (own site by default, others read-only), Manage site, Help wanted, Interest inbox, Handover, Impact, Grow more, QR cards. Can request a new site. |
+| Admin (NTU Sustainability Office) | Demo PIN pre-filled | Everything a committee member can do, for every site, plus Approve new sites, competition settings and Reset demo data. |
+
+Controls a role can't use are hidden. A workspace page opened by the wrong role shows the role cards (one click to switch), not a dead end.
+
+### Route map
+
+**Public side** (editorial, image-led, scroll-driven):
+`/` Explore · `/sites` · `/sites/:siteId` · `/bed/:siteId/:bedId` (QR target) · `/learn` · `/learn/:cropId` · `/join` · `/join/:siteId` · `/get-involved` · `/hall-cup` · `/start-a-garden` · `/start-a-garden/request` · `/my-gardens` (Student) · `/login` · `/credits`
+
+**Committee workspace** (dense tool layout with a sidebar and a site switcher):
+`/workspace` (today at your site) · `/workspace/log` · `/workspace/log/:kind` · `/workspace/dashboard` · `/workspace/dashboard/harvest` · `/workspace/dashboard/planting` · `/workspace/sites/:siteId/manage` · `/workspace/sites/:siteId/tasks` · `/workspace/sites/:siteId/inbox` · `/workspace/sites/:siteId/handover` (+ `/pack`, printable) · `/workspace/sites/:siteId/impact` · `/workspace/sites/:siteId/grow` · `/workspace/sites/:siteId/qr` · Admin: `/workspace/approvals` · `/workspace/competition`
+
+**Bare:** `/live` big-screen board. `?showcase=1` on any page turns on showcase mode.
+
+**Redirects:** `/log/*` → `/workspace/log/*` · `/dashboard/*` → `/workspace/dashboard/*` (query kept) · `/sites/:id?tab=handover` → `/workspace/sites/:id/handover` · `/log/failure` → `/workspace/log/losses`.
 
 ## Sites
 
@@ -115,6 +142,8 @@ Put these in `src/lib/metrics.ts` as pure functions. All respect the dashboard's
 - Every log, person, contact and price is invented and must be labelled as demonstration data in the UI. Real site names and approximate locations only.
 - Period: 13 Jul – 14 Oct 2026. Includes varied planting dates, ~3 months of harvests, a few failures (incl. a drought loss at Yunnan Corner), weeks with missing logs, and 2–3 handover records per site.
 
-## Out of scope
+## Allowed and out of scope
 
-User accounts, authentication, notifications, inventory tracking, quizzes, badges, gamified virtual gardens, any backend.
+Allowed: demo roles anyone can switch (no real security), a local student profile, learning guides, and a hall-level team competition (Hall Garden Cup).
+
+Out of scope: individual points or scores, badges, quizzes, notifications, real user accounts or authentication, inventory tracking, gamified virtual gardens, any backend, AI-generated images.
