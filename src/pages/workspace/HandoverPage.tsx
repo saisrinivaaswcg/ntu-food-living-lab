@@ -1,9 +1,12 @@
+import { FileText, Handshake } from 'lucide-react'
+import { Link } from 'react-router-dom'
 import HandoverTab from '../../components/sites/HandoverTab'
 import ReadOnlyNotice from '../../components/workspace/ReadOnlyNotice'
 import WorkspaceHeader from '../../components/workspace/WorkspaceHeader'
 import { DEMO_DATA_SHORT_NOTICE } from '../../data'
 import { usePageTitle } from '../../hooks/usePageTitle'
 import { useWorkspaceSite } from '../../hooks/useWorkspaceSite'
+import { paths } from '../../lib/paths'
 import NotFoundPage from '../NotFoundPage'
 
 /** The committee's handover record for one site: current leads, open issues, checklist and history. */
@@ -20,6 +23,26 @@ export default function HandoverPage() {
         lead={
           <>
             {site.name}: what the next committee needs to know. <span className="text-demo">{DEMO_DATA_SHORT_NOTICE}</span>
+          </>
+        }
+        actions={
+          <>
+            <Link
+              to={`${paths.siteTool(site.id, 'handover')}/pack`}
+              className="inline-flex min-h-12 items-center gap-1.5 rounded-sm border border-line-strong px-4 font-semibold hover:bg-sunken"
+            >
+              <FileText className="size-4" aria-hidden />
+              Handover pack
+            </Link>
+            {canEdit && (
+              <Link
+                to={`${paths.siteTool(site.id, 'handover')}/new`}
+                className="inline-flex min-h-12 items-center gap-1.5 rounded-sm bg-accent px-4 font-semibold text-white hover:bg-accent-strong"
+              >
+                <Handshake className="size-4" aria-hidden />
+                Start handover
+              </Link>
+            )}
           </>
         }
       />

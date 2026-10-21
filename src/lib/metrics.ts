@@ -2,7 +2,6 @@
  * Derived numbers, as pure functions over LogCollections.
  * Definitions live in docs/SPEC.md → Metric definitions.
  */
-import { crops } from '../data'
 import type {
   Bed,
   CompostType,
@@ -28,10 +27,9 @@ import type {
   WeeklyInputLog,
 } from '../types'
 import { addDays, daysBetween, mondayOf, todayISO } from './dates'
+import { cropIndex, getCropById, getCrops } from './cropRegistry'
 import { getSiteById, getSites } from './siteRegistry'
 
-const cropOrder = new Map(crops.map((c, i) => [c.id, i]))
-const cropById = new Map(crops.map((c) => [c.id, c]))
 
 /** Plants a loss record takes away for good: lost minus any that recovered. */
 export function netLoss(f: Pick<FailureLog, 'estimatedLossPlants' | 'recoveredPlants'>): number {
@@ -75,7 +73,7 @@ export function cropsCurrentlyGrowing(
   site: Site,
 ): CropId[] {
   const ids = new Set([...currentPlantingByBed(logs, site).values()].map((p) => p.cropId))
-  return [...ids].sort((a, b) => (cropOrder.get(a) ?? 0) - (cropOrder.get(b) ?? 0))
+  return [...ids].sort((a, b) => cropIndex(a) - cropIndex(b))
 }
 
 /* ------------------------------------------------------------------ */
@@ -293,6 +291,7 @@ export interface CropInputs {
 const emptyCompost = (): Record<CompostType, number> => ({
   vermicompost: 0,
   'food-waste-compost': 0,
+  'canteen-food-waste': 0,
   'leaf-mould': 0,
   none: 0,
 })
@@ -375,7 +374,7 @@ export function cropEfficiency(logs: LogCollections, allPlantings: PlantingLog[]
         kgPerLabourHour: ratio(kg, labourHours),
       }
     })
-    .sort((a, b) => (cropOrder.get(a.cropId) ?? 0) - (cropOrder.get(b.cropId) ?? 0))
+    .sort((a, b) => cropIndex(a.cropId) - cropIndex(b.cropId))
 }
 
 export interface CropCost {
@@ -608,7 +607,7 @@ export function cropYieldsAtSite(logs: Pick<LogCollections, 'harvests'>, siteId:
 
 /** Sorts crop ids into controlled-vocabulary order. */
 export function sortCropIds(ids: Iterable<CropId>): CropId[] {
-  return [...new Set(ids)].sort((a, b) => (cropOrder.get(a) ?? 0) - (cropOrder.get(b) ?? 0))
+  return [...new Set(ids)].sort((a, b) => cropIndex(a) - cropIndex(b))
 }
 
 /* ------------------------------------------------------------------ */
@@ -728,7 +727,7 @@ export function bedStatuses(
       .filter((h) => h.bedId === bed.id && h.cropId === planting.cropId && h.date >= planting.date)
       .map((h) => h.date)
       .sort()
-    const typical = cropById.get(planting.cropId)?.daysToFirstHarvest
+    const typical = getCropById(planting.cropId)?.daysToFirstHarvest
     const daysSincePlanting = Math.max(0, daysBetween(planting.date, anchor))
     const firstHarvest = harvests[0] ?? null
     return {
@@ -818,7 +817,7 @@ export interface CropSurvival {
 export function survivalByCrop(allLogs: LogCollections, siteIds: SiteId[], period: Period): CropSurvival[] {
   const plantings = allLogs.plantings.filter((p) => siteIds.includes(p.siteId))
   const failures = allLogs.failures.filter((f) => siteIds.includes(f.siteId))
-  return crops
+  return getCrops()
     .map((crop) => {
       const c = survivalCounts(
         plantings.filter((p) => p.cropId === crop.id),
@@ -880,7 +879,7 @@ export function daysToFirstHarvestByCrop(allLogs: LogCollections, siteIds: SiteI
       cropId,
       medianDays: median(list),
       plantings: list.length,
-      typicalDays: cropById.get(cropId)?.daysToFirstHarvest ?? 0,
+      typicalDays: getCropById(cropId)?.daysToFirstHarvest ?? 0,
     }))
     .sort((a, b) => a.medianDays - b.medianDays)
 }
@@ -1004,7 +1003,7 @@ export function growthTimelines(logs: LogCollections, siteIds: SiteId[], asOf: I
       return bedStatuses(logs, site, asOf).flatMap((status): GrowthTimeline[] => {
         const stage = growthStage(status, asOf)
         if (!stage || !status.planting) return []
-        const typical = cropById.get(status.planting.cropId)?.daysToFirstHarvest ?? 0
+        const typical = getCropById(status.planting.cropId)?.daysToFirstHarvest ?? 0
         const lastHarvest =
           logs.harvests
             .filter((h) => h.bedId === status.bed.id && h.cropId === status.planting!.cropId && h.date >= status.planting!.date)
@@ -1190,7 +1189,7 @@ export function cropAtNtu(allLogs: LogCollections, cropId: CropId, problemsLogge
       .sort((a, b) => b.kgPerPlant - a.kgPerPlant)[0] ?? null
 
   // Beginner rating: points for survival, speed to first harvest and few logged problems.
-  const typical = cropById.get(cropId)?.daysToFirstHarvest ?? 0
+  const typical = getCropById(cropId)?.daysToFirstHarvest ?? 0
   const speed = days?.medianDays ?? typical
   const reasons: string[] = []
   let points = 0
@@ -1450,4 +1449,219 @@ export function spotlightStandings(input: CupInputs, challenge: SpotlightId, mon
     return { siteId: site.id, hall: site.hall, value }
   })
   return rows.sort((a, b) => (b.value ?? -1) - (a.value ?? -1))
+}
+
+/* ------------------------------------------------------------------ */
+/* Grow more                                                           */
+/* ------------------------------------------------------------------ */
+
+export interface BedSpace {
+  bed: Bed
+  cropId: CropId | null
+  plantsAlive: number
+  /** Plants the bed holds at NTU spacing for its crop; null when empty */
+  capacity: number | null
+  /** m² free: the whole bed when empty, otherwise the share not filled by live plants */
+  spareSqm: number
+}
+
+/** Spare growing space at a site: empty beds, and beds with fewer live plants than their spacing allows. */
+export function spareSpace(logs: LogCollections, site: Site, asOf: ISODate): { beds: BedSpace[]; spareSqm: number; areaSqm: number } {
+  const beds = bedStatuses(logs, site, asOf).map((s): BedSpace => {
+    const area = s.bed.areaSqm ?? 0
+    const crop = s.planting ? getCropById(s.planting.cropId) : undefined
+    if (!s.planting || !crop) return { bed: s.bed, cropId: null, plantsAlive: 0, capacity: null, spareSqm: area }
+    const capacity = Math.max(1, Math.round(area * crop.careGuide.plantsPerSqm))
+    return { bed: s.bed, cropId: crop.id, plantsAlive: s.plantsAlive, capacity, spareSqm: Math.max(0, area * (1 - s.plantsAlive / capacity)) }
+  })
+  return { beds, spareSqm: sum(beds.map((b) => b.spareSqm)), areaSqm: site.areaSqm }
+}
+
+/** Harvest kg per plant planted, all sites, all time (setup records left out): NTU's "per season" figure. */
+export function kgPerPlantAtNtu(logs: LogCollections, cropId: CropId): number | null {
+  const planted = sum(logs.plantings.filter((p) => p.cropId === cropId && p.source !== 'setup').map((p) => p.quantity))
+  return ratio(sum(logs.harvests.filter((h) => h.cropId === cropId).map((h) => h.weightKg)), planted)
+}
+
+const pricePerKg = (prices: SupermarketPrice[], cropId: CropId) => {
+  const p = prices.find((x) => x.cropId === cropId)
+  return p ? (p.localPerKg ?? p.importedPerKg) : null
+}
+
+export interface PlantSuggestion {
+  cropId: CropId
+  /** 0–1 */
+  score: number
+  survival: number | null
+  kgPerPlant: number | null
+  /** Supermarket value of a season's harvest from one m², SGD */
+  valuePerSqm: number | null
+  days: number
+  /** Survival at this site, when it has grown the crop */
+  siteSurvival: number | null
+  reason: string
+}
+
+/**
+ * What to plant next at a site, ranked by NTU's own data: survival (45%), supermarket value per m² per
+ * season (35%) and speed to first harvest (20%). Each is scaled against the best crop.
+ */
+export function plantNext(logs: LogCollections, site: Site, prices: SupermarketPrice[]): PlantSuggestion[] {
+  const rows = getCrops().map((crop) => {
+    const at = cropAtNtu(logs, crop.id)
+    const kgPerPlant = kgPerPlantAtNtu(logs, crop.id)
+    const price = pricePerKg(prices, crop.id)
+    const valuePerSqm = kgPerPlant !== null && price !== null ? kgPerPlant * crop.careGuide.plantsPerSqm * price : null
+    const sitePlanted = sum(logs.plantings.filter((p) => p.siteId === site.id && p.cropId === crop.id && p.source !== 'setup').map((p) => p.quantity))
+    const siteLost = sum(logs.failures.filter((f) => f.siteId === site.id && f.cropId === crop.id).map(netLoss))
+    const siteSurvival = sitePlanted > 0 ? Math.max(0, 1 - siteLost / sitePlanted) : null
+    return { crop, at, kgPerPlant, valuePerSqm, siteSurvival, days: Math.round(at.medianDays ?? crop.daysToFirstHarvest) }
+  })
+  const bestValue = Math.max(0, ...rows.map((r) => r.valuePerSqm ?? 0))
+  const maxDays = Math.max(1, ...rows.map((r) => r.days))
+  return rows
+    .map(({ crop, at, kgPerPlant, valuePerSqm, siteSurvival, days }): PlantSuggestion => {
+      const survival = siteSurvival ?? at.survival
+      const score =
+        0.45 * (survival ?? 0.5) + 0.35 * (bestValue > 0 && valuePerSqm !== null ? valuePerSqm / bestValue : 0) + 0.2 * (1 - days / maxDays)
+      const parts = [
+        survival !== null ? `${Math.round(survival * 100)}% survive ${siteSurvival !== null ? 'here' : 'at NTU'}` : 'not grown at NTU yet',
+        valuePerSqm !== null ? `about S$${valuePerSqm.toFixed(0)} a season per m² at supermarket prices` : 'no price data',
+        `first harvest in ~${days} days`,
+      ]
+      return { cropId: crop.id, score, survival, kgPerPlant, valuePerSqm, days, siteSurvival, reason: `${parts.join(', ')}.`.replace(/^./, (c) => c.toUpperCase()) }
+    })
+    .sort((a, b) => b.score - a.score)
+}
+
+export interface ExpansionEstimate {
+  plants: number
+  /** m² the plants need at NTU spacing */
+  areaSqm: number
+  /** Of that, m² that fits in the site's spare space */
+  fromSpareSqm: number
+  /** m² of new planter or bed to build */
+  newBedSqm: number
+  kgPerPlant: number | null
+  kg: number | null
+  pricePerKg: number | null
+  /** Supermarket value of a season's harvest */
+  value: number | null
+  setupCost: number
+  /** Water and compost for a season */
+  runningCost: number
+  /** value − running cost, per season */
+  netPerSeason: number | null
+  /** Months until the set-up cost is paid back; null when it never is */
+  paybackMonths: number | null
+}
+
+export interface GrowAssumptions {
+  seasonWeeks: number
+  compostKgPerSqm: number
+  newBedPerSqm: number
+  defaultWaterPerSqmWeek: number
+}
+
+/** Expansion planner: site + crop + plant count → kg, supermarket value and payback, from NTU logs. */
+export function expansionEstimate(
+  logs: LogCollections,
+  site: Site,
+  cropId: CropId,
+  plants: number,
+  prices: SupermarketPrice[],
+  costs: CostAssumptions,
+  grow: GrowAssumptions,
+  asOf: ISODate,
+): ExpansionEstimate {
+  const crop = getCropById(cropId)
+  const areaSqm = crop ? plants / crop.careGuide.plantsPerSqm : 0
+  const spare = spareSpace(logs, site, asOf).spareSqm
+  const fromSpareSqm = Math.min(spare, areaSqm)
+  const newBedSqm = Math.max(0, areaSqm - fromSpareSqm)
+  const kgPerPlant = kgPerPlantAtNtu(logs, cropId)
+  const kg = kgPerPlant !== null ? kgPerPlant * plants : null
+  const price = pricePerKg(prices, cropId)
+  const value = kg !== null && price !== null ? kg * price : null
+
+  const startFrom = crop?.careGuide.startFrom ?? 'seedling'
+  const setupCost = plants * costs.propagationPerUnit[startFrom] + areaSqm * grow.compostKgPerSqm * costs.compostPerKg.vermicompost + newBedSqm * grow.newBedPerSqm
+
+  const siteWeeks = logs.weeklyInputs.filter((w) => w.siteId === site.id)
+  const waterPerSqmWeek =
+    siteWeeks.length > 0 && site.areaSqm > 0 ? sum(siteWeeks.map((w) => w.waterLitres)) / siteWeeks.length / site.areaSqm : grow.defaultWaterPerSqmWeek
+  const runningCost = areaSqm * waterPerSqmWeek * grow.seasonWeeks * costs.waterPerLitre
+  const netPerSeason = value !== null ? value - runningCost : null
+  const seasonMonths = (grow.seasonWeeks * 7) / 30.4
+  const paybackMonths = netPerSeason !== null && netPerSeason > 0 ? (setupCost / netPerSeason) * seasonMonths : null
+  return { plants, areaSqm, fromSpareSqm, newBedSqm, kgPerPlant, kg, pricePerKg: price, value, setupCost, runningCost, netPerSeason, paybackMonths }
+}
+
+/* ------------------------------------------------------------------ */
+/* Impact report                                                       */
+/* ------------------------------------------------------------------ */
+
+export interface ImpactReport {
+  environment: { kg: number; waterLitres: number; waterPerKg: number | null; compostKg: number; canteenWasteKg: number; campusWaterPerKg: number | null; note: string }
+  economy: { value: number; inputCost: number; costs: { water: number; compost: number; propagation: number }; net: number; labourHours: number; note: string }
+  society: { joined: number; slotsFilled: number; slotsOffered: number; handoverDone: boolean; note: string }
+}
+
+/** Per site and period: what the garden did for the environment, the economy and people, each with a trade-off. */
+export function impactReport(
+  logs: LogCollections,
+  site: Site,
+  period: Period,
+  prices: SupermarketPrice[],
+  costs: CostAssumptions,
+  community: { joins: JoinRequest[]; tasks: HelpTask[]; claims: TaskClaim[]; handoverDates: ISODate[] },
+): ImpactReport {
+  const own = filterLogs(logs, period, site.id)
+  const all = filterLogs(logs, period, 'all')
+  const kpis = computeKpis(own)
+  const kg = kpis.totalKg
+  const waterLitres = kpis.waterLitres
+  const waterPerKg = ratio(waterLitres, kg)
+  const campusWaterPerKg = ratio(sum(all.weeklyInputs.map((w) => w.waterLitres)), sum(all.harvests.map((h) => h.weightKg)))
+  const compostKg = sum(own.weeklyInputs.filter((w) => w.compostType !== 'none').map((w) => w.compostKg))
+  const canteenWasteKg = sum(own.weeklyInputs.filter((w) => w.compostType === 'canteen-food-waste').map((w) => w.compostKg))
+
+  const value = sum(own.harvests.filter((h) => h.destination !== 'compost').map((h) => h.weightKg * (pricePerKg(prices, h.cropId) ?? 0)))
+  const c = {
+    water: waterLitres * costs.waterPerLitre,
+    compost: sum(own.weeklyInputs.map((w) => w.compostKg * costs.compostPerKg[w.compostType])),
+    propagation: sum(own.plantings.map((p) => p.quantity * costs.propagationPerUnit[p.propagation])),
+  }
+  const inputCost = c.water + c.compost + c.propagation
+  const labourHours = kpis.labourHours
+
+  const inPeriod = (iso: string) => (period.start === null || iso >= period.start) && iso <= period.end
+  const joined = community.joins.filter((j) => j.siteId === site.id && inPeriod(j.createdAt.slice(0, 10))).length
+  const siteTasks = community.tasks.filter((t) => t.siteId === site.id)
+  const slotsOffered = sum(siteTasks.map((t) => t.helpersNeeded))
+  const slotsFilled = community.claims.filter((cl) => siteTasks.some((t) => t.id === cl.taskId)).length
+  const handoverDone = community.handoverDates.some((d) => inPeriod(d))
+
+  const envNote =
+    waterPerKg !== null && campusWaterPerKg !== null
+      ? waterPerKg > campusWaterPerKg * 1.1
+        ? `Uses ${Math.round(waterPerKg)} L per kg against a campus average of ${Math.round(campusWaterPerKg)} L: leafy crops and planters dry out fast. Mulch and dawn watering trade a little labour for a lot of water.`
+        : `Uses ${Math.round(waterPerKg)} L per kg, at or below the campus average of ${Math.round(campusWaterPerKg)} L. ${canteenWasteKg > 0 ? `Composting ${canteenWasteKg.toFixed(0)} kg of canteen waste replaces bought compost, at the cost of turning time and smell to manage.` : 'Adding canteen food waste to the compost would cut waste further, at the cost of more turning.'}`
+      : 'Not enough water or harvest logs this period to judge water use. Log weekly inputs to see the trade-off.'
+  const econNote =
+    labourHours > 0
+      ? `Produce worth ${value.toFixed(0)} SGD at supermarket prices against ${inputCost.toFixed(0)} SGD of inputs, but ${Math.round(labourHours)} volunteer hours aren’t counted: even at S$8 an hour they would cost ${(labourHours * 8).toFixed(0)} SGD. The garden’s value is mostly in learning and food, not savings.`
+      : `Produce worth ${value.toFixed(0)} SGD at supermarket prices against ${inputCost.toFixed(0)} SGD of inputs. One-off costs (planters, tools) aren’t included.`
+  const socNote =
+    !handoverDone
+      ? `${joined} joined and ${slotsFilled} task slots were filled, but no handover was recorded this period: without one, what this committee learnt leaves with it.`
+      : slotsOffered > 0 && slotsFilled / slotsOffered < 0.6
+        ? `${joined} joined, yet only ${slotsFilled} of ${slotsOffered} task slots were filled. Smaller, beginner-friendly tasks fill faster than long ones.`
+        : `${joined} joined and ${slotsFilled} of ${slotsOffered} task slots were filled. More people also means more training time for the committee.`
+
+  return {
+    environment: { kg, waterLitres, waterPerKg, compostKg, canteenWasteKg, campusWaterPerKg, note: envNote },
+    economy: { value, inputCost, costs: c, net: value - inputCost, labourHours, note: econNote },
+    society: { joined, slotsFilled, slotsOffered, handoverDone, note: socNote },
+  }
 }

@@ -1,8 +1,6 @@
-import { crops } from '../data'
 import type { Bed, Crop, CropId, Site, SiteId } from '../types'
+import { getCropById } from './cropRegistry'
 import { getSiteById } from './siteRegistry'
-
-const cropMap = new Map(crops.map((c) => [c.id, c]))
 
 export function getSite(id: SiteId): Site {
   const site = getSiteById(id)
@@ -16,14 +14,14 @@ export function findSite(id: string | undefined): Site | undefined {
 }
 
 export function getCrop(id: CropId): Crop {
-  const crop = cropMap.get(id)
+  const crop = getCropById(id)
   if (!crop) throw new Error(`Unknown crop: ${id}`)
   return crop
 }
 
 /** For URL params, which may be anything a user types. */
 export function findCrop(id: string | undefined): Crop | undefined {
-  return id ? cropMap.get(id) : undefined
+  return id ? getCropById(id) : undefined
 }
 
 export function getBed(siteId: SiteId, bedId: string): Bed | undefined {
@@ -31,7 +29,7 @@ export function getBed(siteId: SiteId, bedId: string): Bed | undefined {
 }
 
 export function cropName(id: CropId): string {
-  return cropMap.get(id)?.name ?? id
+  return getCropById(id)?.name ?? id
 }
 
 export function siteName(id: SiteId, short = false): string {

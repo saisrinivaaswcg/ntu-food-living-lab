@@ -7,8 +7,8 @@ import TextAreaField from '../../components/log/TextAreaField'
 import EmptyState from '../../components/ui/EmptyState'
 import ReadOnlyNotice from '../../components/workspace/ReadOnlyNotice'
 import WorkspaceHeader from '../../components/workspace/WorkspaceHeader'
-import { crops, DEMO_DATA_SHORT_NOTICE } from '../../data'
-import { useCommunity } from '../../hooks/useCommunity'
+import { DEMO_DATA_SHORT_NOTICE } from '../../data'
+import { useCommunity, useCrops } from '../../hooks/useCommunity'
 import { usePageTitle } from '../../hooks/usePageTitle'
 import { useWorkspaceSite } from '../../hooks/useWorkspaceSite'
 import { communityFor } from '../../lib/community'
@@ -125,6 +125,7 @@ export default function TasksPage() {
 }
 
 function PostTaskForm({ site }: { site: Site }) {
+  const crops = useCrops()
   const [title, setTitle] = useState('')
   const [detail, setDetail] = useState('')
   const [date, setDate] = useState(addDays(todayISO(), 3))

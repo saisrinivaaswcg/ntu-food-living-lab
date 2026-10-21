@@ -1,6 +1,7 @@
 import { ArrowUpRight } from 'lucide-react'
 import { Link } from 'react-router-dom'
 import CommunityEditor from '../../components/community/CommunityEditor'
+import AddCropForm from '../../components/sites/AddCropForm'
 import BedList from '../../components/sites/BedList'
 import SiteSetupEditor from '../../components/sites/SiteSetupEditor'
 import ReadOnlyNotice from '../../components/workspace/ReadOnlyNotice'
@@ -53,6 +54,19 @@ export default function ManageSitePage() {
           </div>
         )}
       </section>
+
+      {canEdit && (
+        <section id="crops" aria-labelledby="crops-heading" className="mt-6 scroll-mt-24 rounded-card bg-surface p-5 shadow-card lg:p-6">
+          <h2 id="crops-heading" className="font-display text-2xl font-medium">
+            Add a crop
+          </h2>
+          <p className="mt-1 mb-5 text-sm text-ink-muted">
+            Growing something that isn’t on the list? Add it with its care guide and every form, Learn and Grow more
+            offer it (on this device).
+          </p>
+          <AddCropForm />
+        </section>
+      )}
 
       <section id="community" aria-labelledby="community-heading" className="mt-6 scroll-mt-24 rounded-card bg-surface p-5 shadow-card lg:p-6">
         <div className="flex flex-wrap items-baseline justify-between gap-2">

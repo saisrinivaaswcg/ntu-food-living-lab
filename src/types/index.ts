@@ -25,7 +25,8 @@ export type PropagationType = 'seed' | 'cutting' | 'seedling'
 
 export type HarvestDestination = 'pantry' | 'members' | 'food-bank' | 'compost'
 
-export type CompostType = 'vermicompost' | 'food-waste-compost' | 'leaf-mould' | 'none'
+/** 'canteen-food-waste': raw canteen food waste (kg) composted at the site, counted for the impact report. */
+export type CompostType = 'vermicompost' | 'food-waste-compost' | 'canteen-food-waste' | 'leaf-mould' | 'none'
 
 export type FailureCause = 'pest' | 'disease' | 'drought' | 'unknown'
 
@@ -301,6 +302,14 @@ export interface HandoverRecord {
   contacts: Person[]
   lessonsLearnt: string[]
   checklist: ChecklistItem[]
+  /** From the handover wizard: each bed as handed over */
+  beds?: { bedId: string; label: string; cropId: CropId | null; plants: number; note?: string }[]
+  /** From the handover wizard: the auto-generated summary of the term */
+  termSummary?: string[]
+  /** The committee PIN was changed at this handover (the PIN itself is never printed) */
+  pinChanged?: boolean
+  /** 'user' for records made with the wizard on this device */
+  source?: RecordSource
 }
 
 /* ------------------------------------------------------------------ */

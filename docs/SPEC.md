@@ -25,7 +25,6 @@ Controls a role can't use are hidden. A workspace page opened by the wrong role 
 **Committee workspace** (dense tool layout with a sidebar and a site switcher):
 `/workspace` (today at your site) · `/workspace/log` · `/workspace/log/:kind` · `/workspace/dashboard` · `/workspace/dashboard/harvest` · `/workspace/dashboard/planting` · `/workspace/sites/:siteId/manage` · `/workspace/sites/:siteId/tasks` · `/workspace/sites/:siteId/inbox` · `/workspace/sites/:siteId/handover` (+ `/pack`, printable) · `/workspace/sites/:siteId/impact` · `/workspace/sites/:siteId/grow` · `/workspace/sites/:siteId/qr` · Admin: `/workspace/approvals` · `/workspace/competition`
 
-**Bare:** `/live` big-screen board. `?showcase=1` on any page turns on showcase mode.
 
 **Workspace home** (`/workspace`): quick log buttons, the last four weeks (weekly logs done, kg harvested, beds ready, last harvest), beds ready soon and weekly logs missing. Admin also sees every site's status and completeness, and **Reset demo data** (with a confirmation).
 
@@ -139,6 +138,14 @@ Built with the scroll-craft skill's rules (brief, grammar and verification in `d
 - **Help wanted** (`/workspace/sites/:siteId/tasks`): the committee posts a task (title, detail, date, start–end slot, helpers needed, beginner-friendly, optional crop), sees who claimed each slot, and takes tasks down (Undo).
 - **Bed page** (`/bed/:siteId/:bedId`, the QR target): crop, stage and progress, planted / plants / first harvest, the crop's three-line care card (`careGuide.quickCare`), pick policy when ready, and big **Log harvest** (harvest form pre-filled with site, bed, crop) and **Log watering** (weekly inputs form pre-filled with the site) buttons. Bed names on site pages link here.
 - **QR cards** (`/workspace/sites/:siteId/qr`): one printable card per bed (site, bed, crop, first care line, QR to the bed page). Codes use `VITE_PUBLIC_SITE_URL` when set, else the page origin. Printing hides the workspace chrome.
+
+## 10. Committee tools (workspace, per site)
+
+- **Manage site:** beds (add, rename, remove, m²) and the crop and plant count in each bed (site setup); **Community** details for Join; **Add a crop** with its care guide (name, local and botanical names, days to first harvest, plant shape for the Learn drawing, light, propagation, plants per m², library line, three care lines, sowing / growing / harvest steps, ready sign, climate notes). Added crops live in the community store and join the controlled vocabulary everywhere through `src/lib/cropRegistry.ts` (forms, Learn, Grow more), with Undo and Remove.
+- **Plant losses:** partial ("3 of 20 lost") with recovered plants added back (Log → Plant losses).
+- **Grow more** (`/grow`): spare space per bed and per site (empty beds plus room below each crop's spacing); **what to plant next**, ranked by NTU data (survival 45%, supermarket value per m² per season 35%, speed 20%) with a one-line reason; a twelve-month **planting calendar** (`plantingWindows`: good / with care / fine, first-harvest date in each cell's label); an **expansion planner** (crop + plants → area, kg from NTU kg per plant, supermarket value, set-up cost, running cost, payback in months; assumptions in `GROW_ASSUMPTIONS`) and **Plan this planting**, which opens the planting form pre-filled with site, the bed with most spare room, crop and quantity.
+- **Handover wizard** (`/handover/new`), five steps: contacts (outgoing, incoming, others), open issues (with open problem-log entries offered), top 5 lessons (from the site's resolved problems, or your own), bed status (site status plus a note per bed), PIN handover (new committee PIN, never printed). Saves a handover record on this device and opens the printable **handover pack** (`/handover/pack`) with an auto-generated term summary (`src/lib/handover.ts`).
+- **Impact report** (`/impact`), per site and term (semester, last 3 months, everything), printable. Environment: kg grown, water per kg (vs campus average), compost added, canteen food waste composted ("Canteen food waste" is a compost type, in kg). Economy: produce value at supermarket prices vs input costs (water, compost, plants), volunteer hours shown but not costed. Society: people who joined, task slots filled, handover done. One data-driven trade-off note per pillar.
 
 ## 9. New hall sites (`/start-a-garden`, `/start-a-garden/request`, Admin: `/workspace/approvals`)
 

@@ -4,7 +4,8 @@ import { Link } from 'react-router-dom'
 import Breadcrumbs from '../../components/layout/Breadcrumbs'
 import EmptyState from '../../components/ui/EmptyState'
 import Reveal from '../../components/ui/Reveal'
-import { bedSizes, crops, DEMO_DATA_SHORT_NOTICE, problemLog, starterItems, startSteps } from '../../data'
+import { bedSizes, DEMO_DATA_SHORT_NOTICE, problemLog, starterItems, startSteps } from '../../data'
+import { useCrops } from '../../hooks/useCommunity'
 import { useLogs } from '../../hooks/useLogs'
 import { usePageTitle } from '../../hooks/usePageTitle'
 import { formatSGD } from '../../lib/format'
@@ -13,6 +14,7 @@ import { paths } from '../../lib/paths'
 
 /** Public guide: beginner crops ranked by NTU survival, bed sizes, starter cost and the steps to a hall garden. */
 export default function StartGardenPage() {
+  const crops = useCrops()
   usePageTitle('Start a garden at your hall')
   const { logs } = useLogs()
   const [sizeId, setSizeId] = useState(bedSizes[1]?.id ?? '')
@@ -24,7 +26,7 @@ export default function StartGardenPage() {
         .map((crop) => ({ crop, at: cropAtNtu(logs, crop.id, problemLog.filter((p) => p.cropId === crop.id).length) }))
         .filter((r) => r.at.survival !== null)
         .sort((a, b) => (b.at.survival ?? 0) - (a.at.survival ?? 0) || a.crop.daysToFirstHarvest - b.crop.daysToFirstHarvest),
-    [logs],
+    [logs, crops],
   )
   const kit = size ? starterItems.filter((i) => size.kit[i.id] > 0).map((i) => ({ ...i, qty: size.kit[i.id], total: size.kit[i.id] * i.price })) : []
   const total = kit.reduce((n, i) => n + i.total, 0)

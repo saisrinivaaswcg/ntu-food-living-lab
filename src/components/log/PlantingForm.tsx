@@ -1,4 +1,5 @@
 import { useState, type FormEvent } from 'react'
+import { useSearchParams } from 'react-router-dom'
 import { propagationOptions } from '../../data'
 import { useSiteBedCrop } from '../../hooks/useSiteBedCrop'
 import { formatDate, todayISO } from '../../lib/dates'
@@ -29,10 +30,15 @@ const ID = {
 }
 
 export default function PlantingForm() {
+  // ?site&bed&crop&quantity from Grow more's "Plan this planting".
+  const [params] = useSearchParams()
   // No crop auto-fill: a new planting usually replaces what's on the bed.
-  const loc = useSiteBedCrop({ autoFillCrop: false })
+  const loc = useSiteBedCrop({
+    autoFillCrop: false,
+    initial: { siteId: params.get('site'), bedId: params.get('bed'), cropId: params.get('crop') },
+  })
   const [date, setDate] = useState(todayISO)
-  const [quantity, setQuantity] = useState('')
+  const [quantity, setQuantity] = useState(() => (/^\d{1,4}$/.test(params.get('quantity') ?? '') ? (params.get('quantity') ?? '') : ''))
   const [propagation, setPropagation] = useState<PropagationType | null>(null)
   const [notes, setNotes] = useState('')
   const [showErrors, setShowErrors] = useState(false)

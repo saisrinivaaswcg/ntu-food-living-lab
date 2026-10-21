@@ -1,4 +1,4 @@
-import { BarChart3, CalendarCheck, CircleCheckBig, ClipboardPen, Handshake, Inbox, LayoutDashboard, QrCode, Shovel, Trophy, type LucideIcon } from 'lucide-react'
+import { BarChart3, CalendarCheck, ChartNoAxesCombined, CircleCheckBig, Sprout, ClipboardPen, Handshake, Inbox, LayoutDashboard, QrCode, Shovel, Trophy, type LucideIcon } from 'lucide-react'
 import { paths, type SiteTool } from '../../lib/paths'
 import type { RoleKind, SiteId } from '../../types'
 
@@ -28,9 +28,11 @@ export const workspaceNav: WorkspaceNavItem[] = [
   { label: 'Log', icon: ClipboardPen, to: () => paths.log(), group: 'today' },
   { label: 'Dashboards', icon: BarChart3, to: () => paths.dashboard(), group: 'today' },
   { label: 'Manage site', icon: Shovel, to: (id) => paths.siteTool(id, 'manage'), tool: 'manage', group: 'site' },
+  { label: 'Grow more', icon: Sprout, to: (id) => paths.siteTool(id, 'grow'), tool: 'grow', group: 'site' },
   { label: 'Help wanted', icon: CalendarCheck, to: (id) => paths.siteTool(id, 'tasks'), tool: 'tasks', group: 'site' },
   { label: 'Interest inbox', icon: Inbox, to: (id) => paths.siteTool(id, 'inbox'), tool: 'inbox', group: 'site' },
   { label: 'Handover', icon: Handshake, to: (id) => paths.siteTool(id, 'handover'), tool: 'handover', group: 'site' },
+  { label: 'Impact report', icon: ChartNoAxesCombined, to: (id) => paths.siteTool(id, 'impact'), tool: 'impact', group: 'site' },
   { label: 'QR cards', icon: QrCode, to: (id) => paths.siteTool(id, 'qr'), tool: 'qr', group: 'site' },
   { label: 'Approve new sites', icon: CircleCheckBig, to: () => paths.approvals, group: 'admin', roles: ['admin'] },
   { label: 'Hall Garden Cup', icon: Trophy, to: () => paths.competition, group: 'admin', roles: ['admin'] },

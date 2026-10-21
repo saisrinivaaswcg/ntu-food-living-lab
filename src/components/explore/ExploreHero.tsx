@@ -2,7 +2,8 @@ import { ArrowDown, ClipboardPen } from 'lucide-react'
 import { motion, useReducedMotion, useScroll, useTransform } from 'motion/react'
 import { useRef, useState } from 'react'
 import { Link } from 'react-router-dom'
-import { crops, exploreHeroImage, exploreHeroVideo, imageAsset, videoAsset } from '../../data'
+import { useCrops } from '../../hooks/useCommunity'
+import { exploreHeroImage, exploreHeroVideo, imageAsset, videoAsset } from '../../data'
 import { useRole } from '../../hooks/useCommunity'
 import { useLogs } from '../../hooks/useLogs'
 import { formatNumber } from '../../lib/format'
@@ -17,6 +18,7 @@ const EASE = [0.22, 1, 0.36, 1] as const
 
 /** Full-width photo (or muted loop) with the headline over it. The photo drifts slower than the page. */
 export default function ExploreHero({ mapId }: { mapId: string }) {
+  const crops = useCrops()
   const reduce = useReducedMotion()
   const { sites } = useLogs()
   const role = useRole()

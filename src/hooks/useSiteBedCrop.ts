@@ -1,5 +1,4 @@
 import { useMemo, useState } from 'react'
-import { crops } from '../data'
 import { findSite } from '../lib/lookups'
 import { currentPlantingByBed } from '../lib/metrics'
 import { getLastSiteId } from '../lib/preferences'
@@ -26,7 +25,7 @@ export function useSiteBedCrop({
     const site = findSite(initial?.siteId ?? undefined)
     if (site && !canEditSite(getCommunitySnapshot().role, site.id)) return null
     const bed = site?.beds.find((b) => b.id === initial?.bedId)
-    const crop = crops.find((c) => c.id === initial?.cropId)
+    const crop = getCommunitySnapshot().crops.find((c) => c.id === initial?.cropId)
     return site && bed && crop ? { siteId: site.id, bedId: bed.id, cropId: crop.id } : null
   })
   const [siteId, setSiteId] = useState<SiteId | ''>(() => {

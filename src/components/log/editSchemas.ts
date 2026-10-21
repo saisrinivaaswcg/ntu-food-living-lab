@@ -1,4 +1,5 @@
-import { compostOptions, crops, destinationOptions, failureCauseOptions, propagationOptions } from '../../data'
+import { compostOptions, destinationOptions, failureCauseOptions, propagationOptions } from '../../data'
+import { getCrops } from '../../lib/cropRegistry'
 import type { LogKind } from '../../types'
 
 /** One editable field of a log record, for the Edit entry dialog. */
@@ -22,7 +23,8 @@ export type EditField =
     }
   | { key: string; label: string; type: 'text'; optional?: boolean }
 
-const cropOptions = crops.map((c) => ({ value: c.id, label: c.name }))
+/** Read when the dialog opens, so crops added in Manage site are offered. */
+const cropOptions = () => getCrops().map((c) => ({ value: c.id, label: c.name }))
 
 /** The fields each record type can be edited on, in form order. Photos stay as they are. */
 export const EDIT_FIELDS: Record<LogKind, EditField[]> = {
@@ -30,7 +32,7 @@ export const EDIT_FIELDS: Record<LogKind, EditField[]> = {
     { key: 'date', label: 'Date', type: 'date' },
     { key: 'siteId', label: 'Site', type: 'site' },
     { key: 'bedId', label: 'Bed', type: 'bed' },
-    { key: 'cropId', label: 'Crop', type: 'select', options: cropOptions },
+    { key: 'cropId', label: 'Crop', type: 'select', get options() { return cropOptions() } },
     { key: 'weightKg', label: 'Weight', type: 'number', unit: 'kg', max: 50 },
     { key: 'destination', label: 'Went to', type: 'choice', options: destinationOptions },
     { key: 'labourHours', label: 'Labour hours', type: 'number', unit: 'h', max: 24 },
@@ -40,7 +42,7 @@ export const EDIT_FIELDS: Record<LogKind, EditField[]> = {
     { key: 'date', label: 'Date', type: 'date' },
     { key: 'siteId', label: 'Site', type: 'site' },
     { key: 'bedId', label: 'Bed', type: 'bed' },
-    { key: 'cropId', label: 'Crop', type: 'select', options: cropOptions },
+    { key: 'cropId', label: 'Crop', type: 'select', get options() { return cropOptions() } },
     { key: 'quantity', label: 'Quantity', type: 'number', unit: 'plants', max: 5000, whole: true },
     { key: 'propagation', label: 'Propagation', type: 'choice', options: propagationOptions },
     { key: 'notes', label: 'Notes', type: 'text', optional: true },
@@ -58,7 +60,7 @@ export const EDIT_FIELDS: Record<LogKind, EditField[]> = {
     { key: 'date', label: 'Date', type: 'date' },
     { key: 'siteId', label: 'Site', type: 'site' },
     { key: 'bedId', label: 'Bed', type: 'bed' },
-    { key: 'cropId', label: 'Crop', type: 'select', options: cropOptions },
+    { key: 'cropId', label: 'Crop', type: 'select', get options() { return cropOptions() } },
     { key: 'cause', label: 'Cause', type: 'choice', options: failureCauseOptions },
     { key: 'estimatedLossPlants', label: 'Plants lost', type: 'number', unit: 'plants', max: 5000, whole: true },
     {

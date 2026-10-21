@@ -1,6 +1,6 @@
 import { Plus, RotateCcw, Trash2 } from 'lucide-react'
 import { useId, useMemo, useState } from 'react'
-import { crops } from '../../data'
+import { useCrops } from '../../hooks/useCommunity'
 import { useLogs } from '../../hooks/useLogs'
 import { inputClass, parseDecimal } from '../../lib/forms'
 import { resetSiteSetup, saveSiteSetup } from '../../lib/logStore'
@@ -30,6 +30,7 @@ const newBedId = (siteId: string) => `${siteId}-bed-${Date.now().toString(36)}${
  * recalculates as soon as it's saved.
  */
 export default function SiteSetupEditor({ site }: { site: Site }) {
+  const crops = useCrops()
   const id = useId()
   const { logs, siteSetup } = useLogs()
   const setup = siteSetup[site.id]

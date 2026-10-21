@@ -1,10 +1,9 @@
-import { crops } from '../../data'
+import { useCrops } from '../../hooks/useCommunity'
 import type { SiteBedCrop } from '../../hooks/useSiteBedCrop'
 import { cropName } from '../../lib/lookups'
 import SelectField from './SelectField'
 import SiteSelect from './SiteSelect'
 
-const cropOptions = crops.map((c) => ({ value: c.id, label: c.name }))
 
 interface Props {
   /** Id prefix, e.g. "harvest" → harvest-site, harvest-bed, harvest-crop */
@@ -15,6 +14,7 @@ interface Props {
 
 /** Site, then bed (filtered to the site), then crop — the same three fields on every bed-level form. */
 export default function SiteBedCropFields({ prefix, state, errors }: Props) {
+  const cropOptions = useCrops().map((c) => ({ value: c.id, label: c.name }))
   const bedOptions = (state.site?.beds ?? []).map((bed) => {
     const planting = state.currentByBed.get(bed.id)
     return { value: bed.id, label: planting ? `${bed.label} · ${cropName(planting.cropId)}` : bed.label }

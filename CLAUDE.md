@@ -12,7 +12,7 @@ Frontend prototype of a shared platform for NTU's campus and hall food-growing s
 
 ## Stack
 
-React 19 + TypeScript (strict) + Vite · Tailwind CSS v4 (CSS-first config in `src/index.css`; there is no tailwind.config) · React Router v7 · Recharts · Leaflet + react-leaflet + OneMap (SLA) and Esri World Imagery basemap tiles · lucide-react · motion · qrcode-generator (bed QR cards, showcase QR).
+React 19 + TypeScript (strict) + Vite · Tailwind CSS v4 (CSS-first config in `src/index.css`; there is no tailwind.config) · React Router v7 · Recharts · Leaflet + react-leaflet + OneMap (SLA) and Esri World Imagery basemap tiles · lucide-react · motion · qrcode-generator (bed QR cards).
 No backend, no real auth, no database: everything a visitor does is saved in this browser's localStorage. "Logging in" is demo role switching that anyone can use.
 
 ## Architecture
@@ -26,7 +26,7 @@ No backend, no real auth, no database: everything a visitor does is saved in thi
 - `src/lib/lookups.ts` — `getSite`, `findSite` (for URL params), `getCrop`, `getBed`, `cropName`, `siteName`.
 - Derived numbers (KPIs, completeness, survival, efficiency, cost per kg, leaderboard) go in `src/lib/metrics.ts` as pure functions over `LogCollections`, not inside components. Definitions are in `docs/SPEC.md` → Metric definitions.
 - `src/pages/` — one file per route (`src/pages/workspace/` for the committee workspace). `src/components/{layout,ui,access,explore,log,dashboard,sites,learn,community,workspace,illustrations}/` — one component per file. Illustrations are hand-drawn-style line SVGs drawn in code (1.75 stroke, round caps), not icon-library glyphs. Learn's growth stages are SVG built from shared parts (stem, leaf, fruit, soil line) with per-crop variations, in `src/components/learn/`; crop data and care guides stay in `src/data/crops.ts`.
-- Two layouts: the public side (`AppShell`: editorial, image-led, top nav + phone tab bar) and the committee workspace (`WorkspaceShell`: denser, sidebar). `/live` has no shell.
+- Two layouts: the public side (`AppShell`: editorial, image-led, top nav + phone tab bar) and the committee workspace (`WorkspaceShell`: denser, sidebar).
 
 ## Build order and status
 
@@ -42,8 +42,10 @@ No backend, no real auth, no database: everything a visitor does is saved in thi
 10. [x] Get involved — help wanted, ready to pick, bed pages, printable QR cards
 11. [x] Hall Garden Cup — `/hall-cup`, demo hall sites, spotlight challenges
 12. [x] New hall sites — start-a-garden guide, request, Admin approval
-13. [ ] Committee tools — manage site, grow more, handover wizard, impact report
-14. [ ] Engaging demo — guided tour, showcase mode, `/live` board
+13. [x] Committee tools — manage site, grow more, handover wizard, impact report
+14. [ ] Image slots — `docs/IMAGE_PROMPTS.md`, AI illustration slots wired with SVG fallbacks
+
+(The guided tour, showcase mode and `/live` board were dropped.)
 
 Tick items here when a step is finished. Remove the `.gitkeep` from a folder once it has real files.
 
@@ -52,8 +54,7 @@ Tick items here when a step is finished. Remove the `.gitkeep` from a folder onc
 Full route map with roles: `docs/SPEC.md` → Routes and roles. In short:
 
 - **Public** (no login needed): `/` Explore · `/sites` · `/sites/:siteId` · `/bed/:siteId/:bedId` · `/learn` · `/learn/:cropId` · `/join` · `/join/:siteId` · `/get-involved` · `/hall-cup` · `/start-a-garden` · `/start-a-garden/request` · `/my-gardens` · `/login` · `/credits`.
-- **Committee workspace**: `/workspace` · `/workspace/log` · `/workspace/log/:kind` (`harvest`, `planting`, `weekly`, `losses`; `failure` redirects) · `/workspace/dashboard` · `/workspace/dashboard/harvest` · `/workspace/dashboard/planting` (period and site filters in the query string) · `/workspace/sites/:siteId/{manage,tasks,inbox,handover,impact,grow,qr}` · Admin only: `/workspace/approvals`, `/workspace/competition`.
-- **Bare**: `/live` (big-screen board). `?showcase=1` on any page turns on showcase mode.
+- **Committee workspace**: `/workspace` · `/workspace/log` · `/workspace/log/:kind` (`harvest`, `planting`, `weekly`, `losses`; `failure` redirects) · `/workspace/dashboard` · `/workspace/dashboard/harvest` · `/workspace/dashboard/planting` (period and site filters in the query string) · `/workspace/sites/:siteId/{manage,tasks,inbox,handover,impact,grow,qr}` (+ `handover/new` wizard, `handover/pack` printable) · Admin only: `/workspace/approvals`, `/workspace/competition`.
 - Old URLs redirect: `/log/*` → `/workspace/log/*`, `/dashboard/*` → `/workspace/dashboard/*`, `/sites/:id?tab=handover` → `/workspace/sites/:id/handover`.
 
 Unknown routes and unknown site IDs show a not-found page with a way back. Hidden helper: `/?editPins=1` makes the map pins draggable and shows their coordinates with Copy buttons (nothing is saved; paste the values into `src/data/sites.ts`).

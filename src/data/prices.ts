@@ -29,6 +29,7 @@ export const costAssumptions: CostAssumptions = {
   compostPerKg: {
     vermicompost: 1.5, // bought in
     'food-waste-compost': 0, // from the campus food-waste digester
+    'canteen-food-waste': 0, // collected from a canteen and composted on site
     'leaf-mould': 0, // made on site
     none: 0,
   },

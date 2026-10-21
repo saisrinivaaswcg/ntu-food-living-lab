@@ -32,6 +32,12 @@ export const paths = {
   competition: '/workspace/competition',
 }
 
+/** Planting form pre-filled from Grow more ("Plan this planting"). */
+export function plantingFormFor(siteId: SiteId, bedId: string, cropId: string, quantity: number): string {
+  const q = new URLSearchParams({ site: siteId, bed: bedId, crop: cropId, quantity: String(quantity) })
+  return `${paths.log('planting')}?${q}`
+}
+
 /** Weekly inputs form for one site (bed pages' "Log watering"). */
 export function weeklyFormFor(siteId: SiteId): string {
   return `${paths.log('weekly')}?${new URLSearchParams({ site: siteId })}`

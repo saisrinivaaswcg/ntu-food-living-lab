@@ -1,6 +1,5 @@
 import { ChevronDown } from 'lucide-react'
-import { useMemo } from 'react'
-import { handovers } from '../../data'
+import { useHandovers } from '../../hooks/useCommunity'
 import { formatDate } from '../../lib/dates'
 import type { Site } from '../../types'
 import EmptyState from '../ui/EmptyState'
@@ -8,10 +7,7 @@ import HandoverChecklist from './HandoverChecklist'
 import HandoverDetails from './HandoverDetails'
 
 export default function HandoverTab({ site }: { site: Site }) {
-  const records = useMemo(
-    () => handovers.filter((h) => h.siteId === site.id).sort((a, b) => b.date.localeCompare(a.date)),
-    [site.id],
-  )
+  const records = useHandovers(site.id)
   const [latest, ...history] = records
 
   if (!latest) {

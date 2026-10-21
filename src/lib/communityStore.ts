@@ -8,8 +8,9 @@
  * merged over it into a snapshot. Read once, write through, notify subscribers, and follow other tabs
  * via the "storage" event. useCommunity() reads it. Nothing here is secure; it is a demo login.
  */
-import { DEMO_COMMITTEE_PIN, DEMO_STUDENT, defaultSpotlights, demoClaims, demoCommunities, demoJoins, demoTasks } from '../data'
-import type { DemoRole, HelpTask, JoinRequest, JoinStatus, SiteCommunity, Site, SiteId, SiteRequest, SpotlightId, StudentProfile, TaskClaim } from '../types'
+import { crops as baseCrops, DEMO_COMMITTEE_PIN, DEMO_STUDENT, defaultSpotlights, demoClaims, demoCommunities, demoJoins, demoTasks } from '../data'
+import { setCrops } from './cropRegistry'
+import type { Crop, DemoRole, HandoverRecord, HelpTask, JoinRequest, JoinStatus, SiteCommunity, Site, SiteId, SiteRequest, SpotlightId, StudentProfile, TaskClaim } from '../types'
 
 const STORAGE_KEY = 'ntu-food-living-lab:community:v1'
 
@@ -36,6 +37,10 @@ interface StoredCommunity {
   spotlights: Record<string, SpotlightId>
   /** Requests for new hall sites made (and decided) on this device */
   siteRequests: SiteRequest[]
+  /** Crops a committee added on this device, with their care guides */
+  customCrops: Crop[]
+  /** Handover records made with the wizard on this device */
+  handovers: HandoverRecord[]
 }
 
 export interface CommunitySnapshot {
@@ -62,6 +67,12 @@ export interface CommunitySnapshot {
   siteRequests: SiteRequest[]
   /** Sites Admin approved on this device (the log store adds them to the map, Sites and the Hall Cup) */
   approvedSites: Site[]
+  /** The crop vocabulary: built-in crops plus those added on this device */
+  crops: Crop[]
+  /** Ids of crops added on this device (they can be removed) */
+  customCropIds: string[]
+  /** Handovers made with the wizard on this device (demo handovers live in src/data) */
+  handovers: HandoverRecord[]
 }
 
 export type CommunitySaveResult = { ok: true } | { ok: false; error: string }
@@ -83,6 +94,8 @@ const fallback = (): StoredCommunity => ({
   claims: [],
   spotlights: {},
   siteRequests: [],
+  customCrops: [],
+  handovers: [],
 })
 
 function parseRole(v: unknown): DemoRole {
@@ -131,6 +144,8 @@ function readStorage(): StoredCommunity {
       claims: listOf<TaskClaim>(parsed.claims),
       spotlights: recordOf<SpotlightId>(parsed.spotlights),
       siteRequests: listOf<SiteRequest>(parsed.siteRequests),
+      handovers: listOf<HandoverRecord>(parsed.handovers),
+      customCrops: listOf<Crop>(parsed.customCrops).filter((c) => typeof c.id === 'string' && isObject(c.careGuide)),
     }
   } catch {
     // Private mode, blocked storage or corrupted JSON: start as a visitor rather than crash.
@@ -154,6 +169,9 @@ function writeStorage(next: StoredCommunity): CommunitySaveResult {
 }
 
 function buildSnapshot(s: StoredCommunity): CommunitySnapshot {
+  const crops = [...baseCrops, ...s.customCrops.filter((c) => !baseCrops.some((b) => b.id === c.id))]
+  // Lookups, metrics and forms read the registry; update it before anyone re-renders.
+  setCrops(crops)
   const withStatus = (j: JoinRequest): JoinRequest => (s.joinStatus[j.id] ? { ...j, status: s.joinStatus[j.id] } : j)
   const myJoins = s.joins.map(withStatus)
   const communities: Record<SiteId, SiteCommunity> = Object.fromEntries(demoCommunities.map((c) => [c.siteId, c]))
@@ -174,6 +192,9 @@ function buildSnapshot(s: StoredCommunity): CommunitySnapshot {
     myClaims: s.claims.filter((c) => live.has(c.taskId)),
     spotlights: { ...defaultSpotlights, ...s.spotlights },
     siteRequests: [...s.siteRequests].sort((a, b) => b.createdAt.localeCompare(a.createdAt)),
+    crops,
+    customCropIds: s.customCrops.map((c) => c.id),
+    handovers: s.handovers,
     approvedSites: s.siteRequests.filter((r) => r.status === 'approved' && r.siteId).map(siteFromRequest),
   }
 }
@@ -407,6 +428,38 @@ export function decideSiteRequest(id: string, status: 'approved' | 'declined', t
   const decided: SiteRequest = { ...request, status, decidedAt: new Date().toISOString(), decisionNote: note, siteId }
   commit({ ...state, siteRequests: before.map((r) => (r.id === id ? decided : r)) })
   return () => commit({ ...state, siteRequests: before })
+}
+
+/* ------------------------------------------------------------------ */
+/* Crops added by committees                                           */
+/* ------------------------------------------------------------------ */
+
+/** Committee: add a crop (with its care guide) to the controlled vocabulary on this device. */
+export function addCrop(crop: Crop): CommunitySaveResult {
+  if (buildSnapshot(state).crops.some((c) => c.id === crop.id || c.name.toLowerCase() === crop.name.toLowerCase())) {
+    return { ok: false, error: `${crop.name} is already on the crop list.` }
+  }
+  return commit({ ...state, customCrops: [...state.customCrops, crop] })
+}
+
+/** Remove a crop added on this device. Returns an undo. */
+export function removeCrop(id: string): () => void {
+  const before = state.customCrops
+  commit({ ...state, customCrops: before.filter((c) => c.id !== id) })
+  return () => commit({ ...state, customCrops: before })
+}
+
+/* ------------------------------------------------------------------ */
+/* Handover                                                            */
+/* ------------------------------------------------------------------ */
+
+/** Save a handover made with the wizard, and (optionally) hand over a new committee PIN with it. */
+export function saveHandover(record: HandoverRecord, newPin?: string): CommunitySaveResult {
+  return commit({
+    ...state,
+    handovers: [...state.handovers.filter((h) => h.id !== record.id), record],
+    pins: newPin ? { ...state.pins, [record.siteId]: newPin } : state.pins,
+  })
 }
 
 /**

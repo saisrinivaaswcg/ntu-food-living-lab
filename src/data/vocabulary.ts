@@ -30,6 +30,7 @@ export const destinationOptions: { value: HarvestDestination; label: string; hin
 export const compostOptions: { value: CompostType; label: string }[] = [
   { value: 'vermicompost', label: 'Vermicompost' },
   { value: 'food-waste-compost', label: 'Food-waste compost (campus)' },
+  { value: 'canteen-food-waste', label: 'Canteen food waste' },
   { value: 'leaf-mould', label: 'Leaf mould' },
   { value: 'none', label: 'None this week' },
 ]

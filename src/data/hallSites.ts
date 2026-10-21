@@ -156,7 +156,7 @@ const plans: HallPlan[] = [
       { bedId: 'TMH-B5', cropId: 'chilli-padi', planted: '2026-05-25', quantity: 14, propagation: 'seedling', firstHarvest: '2026-08-20', every: 14, kg: [0.1, 0.2] },
     ],
     water: [280, 380],
-    compost: { type: 'food-waste-compost', kg: [6, 10] },
+    compost: { type: 'canteen-food-waste', kg: [6, 10] },
     labour: [7, 11],
     missedWeeks: [6],
     failures: [
