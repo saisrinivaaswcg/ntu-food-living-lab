@@ -1,4 +1,4 @@
-import { BookOpen, HeartHandshake, LayoutDashboard, Map, Sprout, type LucideIcon } from 'lucide-react'
+import { BookOpen, HeartHandshake, LayoutDashboard, Map, Sprout, Trophy, type LucideIcon } from 'lucide-react'
 import { paths } from '../../lib/paths'
 
 export interface NavItem {
@@ -9,13 +9,16 @@ export interface NavItem {
   end?: boolean
   /** Only shown to roles that use the workspace (committee, admin). */
   workspace?: boolean
+  /** Left out of the phone tab bar (still in the top nav and the footer), to keep it to five tabs. */
+  desktopOnly?: boolean
 }
 
 /** The public side's main links. Add a page here when it exists, never before (no dead links). */
 export const navItems: NavItem[] = [
   { to: paths.explore, label: 'Explore', icon: Map, end: true },
-  { to: paths.sites, label: 'Sites', icon: Sprout },
+  { to: paths.sites, label: 'Sites', icon: Sprout, desktopOnly: true },
   { to: paths.learn, label: 'Learn', icon: BookOpen },
   { to: paths.join, label: 'Join', icon: HeartHandshake },
+  { to: paths.hallCup, label: 'Hall Cup', icon: Trophy },
   { to: paths.workspace, label: 'Workspace', icon: LayoutDashboard, workspace: true },
 ]

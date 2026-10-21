@@ -7,12 +7,13 @@
  */
 import type { LogCollections } from '../types'
 import { demoFailures } from './failures'
+import { demoHallLogs } from './hallSites'
 import { demoHarvests } from './harvests'
 import { demoPlantings } from './plantings'
 import { demoWeeklyInputs } from './weeklyInputs'
 
 export { sites, CAMPUS_MAP_VIEW } from './sites'
-export { allImageSlots, emptyGalleryImage, exploreHeroImage, exploreHeroVideo, learnImages, logImages, siteImages } from './images'
+export { allImageSlots, emptyGalleryImage, exploreHeroImage, exploreHeroVideo, learnImages, logImages, siteImage, siteImages } from './images'
 export type { ImageSlot, PhotoCredit, VideoSlot } from './images'
 export { imageAsset, videoAsset } from './imageAssets'
 export type { ImageAsset } from './imageAssets'
@@ -25,15 +26,16 @@ export * from './vocabulary'
 export { halls, NO_HALL, CAMPUS } from './halls'
 export { demoTasks, demoClaims } from './tasks'
 export { nparksResources } from './learnResources'
+export { CUP_SEMESTER, spotlightChallenges, defaultSpotlights } from './competition'
 export { demoCommunities, demoJoins, JOIN_PRIVACY_NOTE, pickPolicyOptions, WEEKDAY_NAMES } from './community'
 export { DEMO_LOGIN_NOTICE, DEMO_COMMITTEE_PIN, DEMO_ADMIN_PIN, DEMO_STUDENT, ADMIN_TEAM, contactMethodOptions } from './access'
 
 /** All demo log records, grouped by form type. */
 export const demoLogs: LogCollections = {
-  plantings: demoPlantings,
-  harvests: demoHarvests,
-  weeklyInputs: demoWeeklyInputs,
-  failures: demoFailures,
+  plantings: [...demoPlantings, ...demoHallLogs.plantings],
+  harvests: [...demoHarvests, ...demoHallLogs.harvests],
+  weeklyInputs: [...demoWeeklyInputs, ...demoHallLogs.weeklyInputs],
+  failures: [...demoFailures, ...demoHallLogs.failures],
 }
 
 /** Date range the demo logs cover (Monday of first week → last logged day). */

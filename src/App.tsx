@@ -5,10 +5,12 @@ import { createBrowserRouter, RouterProvider } from 'react-router-dom'
 import AppShell from './components/layout/AppShell'
 import PageLoading from './components/layout/PageLoading'
 import {
+  CompetitionPage,
   CreditsPage,
   DashboardPage,
   ExplorePage,
   HandoverPage,
+  HallCupPage,
   HarvestDashboardPage,
   InboxPage,
   JoinPage,
@@ -44,6 +46,7 @@ const router = createBrowserRouter([
       { path: 'join', element: <JoinPage /> },
       { path: 'join/:siteId', element: <JoinSitePage /> },
       { path: 'my-gardens', element: <MyGardensPage /> },
+      { path: 'hall-cup', element: <HallCupPage /> },
       { path: 'login', element: <LoginPage /> },
       { path: 'credits', element: <CreditsPage /> },
       // Old URLs: Log and Dashboards moved into the workspace.
@@ -71,6 +74,7 @@ const router = createBrowserRouter([
       { path: 'sites/:siteId/manage', element: <ManageSitePage /> },
       { path: 'sites/:siteId/inbox', element: <InboxPage /> },
       { path: 'sites/:siteId/handover', element: <HandoverPage /> },
+      { path: 'competition', element: <CompetitionPage /> },
       { path: '*', element: <NotFoundPage /> },
     ],
   },

@@ -133,7 +133,7 @@ export default function ExplorePage() {
       <section aria-labelledby="site-list-heading" className="mx-auto max-w-7xl px-4 py-14 lg:px-8 lg:py-20">
         <Reveal>
           <h2 id="site-list-heading" className="font-display text-section font-medium">
-            The four sites
+            The sites
           </h2>
           <p className="mt-3 mb-8 max-w-xl text-lg text-ink-muted">
             Choose one to find it on the map, then open its page for crop notes and handover records.

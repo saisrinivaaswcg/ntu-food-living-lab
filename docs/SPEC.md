@@ -133,6 +133,13 @@ Built with the scroll-craft skill's rules (brief, grammar and verification in `d
 - **Interest inbox** (`/workspace/sites/:siteId/inbox`): requests newest first, filter by status, move New → Contacted → Welcomed (with Undo). Contact details show only with consent and only to that site's committee.
 - **My gardens:** communities joined (status, role, next workday, leave with Undo), slots claimed (give back), and the profile (change, or delete everything from this device).
 
+## 7. Hall Garden Cup (`/hall-cup`, Admin: `/workspace/competition`)
+
+- Every site has a `hall` (one of `src/data/halls.ts`, or "Campus"). Only hall sites compete, as teams. Three invented hall gardens (`src/data/hallSites.ts`, `fictional: true`, generated demo logs) are always tagged **Demo hall site**.
+- **Semester ranking** (`CUP_SEMESTER`, standings to the latest logged date): score = 25% yield per m² + 15% survival + 15% water efficiency (kg/L) + 20% data completeness + 25% participation per m² ((people who asked to join this semester + task slots filled) ÷ m²). Weights in `HALL_CUP_WEIGHTS` (`metrics.ts`). Each component is scaled against the best hall (value ÷ best × 100), so small gardens can win. Each hall shows its components, points and a **Why this rank** note (strongest measure, where it lost most, gap to the team above).
+- **Monthly spotlight:** one team challenge a month from a fixed list (`spotlightChallenges`), chosen by Admin on `/workspace/competition`; standings per month, winner/leading marked. It doesn't change the semester score.
+- No individual points, scores or badges.
+
 ---
 
 ### Editing and site setup

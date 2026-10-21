@@ -2,13 +2,14 @@ import { MapPin } from 'lucide-react'
 import { motion, useMotionValue, useReducedMotion, useScroll, useSpring, useTransform } from 'motion/react'
 import { useRef, type PointerEvent } from 'react'
 import { Link } from 'react-router-dom'
-import { imageAsset, siteImages } from '../../data'
+import { imageAsset, siteImage } from '../../data'
 import { getSites } from '../../lib/siteRegistry'
 import type { CropId, Site } from '../../types'
 import Breadcrumbs from '../layout/Breadcrumbs'
 import CountUp from '../ui/CountUp'
 import PhotoCaption from '../ui/PhotoCaption'
 import SlotImage from '../ui/SlotImage'
+import DemoSiteTag from '../ui/DemoSiteTag'
 import StatusBadge from '../ui/StatusBadge'
 import { sitePhotoTransitionName } from './siteTransitions'
 
@@ -86,7 +87,7 @@ export default function SiteHero({ site, growing }: Props) {
               transition={{ duration: 18, ease: 'easeOut' }}
             >
               <SlotImage
-                slot={siteImages[site.id]}
+                slot={siteImage(site)}
                 tone={index}
                 labelAt="top-right"
                 placeholderClassName="px-[8%] py-[7%]"
@@ -97,8 +98,8 @@ export default function SiteHero({ site, growing }: Props) {
           </motion.div>
         </motion.div>
       </div>
-      {imageAsset(siteImages[site.id].src) && (
-        <PhotoCaption slot={siteImages[site.id]} className="absolute top-3 right-3 z-10 max-w-[60%]" />
+      {imageAsset(siteImage(site).src) && (
+        <PhotoCaption slot={siteImage(site)} className="absolute top-3 right-3 z-10 max-w-[60%]" />
       )}
       <div className="absolute inset-0 -z-10 bg-linear-to-t from-ink/90 via-ink/50 to-ink/20" aria-hidden />
 
@@ -108,6 +109,7 @@ export default function SiteHero({ site, growing }: Props) {
         <div className="mt-16 max-w-4xl">
           <motion.div {...enter(0.05)}>
             <StatusBadge status={site.status} onDark />
+            {site.fictional && <DemoSiteTag onDark />}
           </motion.div>
           <motion.h1
             id="site-heading"

@@ -61,6 +61,9 @@ export default function JoinSitePage() {
           </p>
           <p className="mt-4 text-lg lg:text-xl">{community.welcome || site.description}</p>
           <p className="mt-2 text-sm text-demo">{DEMO_DATA_SHORT_NOTICE}</p>
+          <a href="#join" className="mt-5 inline-flex min-h-12 items-center rounded-sm bg-accent px-5 font-semibold text-white hover:bg-accent-strong lg:hidden">
+            {myJoin ? 'Your request' : 'Join this community'}
+          </a>
         </div>
         <div className="flex flex-wrap gap-2">
           {canEditSite(role, site.id) && (

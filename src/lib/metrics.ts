@@ -9,17 +9,22 @@ import type {
   CostAssumptions,
   CropId,
   FailureCause,
+  CupSemester,
   FailureLog,
   HarvestDestination,
+  HelpTask,
   HarvestLog,
   ISODate,
+  JoinRequest,
   LogCollections,
   PlantingLog,
   ProblemEntry,
   PropagationType,
   Site,
   SiteId,
+  SpotlightId,
   SupermarketPrice,
+  TaskClaim,
   WeeklyInputLog,
 } from '../types'
 import { addDays, daysBetween, mondayOf, todayISO } from './dates'
@@ -1280,4 +1285,169 @@ export function cropTroubles(allLogs: LogCollections, problems: ProblemEntry[], 
       }),
     )
   return [...fromProblems, ...fromLosses].sort((a, b) => b.date.localeCompare(a.date))
+}
+
+/* ------------------------------------------------------------------ */
+/* Hall Garden Cup                                                     */
+/* ------------------------------------------------------------------ */
+
+export type CupComponent = 'yield' | 'survival' | 'water' | 'completeness' | 'participation'
+
+/** The Cup's weights, in one place. They add up to 1. */
+export const HALL_CUP_WEIGHTS: Record<CupComponent, number> = {
+  yield: 0.25,
+  survival: 0.15,
+  water: 0.15,
+  completeness: 0.2,
+  participation: 0.25,
+}
+
+export const CUP_COMPONENTS: { key: CupComponent; label: string; short: string; unit: string; how: string }[] = [
+  { key: 'yield', label: 'Yield per m²', short: 'Yield', unit: 'kg/m²', how: 'kg harvested this semester ÷ growing area' },
+  { key: 'survival', label: 'Survival', short: 'Survival', unit: '%', how: '1 − plants lost (net of recovered) ÷ plants in the ground' },
+  { key: 'water', label: 'Water efficiency', short: 'Water', unit: 'kg/L', how: 'kg harvested ÷ litres of water' },
+  { key: 'completeness', label: 'Data completeness', short: 'Data', unit: '%', how: 'weeks with a weekly-inputs record ÷ weeks so far' },
+  { key: 'participation', label: 'Participation per m²', short: 'People', unit: 'per m²', how: '(people who joined + task slots filled) ÷ growing area' },
+]
+
+/** A semester (or any range) as a Period, ending at the anchor date if that comes first. */
+export function periodBetween(start: ISODate, end: ISODate, anchor: ISODate): Period {
+  const last = end < anchor ? end : anchor
+  const weeks = mondaysBetween(mondayOf(start) < start ? addDays(mondayOf(start), 7) : start, mondayOf(last))
+  return { key: 'all', start, end: last, weeks, completeWeeks: weeks.filter((m) => isComplete(m, last)) }
+}
+
+export interface CupEntry {
+  rank: number
+  siteId: SiteId
+  hall: string
+  /** 0–100 */
+  score: number
+  components: Record<CupComponent, { value: number | null; scaled: number; points: number }>
+  /** "Why this rank", in a sentence or two */
+  why: string
+}
+
+export interface CupInputs {
+  logs: LogCollections
+  sites: Site[]
+  joins: JoinRequest[]
+  tasks: HelpTask[]
+  claims: TaskClaim[]
+}
+
+/** Only hall sites compete; campus sites ("Campus") don't. */
+export const isHallSite = (site: Pick<Site, 'hall'>) => site.hall !== '' && site.hall !== 'Campus'
+
+function cupValues(input: CupInputs, site: Site, period: Period): Record<CupComponent, number | null> {
+  const own = filterLogs(input.logs, period, site.id)
+  const kpis = computeKpis(own)
+  const joined = input.joins.filter((j) => j.siteId === site.id && j.createdAt.slice(0, 10) >= (period.start ?? '') && j.createdAt.slice(0, 10) <= period.end).length
+  const siteTasks = new Set(input.tasks.filter((t) => t.siteId === site.id).map((t) => t.id))
+  const filled = input.claims.filter((c) => siteTasks.has(c.taskId)).length
+  return {
+    yield: site.areaSqm > 0 ? kpis.totalKg / site.areaSqm : null,
+    survival: survivalRate(site.id, input.logs.plantings, input.logs.failures, period),
+    water: ratio(kpis.totalKg, kpis.waterLitres),
+    completeness: computeCompleteness(own.weeklyInputs, [site.id], period.completeWeeks).score,
+    participation: site.areaSqm > 0 ? (joined + filled) / site.areaSqm : null,
+  }
+}
+
+function formatCupValue(key: CupComponent, v: number | null): string {
+  if (v === null) return 'no data'
+  if (key === 'survival' || key === 'completeness') return `${Math.round(v * 100)}%`
+  if (key === 'water') return `${(v * 1000).toFixed(1)} g/L`
+  return `${v.toFixed(2)} ${key === 'yield' ? 'kg/m²' : 'per m²'}`
+}
+
+/**
+ * Semester ranking of hall sites. Each component is scaled 0–100 against the best hall (value ÷ best ×
+ * 100), so everything is per m² or a rate and a small garden can beat a big one. Score = Σ weight ×
+ * scaled. A hall with no data on a component scores 0 on it.
+ */
+export function hallCupRanking(input: CupInputs, semester: CupSemester, weights: Record<CupComponent, number> = HALL_CUP_WEIGHTS): CupEntry[] {
+  const period = periodBetween(semester.start, semester.end, anchorDate(input.logs))
+  const halls = input.sites.filter(isHallSite)
+  const values = halls.map((site) => ({ site, v: cupValues(input, site, period) }))
+  const keys = CUP_COMPONENTS.map((c) => c.key)
+  const best = Object.fromEntries(keys.map((k) => [k, Math.max(0, ...values.map((x) => x.v[k] ?? 0))])) as Record<CupComponent, number>
+  const total = sum(keys.map((k) => weights[k])) || 1
+
+  const scored = values.map(({ site, v }) => {
+    const components = Object.fromEntries(
+      keys.map((k) => {
+        const scaled = v[k] !== null && best[k] > 0 ? ((v[k] as number) / best[k]) * 100 : 0
+        return [k, { value: v[k], scaled, points: (scaled * weights[k]) / total }]
+      }),
+    ) as CupEntry['components']
+    return { siteId: site.id, hall: site.hall, score: sum(keys.map((k) => components[k].points)), components }
+  })
+  scored.sort((a, b) => b.score - a.score)
+
+  return scored.map((e, i) => {
+    const rank = i > 0 && Math.abs(scored[i - 1].score - e.score) < 1e-9 ? i : i + 1
+    const label = (k: CupComponent) => CUP_COMPONENTS.find((c) => c.key === k)?.label.toLowerCase() ?? k
+    const strongest = keys.reduce((a, b) => (e.components[b].scaled > e.components[a].scaled + 1e-9 ? b : a))
+    const weakest = keys.reduce((a, b) => (100 - e.components[b].scaled) * weights[b] > (100 - e.components[a].scaled) * weights[a] ? b : a)
+    let why = `Strongest on ${label(strongest)} (${formatCupValue(strongest, e.components[strongest].value)}${e.components[strongest].scaled >= 99.95 ? ', best of all halls' : ''}).`
+    if (e.components[weakest].scaled < 99.95) {
+      const lost = ((100 - e.components[weakest].scaled) * weights[weakest]) / total
+      why += ` Most points lost on ${label(weakest)} (${formatCupValue(weakest, e.components[weakest].value)}, ${lost.toFixed(1)} points behind the best).`
+    }
+    if (i > 0) {
+      const above = scored[i - 1]
+      const gapKey = keys.reduce((a, b) =>
+        above.components[b].points - e.components[b].points > above.components[a].points - e.components[a].points ? b : a,
+      )
+      why += ` ${(above.score - e.score).toFixed(1)} points behind ${above.hall}, mostly on ${label(gapKey)}.`
+    }
+    return { ...e, rank, why }
+  })
+}
+
+export interface SpotlightStanding {
+  siteId: SiteId
+  hall: string
+  value: number | null
+}
+
+/** One month's spotlight challenge: hall teams ordered by the challenge's measure (best first). */
+export function spotlightStandings(input: CupInputs, challenge: SpotlightId, month: string): SpotlightStanding[] {
+  const start = `${month}-01`
+  const [y, m] = month.split('-').map(Number)
+  const lastDay = `${month}-${String(new Date(y, m, 0).getDate()).padStart(2, '0')}`
+  const anchor = anchorDate(input.logs)
+  const period: Period = (() => {
+    const end = lastDay < anchor ? lastDay : anchor
+    const weeks = mondaysBetween(mondayOf(start) < start ? addDays(mondayOf(start), 7) : start, mondayOf(lastDay)).filter((w) => w <= end)
+    return { key: 'all', start, end, weeks, completeWeeks: weeks.filter((w) => isComplete(w, anchor)) }
+  })()
+  const rows = input.sites.filter(isHallSite).map((site) => {
+    const own = filterLogs(input.logs, period, site.id)
+    const kg = sum(own.harvests.map((h) => h.weightKg))
+    let value: number | null
+    switch (challenge) {
+      case 'steady-logger':
+        value = computeCompleteness(own.weeklyInputs, [site.id], period.completeWeeks).score
+        break
+      case 'water-wise':
+        value = ratio(kg, sum(own.weeklyInputs.map((w) => w.waterLitres)))
+        break
+      case 'compost-champion':
+        value = site.areaSqm > 0 ? sum(own.weeklyInputs.filter((w) => w.compostType !== 'none').map((w) => w.compostKg)) / site.areaSqm : null
+        break
+      case 'share-the-harvest':
+        value = ratio(sum(own.harvests.filter((h) => h.destination === 'pantry' || h.destination === 'food-bank').map((h) => h.weightKg)), kg)
+        break
+      case 'welcome-wagon':
+        value = site.areaSqm > 0 ? input.joins.filter((j) => j.siteId === site.id && j.createdAt.slice(0, 7) === month).length / site.areaSqm : null
+        break
+      case 'new-plantings':
+        value = site.areaSqm > 0 ? sum(own.plantings.map((p) => p.quantity)) / site.areaSqm : null
+        break
+    }
+    return { siteId: site.id, hall: site.hall, value }
+  })
+  return rows.sort((a, b) => (b.value ?? -1) - (a.value ?? -1))
 }

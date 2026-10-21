@@ -6,7 +6,7 @@ import { navItems } from './navItems'
 /** Mobile tab bar — within thumb reach. Hidden on large screens, where TopNav shows the links. */
 export default function BottomNav() {
   const role = useRole()
-  const items = navItems.filter((item) => !item.workspace || usesWorkspace(role))
+  const items = navItems.filter((item) => !item.desktopOnly && (!item.workspace || usesWorkspace(role)))
   return (
     <nav
       aria-label="Main"

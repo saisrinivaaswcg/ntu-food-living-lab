@@ -80,7 +80,7 @@ export default function ExploreHero({ mapId }: { mapId: string }) {
             className="font-display text-[clamp(2.75rem,1.6rem+5.4vw,6rem)] leading-[0.98] font-medium tracking-[-0.025em]"
             {...enter(0.1)}
           >
-            Four campus gardens. One shared record.
+            Campus and hall gardens. One shared record.
           </motion.h1>
           <motion.p className="mt-5 max-w-2xl text-lg text-white/90 lg:text-xl" {...enter(0.25)}>
             Every harvest, planting and loss at NTU’s food gardens is logged the same way, so what one student committee

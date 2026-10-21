@@ -1,4 +1,5 @@
 import type { Site } from '../types'
+import { demoHallSites } from './hallSites'
 
 /**
  * DEMONSTRATION DATA — the four campus growing sites.
@@ -24,6 +25,7 @@ export const sites: Site[] = [
     status: 'active',
     statusNote: 'All six beds in production. Turmeric harvest under way.',
     managedBy: 'Yunnan Garden Culinary Trail Committee',
+    hall: 'Campus',
     established: '2024-08-19',
     areaSqm: 64,
     beds: [
@@ -47,6 +49,7 @@ export const sites: Site[] = [
     status: 'active',
     statusNote: 'Four planter boxes active. Chilli padi fruiting.',
     managedBy: 'Hall 12 Green Committee',
+    hall: 'Hall 12',
     established: '2023-01-16',
     areaSqm: 18,
     beds: [
@@ -68,6 +71,7 @@ export const sites: Site[] = [
     status: 'needs-attention',
     statusNote: 'Kangkong bed lost to drought in September. Irrigation fix pending.',
     managedBy: 'Earthlink NTU',
+    hall: 'Campus',
     established: '2025-02-10',
     areaSqm: 30,
     beds: [
@@ -90,6 +94,7 @@ export const sites: Site[] = [
     status: 'active',
     statusNote: 'Eight terrace beds in the student section. Steady weekly harvests.',
     managedBy: 'Community Herb Garden Student Committee',
+    hall: 'Campus',
     established: '2009-06-01',
     areaSqm: 90,
     beds: [
@@ -104,4 +109,6 @@ export const sites: Site[] = [
     ],
     photoAlt: 'Terraced herb beds on a gentle slope with paved paths',
   },
+  // Invented hall gardens for the Hall Garden Cup (labelled "Demo hall site")
+  ...demoHallSites,
 ]

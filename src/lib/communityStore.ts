@@ -8,8 +8,8 @@
  * merged over it into a snapshot. Read once, write through, notify subscribers, and follow other tabs
  * via the "storage" event. useCommunity() reads it. Nothing here is secure; it is a demo login.
  */
-import { DEMO_COMMITTEE_PIN, DEMO_STUDENT, demoClaims, demoCommunities, demoJoins, demoTasks } from '../data'
-import type { DemoRole, HelpTask, JoinRequest, JoinStatus, SiteCommunity, SiteId, StudentProfile, TaskClaim } from '../types'
+import { DEMO_COMMITTEE_PIN, DEMO_STUDENT, defaultSpotlights, demoClaims, demoCommunities, demoJoins, demoTasks } from '../data'
+import type { DemoRole, HelpTask, JoinRequest, JoinStatus, SiteCommunity, SiteId, SpotlightId, StudentProfile, TaskClaim } from '../types'
 
 const STORAGE_KEY = 'ntu-food-living-lab:community:v1'
 
@@ -32,6 +32,8 @@ interface StoredCommunity {
   removedTaskIds: string[]
   /** Slots claimed on this device */
   claims: TaskClaim[]
+  /** Hall Cup spotlight challenges Admin chose on this device, by month "YYYY-MM" */
+  spotlights: Record<string, SpotlightId>
 }
 
 export interface CommunitySnapshot {
@@ -52,6 +54,8 @@ export interface CommunitySnapshot {
   claims: TaskClaim[]
   /** Slots claimed on this device (My gardens) */
   myClaims: TaskClaim[]
+  /** Spotlight challenge by month "YYYY-MM": demo choices with Admin's changes */
+  spotlights: Record<string, SpotlightId>
 }
 
 export type CommunitySaveResult = { ok: true } | { ok: false; error: string }
@@ -71,6 +75,7 @@ const fallback = (): StoredCommunity => ({
   tasks: [],
   removedTaskIds: [],
   claims: [],
+  spotlights: {},
 })
 
 function parseRole(v: unknown): DemoRole {
@@ -117,6 +122,7 @@ function readStorage(): StoredCommunity {
       tasks: listOf<HelpTask>(parsed.tasks),
       removedTaskIds: Array.isArray(parsed.removedTaskIds) ? parsed.removedTaskIds.filter((v): v is string => typeof v === 'string') : [],
       claims: listOf<TaskClaim>(parsed.claims),
+      spotlights: recordOf<SpotlightId>(parsed.spotlights),
     }
   } catch {
     // Private mode, blocked storage or corrupted JSON: start as a visitor rather than crash.
@@ -158,6 +164,7 @@ function buildSnapshot(s: StoredCommunity): CommunitySnapshot {
     tasks,
     claims: [...demoClaims, ...s.claims].filter((c) => live.has(c.taskId)),
     myClaims: s.claims.filter((c) => live.has(c.taskId)),
+    spotlights: { ...defaultSpotlights, ...s.spotlights },
   }
 }
 
@@ -325,6 +332,15 @@ export function claimTask(taskId: string, name: string, hall?: string): Communit
 /** Give a slot back (claims made on this device). */
 export function unclaimTask(claimId: string): CommunitySaveResult {
   return commit({ ...state, claims: state.claims.filter((c) => c.id !== claimId) })
+}
+
+/* ------------------------------------------------------------------ */
+/* Hall Garden Cup                                                     */
+/* ------------------------------------------------------------------ */
+
+/** Admin: choose a month's spotlight challenge (from the fixed list). */
+export function setSpotlight(month: string, challenge: SpotlightId): CommunitySaveResult {
+  return commit({ ...state, spotlights: { ...state.spotlights, [month]: challenge } })
 }
 
 /**

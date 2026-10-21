@@ -1,5 +1,5 @@
 import { MapPin } from 'lucide-react'
-import { siteImages } from '../../data'
+import { siteImage } from '../../data'
 import type { Site, SiteId } from '../../types'
 import Reveal from '../ui/Reveal'
 import SlotImage from '../ui/SlotImage'
@@ -38,7 +38,7 @@ export default function SiteList({ sites, selectedId, onSelect }: Props) {
                 }`}
               >
                 <SlotImage
-                  slot={siteImages[site.id]}
+                  slot={siteImage(site)}
                   title={site.shortName}
                   tone={i}
                   zoomOnHover

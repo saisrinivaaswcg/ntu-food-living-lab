@@ -137,7 +137,7 @@ export default function SiteMap({ sites, selectedId, onSelect, onPinMove, onMovi
         zoomControl={false}
         scrollWheelZoom={false}
         className="size-full"
-        aria-label="Map of the NTU campus showing the four growing sites"
+        aria-label="Map of the NTU campus showing the growing sites"
       >
         {/* key: swapping layers remounts the TileLayer, which also swaps the attribution. */}
         {base === 'map' ? (

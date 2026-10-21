@@ -21,7 +21,7 @@ export default function SitesPage() {
     <div className="mx-auto max-w-7xl px-4 py-5 lg:px-8 lg:py-10">
       <Breadcrumbs items={[{ label: 'Sites' }]} />
       <Reveal className="max-w-3xl">
-        <h1 className="font-display text-display font-medium">Four gardens, one record.</h1>
+        <h1 className="font-display text-display font-medium">Every garden, one record.</h1>
         <p className="mt-4 text-lg text-ink-muted lg:text-xl">
           Each site keeps its growing knowledge and handover notes here, so they carry over from one committee to the
           next.

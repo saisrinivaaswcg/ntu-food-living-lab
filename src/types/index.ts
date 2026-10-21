@@ -60,6 +60,10 @@ export interface Site {
   status: SiteStatus
   statusNote: string
   managedBy: string
+  /** The hall that runs it (one of src/data/halls.ts), or "Campus". Only hall sites enter the Hall Garden Cup. */
+  hall: string
+  /** An invented demo site (not a real NTU garden): always labelled "Demo hall site" in the UI */
+  fictional?: boolean
   established: ISODate
   areaSqm: number
   beds: Bed[]
@@ -422,6 +426,30 @@ export interface SiteCommunity {
 }
 
 export type JoinStatus = 'new' | 'contacted' | 'welcomed'
+
+/* ------------------------------------------------------------------ */
+/* Hall Garden Cup                                                     */
+/* ------------------------------------------------------------------ */
+
+/** A month-long, team-level challenge from the fixed list. Admin picks one per month. */
+export type SpotlightId = 'steady-logger' | 'water-wise' | 'compost-champion' | 'share-the-harvest' | 'welcome-wagon' | 'new-plantings'
+
+export interface SpotlightChallenge {
+  id: SpotlightId
+  title: string
+  /** What the teams do, in one line */
+  pitch: string
+  /** How the month's standings are measured */
+  measure: string
+  unit: string
+}
+
+/** Semester the Cup runs over */
+export interface CupSemester {
+  label: string
+  start: ISODate
+  end: ISODate
+}
 
 /** Someone asking to join a site's community. Shows in that site's Interest inbox. */
 export interface JoinRequest {

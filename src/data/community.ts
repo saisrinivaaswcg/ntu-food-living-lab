@@ -66,6 +66,33 @@ export const demoCommunities: SiteCommunity[] = [
     roles: [roles.harvester, roles.composter, roles.outreach, roles.grower],
     pickPolicy: 'committee-only',
   },
+  {
+    siteId: 'crescent-hall-rooftop',
+    welcome: 'Three planters, one roof, a lot of basil. Small enough that you’ll learn every plant by name.',
+    workdays: [{ weekday: 3, start: '18:30', end: '19:30' }],
+    meetingPoint: 'The lift lobby on the top floor',
+    roles: [roles.waterer, roles.harvester],
+    pickPolicy: 'help-yourself',
+  },
+  {
+    siteId: 'tamarind-hall-garden',
+    welcome: 'Our garden feeds the Friday cook-up. Come early, get muddy, stay for dinner.',
+    workdays: [
+      { weekday: 5, start: '17:00', end: '18:30' },
+      { weekday: 6, start: '08:30', end: '10:00' },
+    ],
+    meetingPoint: 'The hall pantry door',
+    roles: [roles.harvester, roles.composter, roles.grower, roles.outreach],
+    pickPolicy: 'ask-first',
+  },
+  {
+    siteId: 'hall-2-corridor',
+    welcome: 'A new club with two troughs and big plans. We especially need waterers.',
+    workdays: [{ weekday: 1, start: '19:00', end: '19:45' }],
+    meetingPoint: 'The ground-floor corridor by the laundry',
+    roles: [roles.waterer],
+    pickPolicy: 'help-yourself',
+  },
 ]
 
 export const demoJoins: JoinRequest[] = [
@@ -76,7 +103,27 @@ export const demoJoins: JoinRequest[] = [
   { id: 'demo-join-5', siteId: 'earthlink-yunnan-corner', name: 'Daniel Ong', hall: 'Hall 2', contactMethod: 'email', contact: 'daniel.ong.demo@example.com', roleId: 'grower', consent: true, status: 'new', createdAt: '2026-10-12T18:30:00+08:00', source: 'demo' },
   { id: 'demo-join-6', siteId: 'community-herb-garden', name: 'Wei Ling Goh', hall: 'Hall 9', contactMethod: 'telegram', contact: '@weiling.demo', roleId: 'composter', consent: true, status: 'welcomed', createdAt: '2026-08-30T10:20:00+08:00', source: 'demo' },
   { id: 'demo-join-7', siteId: 'community-herb-garden', name: 'Priya Menon', hall: 'Pioneer Hall', contactMethod: 'email', contact: 'priya.demo@example.com', roleId: 'outreach', note: 'Can run a cooking demo in Week 10.', consent: true, status: 'contacted', createdAt: '2026-09-30T14:05:00+08:00', source: 'demo' },
+  ...hallJoins('crescent-hall-rooftop', 'Crescent Hall', ['Nur Aisyah', 'Marcus Teo'], ['harvester', 'waterer']),
+  ...hallJoins('tamarind-hall-garden', 'Tamarind Hall', ['Rachel Koh', 'Vikram Pillai', 'Zhang Min', 'Sarah Yeo', 'Imran Hakim', 'Tan Li Ting', 'Kevin Chua', 'Divya Iyer'], ['harvester', 'composter', 'grower', 'outreach']),
+  ...hallJoins('hall-2-corridor', 'Hall 2', ['Ethan Goh', 'Mei Ling Ho'], ['waterer']),
 ]
+
+/** Demo members of the invented hall gardens, joined across the semester. */
+function hallJoins(siteId: string, hall: string, names: string[], roleIds: string[]): JoinRequest[] {
+  return names.map((name, i) => ({
+    id: `demo-join-${siteId}-${i + 1}`,
+    siteId,
+    name,
+    hall,
+    contactMethod: 'telegram',
+    contact: `@${name.toLowerCase().replace(/[^a-z]+/g, '')}.demo`,
+    roleId: roleIds[i % roleIds.length],
+    consent: true,
+    status: i % 3 === 2 ? 'contacted' : 'welcomed',
+    createdAt: `2026-${i % 2 === 0 ? '08' : '09'}-${String(12 + i * 2).padStart(2, '0')}T19:00:00+08:00`,
+    source: 'demo',
+  }))
+}
 
 export const JOIN_PRIVACY_NOTE =
   'Saved only in this browser for this demo. In the real platform only this site’s committee would see your contact details, and only to welcome you. Change or delete them any time on My gardens.'

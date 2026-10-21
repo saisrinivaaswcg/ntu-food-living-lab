@@ -18,6 +18,7 @@ export const LearnCropPage = lazy(() => import('./learn/LearnCropPage'))
 export const JoinPage = lazy(() => import('./join/JoinPage'))
 export const JoinSitePage = lazy(() => import('./join/JoinSitePage'))
 export const MyGardensPage = lazy(() => import('./MyGardensPage'))
+export const HallCupPage = lazy(() => import('./HallCupPage'))
 
 // Committee workspace
 export const WorkspaceShell = lazy(() => import('../components/workspace/WorkspaceShell'))
@@ -25,4 +26,5 @@ export const TodayPage = lazy(() => import('./workspace/TodayPage'))
 export const ManageSitePage = lazy(() => import('./workspace/ManageSitePage'))
 export const HandoverPage = lazy(() => import('./workspace/HandoverPage'))
 export const InboxPage = lazy(() => import('./workspace/InboxPage'))
+export const CompetitionPage = lazy(() => import('./workspace/CompetitionPage'))
 export const NotFoundPage = lazy(() => import('./NotFoundPage'))

@@ -2,13 +2,14 @@ import { ArrowRight, MapPin, X } from 'lucide-react'
 import { motion, useDragControls, useReducedMotion, type PanInfo, type Variants } from 'motion/react'
 import { useEffect, useMemo, useRef } from 'react'
 import { Link } from 'react-router-dom'
-import { siteImages } from '../../data'
+import { siteImage } from '../../data'
 import { useLogs } from '../../hooks/useLogs'
 import { useMediaQuery } from '../../hooks/useMediaQuery'
 import { cropsCurrentlyGrowing } from '../../lib/metrics'
 import type { Site } from '../../types'
 import CropChips from '../ui/CropChips'
 import SlotImage from '../ui/SlotImage'
+import DemoSiteTag from '../ui/DemoSiteTag'
 import StatusBadge from '../ui/StatusBadge'
 
 interface Props {
@@ -99,7 +100,7 @@ export default function SitePanel({ site, index, onClose, mapMoving }: Props) {
           onPointerDown={(e) => sheetDrag && dragControls.start(e)}
           className="relative aspect-[21/9] touch-none overflow-hidden rounded-2xl lg:aspect-[16/10] lg:touch-auto"
         >
-          <SlotImage slot={siteImages[site.id]} tone={index} sizes="(min-width: 1024px) 26rem, 100vw" />
+          <SlotImage slot={siteImage(site)} tone={index} sizes="(min-width: 1024px) 26rem, 100vw" />
           {/* Soft fade at the bottom so the photo melts into the panel. */}
           <div className="absolute inset-x-0 bottom-0 h-1/3 bg-linear-to-t from-surface/70 to-transparent" aria-hidden />
           <button
@@ -130,6 +131,7 @@ export default function SitePanel({ site, index, onClose, mapMoving }: Props) {
 
           <motion.div variants={item} className="mt-4">
             <StatusBadge status={site.status} />
+            {site.fictional && <DemoSiteTag />}
             <p className="mt-1 text-ink">{site.statusNote}</p>
           </motion.div>
 

@@ -49,7 +49,7 @@ export default function KnowledgeTab({ site }: { site: Site }) {
         <h2 id="protocols-heading" className="font-display text-section font-medium">
           Shared protocols
         </h2>
-        <p className="mt-1 mb-4 max-w-2xl text-sm text-ink-muted">The same protocols apply at all four sites.</p>
+        <p className="mt-1 mb-4 max-w-2xl text-sm text-ink-muted">The same protocols apply at every site.</p>
         <ProtocolList protocols={protocols} />
       </section>
     </div>

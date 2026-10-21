@@ -1,10 +1,11 @@
 import { ArrowRight, MapPin } from 'lucide-react'
 import { Link } from 'react-router-dom'
-import { siteImages } from '../../data'
+import { siteImage } from '../../data'
 import { cropName } from '../../lib/lookups'
 import type { CropId, Site } from '../../types'
 import Reveal from '../ui/Reveal'
 import SlotImage from '../ui/SlotImage'
+import DemoSiteTag from '../ui/DemoSiteTag'
 import StatusBadge from '../ui/StatusBadge'
 import { sitePhotoTransitionName } from './siteTransitions'
 
@@ -33,7 +34,7 @@ export default function SiteRow({ site, index, growing }: Props) {
           style={{ viewTransitionName: sitePhotoTransitionName(site.id) }}
         >
           <SlotImage
-            slot={siteImages[site.id]}
+            slot={siteImage(site)}
             title={site.shortName}
             tone={index}
             zoomOnHover
@@ -43,6 +44,7 @@ export default function SiteRow({ site, index, growing }: Props) {
 
         <span className={`block lg:col-span-5 ${flip ? 'lg:order-1' : ''}`}>
           <StatusBadge status={site.status} />
+          {site.fictional && <DemoSiteTag />}
           <span className="mt-2 block font-display text-[clamp(2rem,1.4rem+2.4vw,3.25rem)] leading-[1.05] font-medium decoration-brand-700 decoration-2 underline-offset-[6px] group-hover:underline">
             {site.name}
           </span>

@@ -1,4 +1,4 @@
-import type { CropId, SiteId } from '../types'
+import type { CropId, Site, SiteId } from '../types'
 
 /**
  * Every image slot in the app. Drop a file at `src` (under public/) and it appears; until then the
@@ -137,6 +137,11 @@ export const siteImages: Record<SiteId, ImageSlot> = {
 }
 
 /** Photos for the four log forms and the empty harvest-photo gallery. */
+/** A site's photo slot. Sites without one (demo hall sites, newly approved sites) get a slot that shows the labelled placeholder until a photo is dropped at /images/sites/<site id>.jpg. */
+export function siteImage(site: Pick<Site, 'id' | 'photoAlt'>): ImageSlot {
+  return siteImages[site.id] ?? { src: `/images/sites/${site.id}.jpg`, alt: site.photoAlt, width: 2400, height: 1600 }
+}
+
 export const logImages = {
   harvest: {
     src: '/images/log/harvest.jpg',
