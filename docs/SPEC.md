@@ -133,6 +133,13 @@ Built with the scroll-craft skill's rules (brief, grammar and verification in `d
 - **Interest inbox** (`/workspace/sites/:siteId/inbox`): requests newest first, filter by status, move New → Contacted → Welcomed (with Undo). Contact details show only with consent and only to that site's committee.
 - **My gardens:** communities joined (status, role, next workday, leave with Undo), slots claimed (give back), and the profile (change, or delete everything from this device).
 
+## 8. Get involved, bed pages and QR cards
+
+- **`/get-involved`:** every upcoming help-wanted task (filter by garden, beginner-friendly only). **Claim a slot** with the name pre-filled from the student profile (one slot per name; full tasks say Full; give back with Undo) and **Add to calendar** (.ics, Asia/Singapore). **Ready to pick:** per site, beds at Ready or Harvesting stage (linking to bed pages) and the site's pick policy (Help yourself / Ask first / Committee picks).
+- **Help wanted** (`/workspace/sites/:siteId/tasks`): the committee posts a task (title, detail, date, start–end slot, helpers needed, beginner-friendly, optional crop), sees who claimed each slot, and takes tasks down (Undo).
+- **Bed page** (`/bed/:siteId/:bedId`, the QR target): crop, stage and progress, planted / plants / first harvest, the crop's three-line care card (`careGuide.quickCare`), pick policy when ready, and big **Log harvest** (harvest form pre-filled with site, bed, crop) and **Log watering** (weekly inputs form pre-filled with the site) buttons. Bed names on site pages link here.
+- **QR cards** (`/workspace/sites/:siteId/qr`): one printable card per bed (site, bed, crop, first care line, QR to the bed page). Codes use `VITE_PUBLIC_SITE_URL` when set, else the page origin. Printing hides the workspace chrome.
+
 ## 7. Hall Garden Cup (`/hall-cup`, Admin: `/workspace/competition`)
 
 - Every site has a `hall` (one of `src/data/halls.ts`, or "Campus"). Only hall sites compete, as teams. Three invented hall gardens (`src/data/hallSites.ts`, `fictional: true`, generated demo logs) are always tagged **Demo hall site**.

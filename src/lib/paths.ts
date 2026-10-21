@@ -32,8 +32,19 @@ export const paths = {
   competition: '/workspace/competition',
 }
 
+/** Weekly inputs form for one site (bed pages' "Log watering"). */
+export function weeklyFormFor(siteId: SiteId): string {
+  return `${paths.log('weekly')}?${new URLSearchParams({ site: siteId })}`
+}
+
 /** Pre-filled harvest form for one bed (from "Ready soon" cards and bed pages). */
 export function harvestFormFor(siteId: SiteId, bedId: string, cropId?: string): string {
   const q = new URLSearchParams({ site: siteId, bed: bedId, ...(cropId ? { crop: cropId } : {}) })
   return `${paths.log('harvest')}?${q}`
+}
+
+/** Full address of an in-app page, for QR codes: VITE_PUBLIC_SITE_URL when set, otherwise this page's origin. */
+export function publicUrl(path: string): string {
+  const base = import.meta.env.VITE_PUBLIC_SITE_URL?.replace(/\/$/, '') || window.location.origin
+  return `${base}${path}`
 }

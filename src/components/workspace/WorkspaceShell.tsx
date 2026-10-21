@@ -37,7 +37,7 @@ export default function WorkspaceShell() {
         Skip to content
       </a>
 
-      <header className="sticky top-0 z-[1000] border-b border-line bg-brand-900 text-white">
+      <header className="sticky top-0 z-[1000] border-b print:hidden border-line bg-brand-900 text-white">
         <div className="flex h-14 items-center justify-between gap-3 px-4 lg:px-6">
           <Link to={paths.workspace} className="flex min-h-12 items-center gap-2.5">
             <span className="flex size-8 items-center justify-center rounded-sm bg-white/10">
@@ -66,7 +66,7 @@ export default function WorkspaceShell() {
 
       <div className="flex flex-1">
         {usesWorkspace(role) && (
-          <aside className="sticky top-14 hidden h-[calc(100dvh-3.5rem)] w-64 shrink-0 flex-col overflow-y-auto border-r border-line bg-surface py-5 lg:flex">
+          <aside className="sticky top-14 hidden print:hidden h-[calc(100dvh-3.5rem)] w-64 shrink-0 flex-col overflow-y-auto border-r border-line bg-surface py-5 lg:flex">
             <WorkspaceSiteSwitcher />
             <div className="mt-6 flex-1 px-2">
               <WorkspaceNav />
@@ -80,7 +80,7 @@ export default function WorkspaceShell() {
           </aside>
         )}
 
-        <main id="main" tabIndex={-1} className="min-w-0 flex-1 pb-[calc(5rem+env(safe-area-inset-bottom))] outline-none lg:pb-12">
+        <main id="main" tabIndex={-1} className="min-w-0 flex-1 pb-[calc(5rem+env(safe-area-inset-bottom))] outline-none lg:pb-12 print:pb-0">
           <RoleGate
             allow={['committee', 'admin']}
             what="The workspace"

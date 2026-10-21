@@ -13,7 +13,7 @@ export default function BottomNav() {
       className="fixed inset-x-0 bottom-0 z-[1000] border-t border-line bg-surface pb-[env(safe-area-inset-bottom)] lg:hidden"
     >
       <ul className="grid h-16" style={{ gridTemplateColumns: `repeat(${items.length}, minmax(0, 1fr))` }}>
-        {items.map(({ to, label, icon: Icon, end }) => (
+        {items.map(({ to, label, phoneLabel, icon: Icon, end }) => (
           <li key={to}>
             <NavLink
               to={to}
@@ -33,7 +33,7 @@ export default function BottomNav() {
                     aria-hidden
                   />
                   <Icon className="size-5" strokeWidth={isActive ? 2.25 : 1.75} aria-hidden />
-                  {label}
+                  {phoneLabel ?? label}
                 </>
               )}
             </NavLink>

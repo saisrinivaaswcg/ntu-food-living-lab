@@ -109,7 +109,7 @@ export default function MyGardensPage() {
               </h2>
               {myTasks.length === 0 ? (
                 <div className="mt-4">
-                  <EmptyState title="No slots claimed" detail="Beginner tasks are on each garden’s Join page." />
+                  <EmptyState title="No slots claimed" detail="Find one on Get involved: beginner tasks need no experience." />
                 </div>
               ) : (
                 <div className="mt-4 border-t border-ink">

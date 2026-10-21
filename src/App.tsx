@@ -5,10 +5,12 @@ import { createBrowserRouter, RouterProvider } from 'react-router-dom'
 import AppShell from './components/layout/AppShell'
 import PageLoading from './components/layout/PageLoading'
 import {
+  BedPage,
   CompetitionPage,
   CreditsPage,
   DashboardPage,
   ExplorePage,
+  GetInvolvedPage,
   HandoverPage,
   HallCupPage,
   HarvestDashboardPage,
@@ -24,8 +26,10 @@ import {
   MyGardensPage,
   NotFoundPage,
   PlantingDashboardPage,
+  QrCardsPage,
   SiteDetailPage,
   SitesPage,
+  TasksPage,
   TodayPage,
   WorkspaceShell,
 } from './pages/lazyPages'
@@ -47,6 +51,8 @@ const router = createBrowserRouter([
       { path: 'join/:siteId', element: <JoinSitePage /> },
       { path: 'my-gardens', element: <MyGardensPage /> },
       { path: 'hall-cup', element: <HallCupPage /> },
+      { path: 'get-involved', element: <GetInvolvedPage /> },
+      { path: 'bed/:siteId/:bedId', element: <BedPage /> },
       { path: 'login', element: <LoginPage /> },
       { path: 'credits', element: <CreditsPage /> },
       // Old URLs: Log and Dashboards moved into the workspace.
@@ -72,7 +78,9 @@ const router = createBrowserRouter([
       { path: 'dashboard/harvest', element: <HarvestDashboardPage /> },
       { path: 'dashboard/planting', element: <PlantingDashboardPage /> },
       { path: 'sites/:siteId/manage', element: <ManageSitePage /> },
+      { path: 'sites/:siteId/tasks', element: <TasksPage /> },
       { path: 'sites/:siteId/inbox', element: <InboxPage /> },
+      { path: 'sites/:siteId/qr', element: <QrCardsPage /> },
       { path: 'sites/:siteId/handover', element: <HandoverPage /> },
       { path: 'competition', element: <CompetitionPage /> },
       { path: '*', element: <NotFoundPage /> },

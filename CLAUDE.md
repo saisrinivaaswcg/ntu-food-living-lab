@@ -39,7 +39,7 @@ No backend, no real auth, no database: everything a visitor does is saved in thi
 7. [x] Two sides — public shell and committee workspace with sidebar; old URLs redirect
 8. [x] Learn to grow — `/learn`, `/learn/:cropId` scroll journeys (scroll-craft rules; working files in `docs/scrollcraft/`)
 9. [x] Join a community — `/join`, `/join/:siteId`, My gardens
-10. [ ] Get involved — help wanted, ready to pick, bed pages, printable QR cards
+10. [x] Get involved — help wanted, ready to pick, bed pages, printable QR cards
 11. [x] Hall Garden Cup — `/hall-cup`, demo hall sites, spotlight challenges
 12. [ ] New hall sites — start-a-garden guide, request, Admin approval
 13. [ ] Committee tools — manage site, grow more, handover wizard, impact report

@@ -1,4 +1,5 @@
 import { useMemo, useState, type FormEvent } from 'react'
+import { useSearchParams } from 'react-router-dom'
 import { compostOptions, demoLogs } from '../../data'
 import { compostSummary } from '../../lib/format'
 import { useLogs } from '../../hooks/useLogs'
@@ -47,7 +48,9 @@ const DEMO_WEEK_MESSAGE =
 export default function WeeklyInputForm() {
   const { userLogs } = useLogs()
   const thisMonday = mondayOf(todayISO())
-  const [siteId, setSiteId] = useState<SiteId | ''>(() => getLastSiteId() ?? '')
+  const [params] = useSearchParams()
+  // ?site= from a bed page's "Log watering" button; otherwise the last site used on this device.
+  const [siteId, setSiteId] = useState<SiteId | ''>(() => params.get('site') ?? getLastSiteId() ?? '')
   const [week, setWeek] = useState<ISODate>(thisMonday)
   const [water, setWater] = useState('')
   const [compostType, setCompostType] = useState<CompostType | null>(null)

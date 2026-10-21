@@ -5,6 +5,8 @@ import { paths } from '../../lib/paths'
 const links = [
   { to: paths.sites, label: 'Sites' },
   { to: paths.join, label: 'Join a community' },
+  { to: paths.getInvolved, label: 'Get involved' },
+  { to: paths.hallCup, label: 'Hall Garden Cup' },
   { to: paths.myGardens, label: 'My gardens' },
   { to: paths.credits, label: 'Photo credits' },
 ]
