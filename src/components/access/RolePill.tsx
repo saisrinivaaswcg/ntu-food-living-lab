@@ -51,7 +51,7 @@ export default function RolePill() {
         data-tour="role-pill"
       >
         <UserRound className="size-4 shrink-0 text-brand-700" aria-hidden />
-        <span className="sr-only sm:not-sr-only">Viewing as:</span>
+        <span className="sr-only whitespace-nowrap sm:not-sr-only xl:sr-only 2xl:not-sr-only">Viewing as:</span>
         <span className="truncate font-semibold sm:hidden">{roleShortName(role, profile)}</span>
         <span className="hidden truncate font-semibold sm:inline">{roleName(role, profile)}</span>
         <span className="hidden text-ink-muted sm:inline" aria-hidden>

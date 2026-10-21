@@ -43,7 +43,7 @@ No backend, no real auth, no database: everything a visitor does is saved in thi
 11. [x] Hall Garden Cup — `/hall-cup`, demo hall sites, spotlight challenges
 12. [x] New hall sites — start-a-garden guide, request, Admin approval
 13. [x] Committee tools — manage site, grow more, handover wizard, impact report
-14. [ ] Image slots — `docs/IMAGE_PROMPTS.md`, AI illustration slots wired with SVG fallbacks
+14. [x] Image slots — `docs/IMAGE_PROMPTS.md`, AI illustration slots wired with SVG fallbacks
 
 (The guided tour, showcase mode and `/live` board were dropped.)
 
@@ -68,7 +68,7 @@ Unknown routes and unknown site IDs show a not-found page with a way back. Hidde
 - Controlled vocabulary: site, bed, crop, destination, propagation, compost type and cause are selects or buttons fed from `src/data` (beds from the current site setup). Free text only in notes/description fields, and in bed names in site setup.
 - **Allowed:** demo roles (Visitor, Student, Committee member, Admin) that anyone can switch between, with no real security and a visible "Demo login" note; a local student profile created when someone joins a community; learning guides (Learn to grow); a hall-level competition (Hall Garden Cup) where teams, not individuals, are ranked. Editing a site's beds, bed areas, crops and plant counts is **site setup**, not inventory tracking; so is editing or deleting log entries.
 - **Still NOT allowed:** individual points or scores, badges, quizzes, notifications, real user accounts or authentication, inventory tracking, gamified virtual gardens.
-- No AI-generated images. Crop close-ups are freely licensed photos (Wikimedia Commons CC0 / CC BY / CC BY-SA, Unsplash, Pexels) with author, source URL and licence recorded in `src/data/images.ts` and shown on `/credits`; otherwise the SVG illustration. Never images of real NTU people.
+- Photos are never AI-generated: crop close-ups are freely licensed photos (Wikimedia Commons CC0 / CC BY / CC BY-SA, Unsplash, Pexels) with author, source URL and licence recorded in `src/data/images.ts` and shown on `/credits`. The only AI images are the 16 illustration slots in `illustrations` (`kind: 'illustration'`, `aiGenerated: true`, credit "AI illustration"), made by the team from `docs/IMAGE_PROMPTS.md` and dropped into `public/images/illustrations/`. Each falls back to the SVG drawing, the plain icon or a text-only header when its file is missing (`<Illustration>`, `<PageHero>`, `EmptyState illustration`). Never images of real NTU people or buildings.
 
 ## Design
 

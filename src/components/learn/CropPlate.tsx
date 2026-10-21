@@ -3,6 +3,8 @@ import { Link } from 'react-router-dom'
 import { BEGINNER_RATING_LABELS, type CropAtNtu } from '../../lib/metrics'
 import { paths } from '../../lib/paths'
 import type { Crop } from '../../types'
+import { illustrations } from '../../data'
+import Illustration from '../ui/Illustration'
 import GrowingPlant from './GrowingPlant'
 import { PLATE_FRAME } from './journey'
 
@@ -15,11 +17,18 @@ export default function CropPlate({ crop, atNtu, id }: { crop: Crop; atNtu: Crop
     <article id={id} aria-labelledby={`${id}-name`} className="group scroll-mt-24">
       <Link to={paths.learnCrop(crop.id)} className="block">
         <div className="relative flex aspect-[4/5] items-end justify-center overflow-hidden border border-line bg-surface px-4 pt-4 transition-colors group-hover:border-ink">
-          <GrowingPlant
-            crop={crop}
-            progress={PLATE_FRAME}
-            className="h-[98%] w-auto transition-transform duration-500 ease-out group-hover:-translate-y-1 motion-reduce:transition-none motion-reduce:group-hover:translate-y-0"
-          />
+          {/* The AI illustration when its file is in place, otherwise the plant drawn in code. */}
+          {(() => {
+            const drawing = (
+              <GrowingPlant
+                crop={crop}
+                progress={PLATE_FRAME}
+                className="h-[98%] w-auto transition-transform duration-500 ease-out group-hover:-translate-y-1 motion-reduce:transition-none motion-reduce:group-hover:translate-y-0"
+              />
+            )
+            const slot = illustrations.learnCrops[crop.id]
+            return slot ? <Illustration slot={slot} fallback={drawing} fit="cover" sizes="(min-width: 1024px) 24rem, (min-width: 640px) 45vw, 100vw" /> : drawing
+          })()}
         </div>
         <div className="mt-3">
           <h2 id={`${id}-name`} className="flex items-center justify-between gap-3 font-display text-2xl font-medium">

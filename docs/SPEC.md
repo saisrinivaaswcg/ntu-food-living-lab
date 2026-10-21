@@ -197,4 +197,4 @@ Put these in `src/lib/metrics.ts` as pure functions. All respect the dashboard's
 
 Allowed: demo roles anyone can switch (no real security), a local student profile, learning guides, and a hall-level team competition (Hall Garden Cup).
 
-Out of scope: individual points or scores, badges, quizzes, notifications, real user accounts or authentication, inventory tracking, gamified virtual gardens, any backend, AI-generated images.
+Out of scope: individual points or scores, badges, quizzes, notifications, real user accounts or authentication, inventory tracking, gamified virtual gardens, any backend, AI-generated photos. (AI illustrations are allowed only in the slots listed in `docs/IMAGE_PROMPTS.md`, always credited "AI illustration".)

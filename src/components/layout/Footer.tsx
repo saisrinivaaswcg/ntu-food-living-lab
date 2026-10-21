@@ -15,7 +15,7 @@ const links = [
 /** Site footer: credits and the demo-data reminder. Leaves room for the phone tab bar. */
 export default function Footer() {
   return (
-    <footer className="border-t border-line bg-surface pb-[calc(5rem+env(safe-area-inset-bottom))] lg:pb-0">
+    <footer className="border-t border-line bg-surface pb-[calc(5rem+env(safe-area-inset-bottom))] xl:pb-0">
       <div className="mx-auto flex max-w-7xl flex-col gap-2 px-4 py-6 text-sm text-ink-muted sm:flex-row sm:items-center sm:justify-between lg:px-8">
         <p>
           NTU Campus Food Systems Living Lab · prototype. <span className="text-demo">{DEMO_DATA_SHORT_NOTICE}</span>

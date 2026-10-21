@@ -5,8 +5,9 @@ import NewcomerPath from '../../components/community/NewcomerPath'
 import Breadcrumbs from '../../components/layout/Breadcrumbs'
 import CropChips from '../../components/ui/CropChips'
 import EmptyState from '../../components/ui/EmptyState'
+import PageHero from '../../components/ui/PageHero'
 import Reveal from '../../components/ui/Reveal'
-import { DEMO_DATA_SHORT_NOTICE, pickPolicyOptions } from '../../data'
+import { DEMO_DATA_SHORT_NOTICE, pickPolicyOptions, illustrations } from '../../data'
 import { useCommunity } from '../../hooks/useCommunity'
 import { useLogs } from '../../hooks/useLogs'
 import { usePageTitle } from '../../hooks/usePageTitle'
@@ -35,14 +36,16 @@ export default function JoinPage() {
   return (
     <div className="mx-auto max-w-7xl px-4 py-5 lg:px-8 lg:py-10">
       <Breadcrumbs items={[{ label: 'Join a community' }]} />
-      <Reveal className="max-w-3xl">
-        <h1 className="font-display text-display font-medium">Find your garden.</h1>
-        <p className="mt-4 text-lg text-ink-muted lg:text-xl">
-          Every garden on campus is run by students. Pick one near you, come to a workday, and you’ll know how to grow
-          something by the end of the month. No experience needed.
-        </p>
-        <p className="mt-2 text-sm text-demo">{DEMO_DATA_SHORT_NOTICE}</p>
-      </Reveal>
+      <PageHero slot={illustrations.heroes.join}>
+        <Reveal className="max-w-3xl">
+          <h1 className="font-display text-display font-medium">Find your garden.</h1>
+          <p className="mt-4 text-lg text-ink-muted lg:text-xl">
+            Every garden on campus is run by students. Pick one near you, come to a workday, and you’ll know how to grow
+            something by the end of the month. No experience needed.
+          </p>
+          <p className="mt-2 text-sm text-demo">{DEMO_DATA_SHORT_NOTICE}</p>
+        </Reveal>
+      </PageHero>
 
       <section aria-labelledby="path-heading" className="mt-12">
         <h2 id="path-heading" className="font-display text-section font-medium">

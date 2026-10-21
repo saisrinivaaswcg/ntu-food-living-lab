@@ -4,8 +4,9 @@ import { Link } from 'react-router-dom'
 import TaskRow from '../components/community/TaskRow'
 import Breadcrumbs from '../components/layout/Breadcrumbs'
 import EmptyState from '../components/ui/EmptyState'
+import PageHero from '../components/ui/PageHero'
 import Reveal from '../components/ui/Reveal'
-import { DEMO_DATA_SHORT_NOTICE, pickPolicyOptions } from '../data'
+import { DEMO_DATA_SHORT_NOTICE, pickPolicyOptions, illustrations } from '../data'
 import { useCommunity } from '../hooks/useCommunity'
 import { useLogs } from '../hooks/useLogs'
 import { usePageTitle } from '../hooks/usePageTitle'
@@ -47,14 +48,16 @@ export default function GetInvolvedPage() {
   return (
     <div className="mx-auto max-w-7xl px-4 py-5 lg:px-8 lg:py-10">
       <Breadcrumbs items={[{ label: 'Get involved' }]} />
-      <Reveal className="max-w-3xl">
-        <h1 className="font-display text-display font-medium">An hour helps.</h1>
-        <p className="mt-4 text-lg text-ink-muted lg:text-xl">
-          Committees post the jobs they need hands for. Claim a slot, add it to your calendar and turn up: someone shows
-          you what to do.
-        </p>
-        <p className="mt-2 text-sm text-demo">{DEMO_DATA_SHORT_NOTICE}</p>
-      </Reveal>
+      <PageHero slot={illustrations.heroes.getInvolved}>
+        <Reveal className="max-w-3xl">
+          <h1 className="font-display text-display font-medium">An hour helps.</h1>
+          <p className="mt-4 text-lg text-ink-muted lg:text-xl">
+            Committees post the jobs they need hands for. Claim a slot, add it to your calendar and turn up: someone shows
+            you what to do.
+          </p>
+          <p className="mt-2 text-sm text-demo">{DEMO_DATA_SHORT_NOTICE}</p>
+        </Reveal>
+      </PageHero>
 
       <div className="mt-12 grid gap-12 lg:grid-cols-12 lg:gap-10">
         <section aria-labelledby="help-heading" className="lg:col-span-8">
@@ -83,6 +86,7 @@ export default function GetInvolvedPage() {
           {shown.length === 0 ? (
             <div className="mt-5">
               <EmptyState
+                illustration={illustrations.empty.tasks}
                 title="No tasks match"
                 detail={tasks.length === 0 ? 'Committees haven’t posted any tasks yet.' : 'Try every garden, or include tasks that need some experience.'}
               />
@@ -103,7 +107,7 @@ export default function GetInvolvedPage() {
           <p className="mt-1 text-ink-muted">Crops at harvest stage now, and whether students may take some.</p>
           {ready.length === 0 ? (
             <div className="mt-5">
-              <EmptyState title="Nothing is ready right now" detail="Check back after the next workday." />
+              <EmptyState illustration={illustrations.empty.ready} title="Nothing is ready right now" detail="Check back after the next workday." />
             </div>
           ) : (
             <ul className="mt-5 space-y-4">

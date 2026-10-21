@@ -3,8 +3,9 @@ import { useMemo, useState } from 'react'
 import { Link } from 'react-router-dom'
 import Breadcrumbs from '../../components/layout/Breadcrumbs'
 import EmptyState from '../../components/ui/EmptyState'
+import PageHero from '../../components/ui/PageHero'
 import Reveal from '../../components/ui/Reveal'
-import { bedSizes, DEMO_DATA_SHORT_NOTICE, problemLog, starterItems, startSteps } from '../../data'
+import { bedSizes, DEMO_DATA_SHORT_NOTICE, problemLog, starterItems, startSteps, illustrations } from '../../data'
 import { useCrops } from '../../hooks/useCommunity'
 import { useLogs } from '../../hooks/useLogs'
 import { usePageTitle } from '../../hooks/usePageTitle'
@@ -34,21 +35,23 @@ export default function StartGardenPage() {
   return (
     <div className="mx-auto max-w-7xl px-4 py-5 lg:px-8 lg:py-10">
       <Breadcrumbs items={[{ label: 'Start a garden' }]} />
-      <Reveal className="max-w-3xl">
-        <h1 className="font-display text-display font-medium">Start a garden at your hall.</h1>
-        <p className="mt-4 text-lg text-ink-muted lg:text-xl">
-          A trough on a ledge is enough to begin. Here is what grows best at NTU, what it costs and the six steps from
-          an empty corner to the Hall Garden Cup.
-        </p>
-        <p className="mt-2 text-sm text-demo">{DEMO_DATA_SHORT_NOTICE} Prices are indicative.</p>
-        <Link
-          to={paths.startGardenRequest}
-          className="group mt-6 inline-flex min-h-12 items-center gap-1.5 rounded-sm bg-accent px-5 font-semibold text-white hover:bg-accent-strong"
-        >
-          Request a hall site
-          <ArrowRight className="size-4 transition-transform group-hover:translate-x-0.5" aria-hidden />
-        </Link>
-      </Reveal>
+      <PageHero slot={illustrations.heroes.startGarden}>
+        <Reveal className="max-w-3xl">
+          <h1 className="font-display text-display font-medium">Start a garden at your hall.</h1>
+          <p className="mt-4 text-lg text-ink-muted lg:text-xl">
+            A trough on a ledge is enough to begin. Here is what grows best at NTU, what it costs and the six steps from
+            an empty corner to the Hall Garden Cup.
+          </p>
+          <p className="mt-2 text-sm text-demo">{DEMO_DATA_SHORT_NOTICE} Prices are indicative.</p>
+          <Link
+            to={paths.startGardenRequest}
+            className="group mt-6 inline-flex min-h-12 items-center gap-1.5 rounded-sm bg-accent px-5 font-semibold text-white hover:bg-accent-strong"
+          >
+            Request a hall site
+            <ArrowRight className="size-4 transition-transform group-hover:translate-x-0.5" aria-hidden />
+          </Link>
+        </Reveal>
+      </PageHero>
 
       <section aria-labelledby="crops-heading" className="mt-16">
         <h2 id="crops-heading" className="font-display text-section font-medium">

@@ -3,8 +3,9 @@ import { useMemo } from 'react'
 import { Link } from 'react-router-dom'
 import Breadcrumbs from '../components/layout/Breadcrumbs'
 import EmptyState from '../components/ui/EmptyState'
+import PageHero from '../components/ui/PageHero'
 import Reveal from '../components/ui/Reveal'
-import { CUP_SEMESTER, DEMO_DATA_SHORT_NOTICE, spotlightChallenges } from '../data'
+import { CUP_SEMESTER, DEMO_DATA_SHORT_NOTICE, spotlightChallenges, illustrations } from '../data'
 import { useCommunity } from '../hooks/useCommunity'
 import { useLogs } from '../hooks/useLogs'
 import { usePageTitle } from '../hooks/usePageTitle'
@@ -58,18 +59,20 @@ export default function HallCupPage() {
   return (
     <div className="mx-auto max-w-7xl px-4 py-5 lg:px-8 lg:py-10">
       <Breadcrumbs items={[{ label: 'Hall Garden Cup' }]} />
-      <Reveal className="max-w-3xl">
-        <p className="flex items-center gap-2 text-sm font-semibold tracking-wide text-accent uppercase">
-          <Trophy className="size-4" aria-hidden />
-          {CUP_SEMESTER.label}
-        </p>
-        <h1 className="mt-2 font-display text-display font-medium">The Hall Garden Cup</h1>
-        <p className="mt-4 text-lg text-ink-muted lg:text-xl">
-          Halls compete as teams, not individuals. Every measure is per m² or a rate, so a three-planter rooftop can
-          beat a big garden. Standings to {formatDate(anchor)}.
-        </p>
-        <p className="mt-2 text-sm text-demo">{DEMO_DATA_SHORT_NOTICE} Halls marked “Demo hall site” are invented gardens.</p>
-      </Reveal>
+      <PageHero slot={illustrations.heroes.hallCup}>
+        <Reveal className="max-w-3xl">
+          <p className="flex items-center gap-2 text-sm font-semibold tracking-wide text-accent uppercase">
+            <Trophy className="size-4" aria-hidden />
+            {CUP_SEMESTER.label}
+          </p>
+          <h1 className="mt-2 font-display text-display font-medium">The Hall Garden Cup</h1>
+          <p className="mt-4 text-lg text-ink-muted lg:text-xl">
+            Halls compete as teams, not individuals. Every measure is per m² or a rate, so a three-planter rooftop can
+            beat a big garden. Standings to {formatDate(anchor)}.
+          </p>
+          <p className="mt-2 text-sm text-demo">{DEMO_DATA_SHORT_NOTICE} Halls marked “Demo hall site” are invented gardens.</p>
+        </Reveal>
+      </PageHero>
 
       <section aria-labelledby="ranking-heading" className="mt-12">
         <h2 id="ranking-heading" className="font-display text-section font-medium">

@@ -2,8 +2,9 @@ import { useMemo } from 'react'
 import CropPlate from '../../components/learn/CropPlate'
 import Breadcrumbs from '../../components/layout/Breadcrumbs'
 import EmptyState from '../../components/ui/EmptyState'
+import PageHero from '../../components/ui/PageHero'
 import Reveal from '../../components/ui/Reveal'
-import { DEMO_DATA_SHORT_NOTICE, problemLog } from '../../data'
+import { DEMO_DATA_SHORT_NOTICE, problemLog, illustrations } from '../../data'
 import { useCrops } from '../../hooks/useCommunity'
 import { useLogs } from '../../hooks/useLogs'
 import { usePageTitle } from '../../hooks/usePageTitle'
@@ -30,26 +31,28 @@ export default function LearnPage() {
   return (
     <div className="mx-auto max-w-7xl px-4 py-5 lg:px-8 lg:py-10">
       <Breadcrumbs items={[{ label: 'Learn' }]} />
-      <div className="flex flex-wrap items-end justify-between gap-x-10 gap-y-4">
-        <div className="max-w-2xl">
-          <h1 className="font-display text-display font-medium">Learn to grow</h1>
-          <p className="mt-3 text-lg text-ink-muted">
-            Crops that do well on campus, easiest first. Each guide follows one plant from seed to harvest, with
-            what NTU’s gardens learnt along the way. <span className="text-demo">{DEMO_DATA_SHORT_NOTICE}</span>
-          </p>
+      <PageHero slot={illustrations.heroes.learn}>
+        <div className="flex flex-wrap items-end justify-between gap-x-10 gap-y-4">
+          <div className="max-w-2xl">
+            <h1 className="font-display text-display font-medium">Learn to grow</h1>
+            <p className="mt-3 text-lg text-ink-muted">
+              Crops that do well on campus, easiest first. Each guide follows one plant from seed to harvest, with
+              what NTU’s gardens learnt along the way. <span className="text-demo">{DEMO_DATA_SHORT_NOTICE}</span>
+            </p>
+          </div>
+          <nav aria-label="Crops" className="max-w-xl">
+            <ul className="flex flex-wrap gap-x-1 gap-y-0">
+              {library.map(({ crop }) => (
+                <li key={crop.id}>
+                  <a href={`#crop-${crop.id}`} className="inline-flex min-h-12 items-center px-2 font-semibold underline-offset-4 hover:underline">
+                    {crop.name}
+                  </a>
+                </li>
+              ))}
+            </ul>
+          </nav>
         </div>
-        <nav aria-label="Crops" className="max-w-xl">
-          <ul className="flex flex-wrap gap-x-1 gap-y-0">
-            {library.map(({ crop }) => (
-              <li key={crop.id}>
-                <a href={`#crop-${crop.id}`} className="inline-flex min-h-12 items-center px-2 font-semibold underline-offset-4 hover:underline">
-                  {crop.name}
-                </a>
-              </li>
-            ))}
-          </ul>
-        </nav>
-      </div>
+      </PageHero>
 
       {library.length === 0 ? (
         <div className="mt-10">

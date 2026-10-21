@@ -51,15 +51,15 @@ export default function TopNav() {
         </Link>
 
         <div className="flex items-center gap-2">
-          <nav aria-label="Main" className="hidden lg:block">
-            <ul className="flex items-center gap-2">
+          <nav aria-label="Main" className="hidden xl:block">
+            <ul className="flex items-center gap-1">
               {items.map(({ to, label, end }) => (
                 <li key={to}>
                   <NavLink
                     to={to}
                     end={end}
                     className={({ isActive }) =>
-                      `group relative flex min-h-12 items-center px-3 font-medium ${
+                      `group relative flex min-h-12 items-center px-2.5 font-medium whitespace-nowrap ${
                         isActive ? 'text-ink' : 'text-ink-muted hover:text-ink'
                       }`
                     }
@@ -69,7 +69,7 @@ export default function TopNav() {
                         {label}
                         {/* Underline slides in from the left on hover; stays put for the current page. */}
                         <span
-                          className={`absolute inset-x-3 bottom-2 h-0.5 origin-left bg-brand-700 transition-transform duration-300 ${
+                          className={`absolute inset-x-2.5 bottom-2 h-0.5 origin-left bg-brand-700 transition-transform duration-300 ${
                             isActive ? 'scale-x-100' : 'scale-x-0 group-hover:scale-x-100'
                           }`}
                           aria-hidden
@@ -83,7 +83,7 @@ export default function TopNav() {
                 <li className="ml-2">
                   <Link
                     to={paths.workspace}
-                    className="inline-flex min-h-12 items-center rounded-sm bg-accent px-4 font-semibold text-white transition-transform hover:-translate-y-0.5 hover:bg-accent-strong active:translate-y-0"
+                    className="inline-flex min-h-12 items-center rounded-sm bg-accent px-4 font-semibold whitespace-nowrap text-white transition-transform hover:-translate-y-0.5 hover:bg-accent-strong active:translate-y-0"
                   >
                     Open workspace
                   </Link>

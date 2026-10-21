@@ -22,9 +22,16 @@ export interface PhotoCredit {
   changes: string
 }
 
+/** Credit shown on AI-made illustrations (made by the project team, see docs/IMAGE_PROMPTS.md). */
+export const AI_CREDIT = 'AI illustration'
+
 export interface ImageSlot {
   /** Path under public/ */
   src: string
+  /** 'illustration': a drawn image (AI-made slots are listed in docs/IMAGE_PROMPTS.md). Default 'photo'. */
+  kind?: 'photo' | 'illustration'
+  /** Made with an AI image tool: always credited "AI illustration" */
+  aiGenerated?: boolean
   /** Describes the photo; used as alt text, and as the placeholder's label */
   alt: string
   width: number
@@ -33,8 +40,8 @@ export interface ImageSlot {
   focus?: string
   /** Shown as a small "Representative photo" label: not the actual site or activity */
   representative?: boolean
-  /** Present when the photo is someone else's licensed work */
-  credit?: PhotoCredit
+  /** Someone else's licensed work, or "AI illustration" for AI-made illustrations */
+  credit?: PhotoCredit | typeof AI_CREDIT
 }
 
 export interface VideoSlot {
@@ -324,6 +331,49 @@ export const learnImages: Partial<Record<CropId, ImageSlot>> = {
   },
 }
 
+/* ------------------------------------------------------------------ */
+/* AI illustrations (made by the team; prompts in docs/IMAGE_PROMPTS.md) */
+/* ------------------------------------------------------------------ */
+
+const ILLUSTRATION_DIR = '/images/illustrations'
+
+function illustration(path: string, alt: string, width: number, height: number): ImageSlot {
+  return { src: `${ILLUSTRATION_DIR}/${path}`, alt, width, height, kind: 'illustration', aiGenerated: true, credit: AI_CREDIT }
+}
+
+/**
+ * Slots for AI illustrations. Drop a PNG or JPG with the slot's name (any of .png/.jpg/.jpeg/.webp) into
+ * public/images/illustrations/… and it is served as resized WebP. Until then each one falls back to the
+ * SVG drawing or simply isn't shown: never a broken image.
+ */
+export const illustrations = {
+  /** Header of each crop's plate on /learn (falls back to the SVG drawing) */
+  learnCrops: {
+    basil: illustration('learn/basil.png', 'Botanical illustration of a Thai basil plant with purple flower spikes', 1600, 2000),
+    mint: illustration('learn/mint.png', 'Botanical illustration of a spreading mint plant with runners', 1600, 2000),
+    lemongrass: illustration('learn/lemongrass.png', 'Botanical illustration of a lemongrass clump with pale stalks', 1600, 2000),
+    pandan: illustration('learn/pandan.png', 'Botanical illustration of a pandan rosette with long glossy leaves', 1600, 2000),
+    'chilli-padi': illustration('learn/chilli-padi.png', 'Botanical illustration of a chilli padi shrub with small upright red chillies', 1600, 2000),
+    turmeric: illustration('learn/turmeric.png', 'Botanical illustration of a turmeric plant with broad leaves and orange rhizomes', 1600, 2000),
+    kangkong: illustration('learn/kangkong.png', 'Botanical illustration of kangkong with arrow-shaped leaves on hollow stems', 1600, 2000),
+  } as Record<CropId, ImageSlot>,
+  /** Page headers (not shown until the file exists) */
+  heroes: {
+    learn: illustration('hero/learn.png', 'Illustration of seedlings growing in a row of pots, from seed to harvest', 1600, 1200),
+    join: illustration('hero/join.png', 'Illustration of garden tools, gloves and a watering can beside a raised herb bed', 1600, 1200),
+    hallCup: illustration('hero/hall-cup.png', 'Illustration of a trophy-shaped planter overflowing with herbs', 1600, 1200),
+    getInvolved: illustration('hero/get-involved.png', 'Illustration of a harvest basket, a calendar card and secateurs on a potting bench', 1600, 1200),
+    startGarden: illustration('hero/start-a-garden.png', 'Illustration of an empty corridor ledge turned into a row of planter boxes', 1600, 1200),
+  },
+  /** Small pictures in empty states (fall back to the plain empty-state icon) */
+  empty: {
+    tasks: illustration('empty/no-tasks.png', 'Illustration of a clipboard with a blank task list leaning on a pot', 800, 800),
+    ready: illustration('empty/nothing-ready.png', 'Illustration of a small seedling in a pot, not ready yet', 800, 800),
+    gardens: illustration('empty/no-gardens.png', 'Illustration of an empty seed tray waiting for its first seeds', 800, 800),
+    notFound: illustration('empty/not-found.png', 'Illustration of a garden path that ends at a closed wooden gate', 800, 800),
+  },
+} satisfies Record<string, Record<string, ImageSlot>>
+
 /** Every slot, for the Photo credits page. */
 export const allImageSlots: { use: string; slot: ImageSlot }[] = [
   { use: 'Explore page header', slot: exploreHeroImage },
@@ -339,4 +389,14 @@ export const allImageSlots: { use: string; slot: ImageSlot }[] = [
   ...Object.entries(learnImages).flatMap(([cropId, slot]) =>
     slot ? [{ use: `Learn: ${cropId.replace('-', ' ')} when ready`, slot }] : [],
   ),
+  ...Object.entries(illustrations.learnCrops).map(([cropId, slot]) => ({ use: `Learn: ${cropId.replace('-', ' ')} plate`, slot })),
+  { use: 'Learn page header', slot: illustrations.heroes.learn },
+  { use: 'Join page header', slot: illustrations.heroes.join },
+  { use: 'Hall Garden Cup header', slot: illustrations.heroes.hallCup },
+  { use: 'Get involved header', slot: illustrations.heroes.getInvolved },
+  { use: 'Start a hall garden header', slot: illustrations.heroes.startGarden },
+  { use: 'Empty state: no tasks', slot: illustrations.empty.tasks },
+  { use: 'Empty state: nothing ready', slot: illustrations.empty.ready },
+  { use: 'Empty state: no gardens joined', slot: illustrations.empty.gardens },
+  { use: 'Page not found', slot: illustrations.empty.notFound },
 ]

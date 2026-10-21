@@ -48,9 +48,26 @@ const assets = new Map<string, ImageAsset>(
   ]),
 )
 
-/** The processed image for a public path like "/images/sites/hall-12-herb-spice.jpg", if the file exists. */
+const EXTENSIONS = ['.jpg', '.jpeg', '.png', '.webp']
+
+/**
+ * The processed image for a public path like "/images/sites/hall-12-herb-spice.jpg", if the file exists.
+ * The extension is a hint: "basil.png" also finds basil.jpg, .jpeg or .webp, so any of them can be dropped in.
+ */
 export function imageAsset(publicPath: string): ImageAsset | undefined {
-  return assets.get(publicPath)
+  const exact = assets.get(publicPath)
+  if (exact) return exact
+  const base = publicPath.replace(/\.(jpe?g|png|webp)$/i, '')
+  for (const ext of EXTENSIONS) {
+    const hit = assets.get(base + ext) ?? assets.get(base + ext.toUpperCase())
+    if (hit) return hit
+  }
+  return undefined
+}
+
+/** True when the slot's file is in place (so layouts can make room for an illustration). */
+export function hasIllustration(slot: { src: string }): boolean {
+  return Boolean(imageAsset(slot.src))
 }
 
 const videos = import.meta.glob<string>('../../public/images/**/*.{mp4,webm}', {

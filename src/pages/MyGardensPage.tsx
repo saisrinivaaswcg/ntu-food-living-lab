@@ -8,7 +8,7 @@ import Field from '../components/log/Field'
 import SelectField from '../components/log/SelectField'
 import ConfirmDialog from '../components/ui/ConfirmDialog'
 import EmptyState from '../components/ui/EmptyState'
-import { contactMethodOptions, halls, JOIN_PRIVACY_NOTE, NO_HALL } from '../data'
+import { contactMethodOptions, halls, illustrations, JOIN_PRIVACY_NOTE, NO_HALL } from '../data'
 import { useCommunity } from '../hooks/useCommunity'
 import { usePageTitle } from '../hooks/usePageTitle'
 import { communityFor, nextWorkday, roleTitle } from '../lib/community'
@@ -50,7 +50,7 @@ export default function MyGardensPage() {
 
       {!profile ? (
         <div className="mt-10 max-w-2xl">
-          <EmptyState title="You haven’t joined a garden yet" detail="Join a community and your gardens, workdays and slots show up here." />
+          <EmptyState illustration={illustrations.empty.gardens} title="You haven’t joined a garden yet" detail="Join a community and your gardens, workdays and slots show up here." />
           <Link to={paths.join} className="group mt-5 inline-flex min-h-12 items-center gap-1.5 rounded-sm bg-accent px-5 font-semibold text-white hover:bg-accent-strong">
             Find a garden
             <ArrowRight className="size-4 transition-transform group-hover:translate-x-0.5" aria-hidden />

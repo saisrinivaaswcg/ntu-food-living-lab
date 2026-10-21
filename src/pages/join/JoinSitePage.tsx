@@ -7,7 +7,7 @@ import TaskRow from '../../components/community/TaskRow'
 import Breadcrumbs from '../../components/layout/Breadcrumbs'
 import CropChips from '../../components/ui/CropChips'
 import EmptyState from '../../components/ui/EmptyState'
-import { DEMO_DATA_SHORT_NOTICE, pickPolicyOptions } from '../../data'
+import { DEMO_DATA_SHORT_NOTICE, illustrations, pickPolicyOptions } from '../../data'
 import { useCommunity } from '../../hooks/useCommunity'
 import { useLogs } from '../../hooks/useLogs'
 import { usePageTitle } from '../../hooks/usePageTitle'
@@ -161,7 +161,7 @@ export default function JoinSitePage() {
             <p className="mt-1 text-ink-muted">Claim a slot: someone from the committee shows you how on the day.</p>
             {beginnerTasks.length === 0 ? (
               <div className="mt-4">
-                <EmptyState title="No beginner tasks posted right now" detail="Come to a workday instead; they’re open to everyone." />
+                <EmptyState illustration={illustrations.empty.tasks} title="No beginner tasks posted right now" detail="Come to a workday instead; they’re open to everyone." />
               </div>
             ) : (
               <div className="mt-4 border-t border-ink">
