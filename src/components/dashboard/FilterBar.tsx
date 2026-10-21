@@ -1,5 +1,5 @@
 import { Download } from 'lucide-react'
-import { sites } from '../../data'
+import { getSites } from '../../lib/siteRegistry'
 import { inputClass } from '../../lib/forms'
 import type { PeriodKey, SiteFilter } from '../../lib/metrics'
 import { PERIOD_LABELS } from './periods'
@@ -71,7 +71,7 @@ export default function FilterBar({
           className={inputClass}
         >
           <option value="all">All sites</option>
-          {sites.map((s) => (
+          {getSites().map((s) => (
             <option key={s.id} value={s.id}>
               {s.name}
             </option>

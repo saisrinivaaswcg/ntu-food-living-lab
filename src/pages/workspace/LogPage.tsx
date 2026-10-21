@@ -1,32 +1,26 @@
 import { ArrowRight } from 'lucide-react'
 import { useMemo } from 'react'
 import { Link } from 'react-router-dom'
-import RoleGate from '../components/access/RoleGate'
-import FormIllustration from '../components/illustrations/FormIllustration'
-import Breadcrumbs from '../components/layout/Breadcrumbs'
-import { logFormKinds } from '../components/log/logFormKinds'
-import LogOverviewStrip from '../components/log/LogOverviewStrip'
-import ReadySoonCard from '../components/log/ReadySoonCard'
-import RecentEntries from '../components/log/RecentEntries'
-import SlotImage from '../components/ui/SlotImage'
-import { useLogs } from '../hooks/useLogs'
-import { useRole } from '../hooks/useCommunity'
-import { usePageTitle } from '../hooks/usePageTitle'
-import { growthAsOf, logOverview, readySoon } from '../lib/metrics'
-import { editableSites } from '../lib/roles'
+import FormIllustration from '../../components/illustrations/FormIllustration'
+import Breadcrumbs from '../../components/layout/Breadcrumbs'
+import { logFormKinds } from '../../components/log/logFormKinds'
+import LogOverviewStrip from '../../components/log/LogOverviewStrip'
+import ReadySoonCard from '../../components/log/ReadySoonCard'
+import RecentEntries from '../../components/log/RecentEntries'
+import SlotImage from '../../components/ui/SlotImage'
+import { useLogs } from '../../hooks/useLogs'
+import { useRole } from '../../hooks/useCommunity'
+import { usePageTitle } from '../../hooks/usePageTitle'
+import { growthAsOf, logOverview, readySoon } from '../../lib/metrics'
+import { paths } from '../../lib/paths'
+import { editableSites } from '../../lib/roles'
 
 export default function LogPage() {
   usePageTitle('Log')
   return (
     <div className="mx-auto max-w-5xl px-4 py-5 lg:px-8 lg:py-10">
       <Breadcrumbs items={[{ label: 'Log' }]} />
-      <RoleGate
-        allow={['committee', 'admin']}
-        what="The Log"
-        why="Harvests, plantings, weekly inputs and plant losses are logged by each site's committee."
-      >
-        <LogHome />
-      </RoleGate>
+      <LogHome />
     </div>
   )
 }
@@ -43,7 +37,7 @@ function LogHome() {
 
   return (
     <>
-      <h1 className="font-display text-display font-medium">What are you logging?</h1>
+      <h1 className="font-display text-3xl font-medium lg:text-5xl">What are you logging?</h1>
       <p className="mt-3 max-w-2xl text-lg text-ink-muted">
         Every site uses the same four forms, so the numbers can be compared.
       </p>
@@ -73,7 +67,7 @@ function LogHome() {
           Log forms
         </h2>
         <Link
-          to={`/log/${harvest.slug}`}
+          to={paths.log(harvest.slug)}
           className="group relative grid overflow-hidden rounded-3xl bg-brand-900 text-white shadow-float transition-transform duration-200 hover:-translate-y-0.5 active:translate-y-0 sm:grid-cols-2"
         >
           <span className="relative block aspect-[16/9] sm:aspect-auto sm:min-h-72">
@@ -94,7 +88,7 @@ function LogHome() {
           {others.map(({ slug, title, description, image }) => (
             <li key={slug}>
               <Link
-                to={`/log/${slug}`}
+                to={paths.log(slug)}
                 className="group flex h-full flex-col overflow-hidden rounded-3xl bg-surface shadow-card transition-transform duration-200 hover:-translate-y-0.5 active:translate-y-0"
               >
                 <span className="relative block aspect-[16/9]">

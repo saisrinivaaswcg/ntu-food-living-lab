@@ -27,6 +27,8 @@ Controls a role can't use are hidden. A workspace page opened by the wrong role 
 
 **Bare:** `/live` big-screen board. `?showcase=1` on any page turns on showcase mode.
 
+**Workspace home** (`/workspace`): quick log buttons, the last four weeks (weekly logs done, kg harvested, beds ready, last harvest), beds ready soon and weekly logs missing. Admin also sees every site's status and completeness, and **Reset demo data** (with a confirmation).
+
 **Redirects:** `/log/*` → `/workspace/log/*` · `/dashboard/*` → `/workspace/dashboard/*` (query kept) · `/sites/:id?tab=handover` → `/workspace/sites/:id/handover` · `/log/failure` → `/workspace/log/losses`.
 
 ## Sites
@@ -50,7 +52,7 @@ Crops (controlled list): Thai basil, mint, lemongrass, pandan, chilli padi, turm
 - A list of the four sites under or beside the map, so the page works without using the map (keyboard and screen-reader friendly). Selecting a site in the list opens the same panel and pans the map.
 - Panel can be closed (close button + Escape).
 
-## 2. Log (`/log`, `/log/:kind`)
+## 2. Log (`/workspace/log`, `/workspace/log/:kind`) — committee workspace
 
 Four forms with an identical structure across sites. Site and crop are always dropdowns/buttons (controlled vocabulary); free text only in description/notes fields. Submissions save to localStorage via `addLog` and appear immediately on the Dashboard.
 
@@ -74,7 +76,9 @@ Four forms with an identical structure across sites. Site and crop are always dr
 - After saving: confirmation with a summary, **Undo** (calls `removeUserLog`), **Log another harvest** (keeps site), and **View dashboard**.
 - No page-level scrolling needed on a 390×844 phone except to reach notes.
 
-## 3. Dashboard (`/dashboard`) — public, open to anyone
+## 3. Dashboards (`/workspace/dashboard`) — committee workspace
+
+A committee sees its own site by default and can switch the site filter to any other site (dashboards are read-only). Admin sees all sites.
 
 Controls: period (last 4 weeks / last 3 months / all), site filter (all or one), demo-data toggle. Every block shows an empty state when there is no data.
 
@@ -87,9 +91,9 @@ Controls: period (last 4 weeks / last 3 months / all), site filter (all or one),
 - **CSV export** of the raw harvest log (respects the current filters): `id, date, site, bed, crop, weight_kg, destination, labour_hours, has_photo, notes, source`. Photos are not exported.
 - **Inter-hall challenge leaderboard:** ranks sites on a blended score, not yield alone. Show each component so the ranking is transparent.
 
-### Harvest and Planting dashboards (`/dashboard/harvest`, `/dashboard/planting`)
+### Harvest and Planting dashboards (`/workspace/dashboard/harvest`, `/workspace/dashboard/planting`)
 
-Tabs beside the Overview (`/dashboard`). Period and site filters are shared through the URL.
+Tabs beside the Overview (`/workspace/dashboard`). Period and site filters are shared through the URL.
 
 - **Harvest:** headline (total kg, number of harvests, kg per m², top crop); kg per week by site (small multiples on a shared scale); kg by crop; where the harvest went (destination); a gallery of harvest photos (select to enlarge); a sortable recent-harvests table with photo thumbnails; CSV export.
 - **Planting:** headline (plants in the ground now, plantings this period, survival rate, beds in use); a bed-by-bed view per site of what is growing now; plantings per week; survival rate by crop; propagation method breakdown; median days from planting to first harvest by crop against the crop's typical days; expected upcoming first harvests; losses by cause; a sortable recent-plantings table; CSV export (`id, date, site, bed, crop, quantity, propagation, notes, source`).
@@ -97,14 +101,14 @@ Tabs beside the Overview (`/dashboard`). Period and site filters are shared thro
 
 ## 4. Sites (`/sites`, `/sites/:siteId`)
 
-`/sites` lists the four sites as cards. Each site page has two tabs:
+`/sites` lists the sites. Each public site page shows what's growing, the beds, the bed map, growth timelines and the site's Knowledge. Committee members of that site (and Admin) also see links to **Manage site** and **Handover** in the workspace.
 
 ### Knowledge
 - **Crop cards** — what grew here, yield range (computed from that site's harvest logs: per-harvest min–max kg and total kg), problems hit, what fixed them (from `cropNotes`). Crops with harvests but no notes still get a card.
 - **Problem log** — searchable (title, symptoms, action, tags) and filterable by crop, cause and status (open/resolved).
 - **Shared protocols** — food safety, harvest handling, pest response (`protocols`), shown as expandable sections.
 
-### Handover
+### Handover (`/workspace/sites/:siteId/handover`)
 - From the latest handover record: current leads (incoming leads), site status, open issues (by priority), contacts, lessons learnt.
 - **Handover checklist** — interactive; ticks persist in localStorage per handover record, with a progress count.
 - **History** — previous handover records stay visible as a list (newest first), each expandable to show its full details.
@@ -114,7 +118,7 @@ Tabs beside the Overview (`/dashboard`). Period and site filters are shared thro
 ### Editing and site setup
 
 - **Recent entries** on the Log page: every record (harvest, planting, weekly inputs, losses) can be edited or deleted (with Undo). Demo records are changed through overrides on this device, with Reset per entry and for all. Edited entries show an “Edited” marker. Dashboards update immediately.
-- **Beds & plants** on each site page (site setup, not inventory tracking): add or remove beds, edit each bed's name and area (m²), and set the crop and plant count in each bed. Saved on this device as overrides with “Reset to original values”. A site's area becomes the sum of its bed areas; a bed's crop and plant count become a setup record dated at the latest log, so beds in use, plants in the ground, survival and kg per m² follow immediately. Setup records are not plantings: they are left out of planting activity, tables and CSV.
+- **Beds & plants** in the workspace's Manage site (`/workspace/sites/:siteId/manage`; site setup, not inventory tracking): add or remove beds, edit each bed's name and area (m²), and set the crop and plant count in each bed. Saved on this device as overrides with “Reset to original values”. A site's area becomes the sum of its bed areas; a bed's crop and plant count become a setup record dated at the latest log, so beds in use, plants in the ground, survival and kg per m² follow immediately. Setup records are not plantings: they are left out of planting activity, tables and CSV.
 
 ## Metric definitions
 

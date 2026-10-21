@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom'
 import { formatShortDate } from '../../lib/dates'
 import { cropName, siteName } from '../../lib/lookups'
 import type { GrowthTimeline } from '../../lib/metrics'
+import { harvestFormFor } from '../../lib/paths'
 import PlantSprite from '../illustrations/PlantSprite'
 
 function when(t: GrowthTimeline): string {
@@ -17,7 +18,7 @@ function when(t: GrowthTimeline): string {
 export default function ReadySoonCard({ timeline: t }: { timeline: GrowthTimeline }) {
   const planting = t.status.planting
   if (!planting) return null
-  const href = `/log/harvest?site=${t.siteId}&bed=${encodeURIComponent(t.status.bed.id)}&crop=${planting.cropId}`
+  const href = harvestFormFor(t.siteId, t.status.bed.id, planting.cropId)
   return (
     <Link
       to={href}

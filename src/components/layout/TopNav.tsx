@@ -3,6 +3,7 @@ import { useMotionValueEvent, useScroll } from 'motion/react'
 import { useState } from 'react'
 import { Link, NavLink } from 'react-router-dom'
 import { useRole } from '../../hooks/useCommunity'
+import { paths } from '../../lib/paths'
 import { usesWorkspace } from '../../lib/roles'
 import RolePill from '../access/RolePill'
 import { navItems } from './navItems'
@@ -16,7 +17,8 @@ export default function TopNav() {
   const [scrolled, setScrolled] = useState(false)
   const role = useRole()
   const loggers = usesWorkspace(role)
-  const items = navItems.filter((item) => !item.workspace || loggers)
+  // The workspace gets a button of its own on the right.
+  const items = navItems.filter((item) => !item.workspace)
   // Motion value, not a scroll listener: React state changes only when the threshold is crossed.
   useMotionValueEvent(scrollY, 'change', (y) => {
     const next = y > 24
@@ -30,7 +32,7 @@ export default function TopNav() {
         aria-hidden
       />
       <div className="relative mx-auto flex h-14 max-w-7xl items-center justify-between gap-4 px-4 lg:h-16 lg:px-8">
-        <Link to="/" className="group flex min-h-12 items-center gap-2.5 text-ink">
+        <Link to="/" className="group flex min-h-12 min-w-0 items-center gap-2 text-ink min-[400px]:gap-2.5">
           <span
             className={`flex size-9 items-center justify-center rounded-sm bg-brand-700 text-white transition-transform duration-300 group-hover:-rotate-6 ${
               scrolled ? 'scale-90' : 'scale-100'
@@ -39,7 +41,7 @@ export default function TopNav() {
             <Leaf className="size-5" aria-hidden />
           </span>
           <span className="leading-tight">
-            <span className="font-display text-base font-medium whitespace-nowrap min-[400px]:text-lg">NTU Food Living Lab</span>
+            <span className="font-display text-[15px] font-medium whitespace-nowrap min-[400px]:text-lg">NTU Food Living Lab</span>
             <span
               className={`hidden text-xs text-ink-muted transition-opacity duration-300 sm:block ${scrolled ? 'opacity-0' : 'opacity-100'}`}
             >
@@ -80,10 +82,10 @@ export default function TopNav() {
               {loggers && (
                 <li className="ml-2">
                   <Link
-                    to="/log/harvest"
+                    to={paths.workspace}
                     className="inline-flex min-h-12 items-center rounded-sm bg-accent px-4 font-semibold text-white transition-transform hover:-translate-y-0.5 hover:bg-accent-strong active:translate-y-0"
                   >
-                    Log a harvest
+                    Open workspace
                   </Link>
                 </li>
               )}

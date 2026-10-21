@@ -17,7 +17,7 @@ export interface LogFormKind {
   Form: ComponentType
 }
 
-/** The four forms, in the order the Log page offers them. URL: /log/:slug */
+/** The four forms, in the order the Log page offers them. URL: /workspace/log/:slug */
 export const logFormKinds: LogFormKind[] = [
   {
     slug: 'harvest',

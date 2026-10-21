@@ -1,5 +1,6 @@
 import { useLocation } from 'react-router-dom'
 import { setShowDemoData } from '../../lib/logStore'
+import { paths } from '../../lib/paths'
 import type { DashboardScope } from '../../hooks/useDashboard'
 import Breadcrumbs from '../layout/Breadcrumbs'
 import DashboardNav from './DashboardNav'
@@ -23,20 +24,20 @@ export default function DashboardHeader({ dash, crumb, headline, onExport, expor
   return (
     <>
       <Breadcrumbs
-        items={crumb ? [{ label: 'Dashboard', to: `/dashboard${search}` }, { label: crumb }] : [{ label: 'Dashboard' }]}
+        items={crumb ? [{ label: 'Dashboards', to: `${paths.dashboard()}${search}` }, { label: crumb }] : [{ label: 'Dashboards' }]}
         className="mb-2"
       />
       <DashboardNav />
 
       <header className="mt-8 max-w-4xl">
-        <h1 className="font-display text-display font-medium">{`${headline}.`}</h1>
+        <h1 className="font-display text-3xl font-medium lg:text-5xl">{`${headline}.`}</h1>
         <p className="mt-3 max-w-2xl text-ink-muted lg:text-lg">
           {dash.hasAnyLogs ? (
             <>
               {dash.periodLabel}, {dash.scope}: {dash.rangeText}. Periods end on the latest log, not today.{demoNote}
             </>
           ) : (
-            'Open to anyone. Every number comes from the logs at the four sites.'
+            'Every number comes from the logs at the sites.'
           )}
         </p>
       </header>

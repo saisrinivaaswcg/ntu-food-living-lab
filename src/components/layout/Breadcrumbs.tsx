@@ -1,5 +1,6 @@
 import { ChevronRight } from 'lucide-react'
-import { Link } from 'react-router-dom'
+import { Link, useLocation } from 'react-router-dom'
+import { paths } from '../../lib/paths'
 
 export interface Crumb {
   label: string
@@ -15,9 +16,11 @@ interface Props {
   onDark?: boolean
 }
 
-/** Trail starting at Explore. Pass the crumbs below the top level. */
+/** Trail starting at Explore (or at Workspace inside the workspace). Pass the crumbs below the top level. */
 export default function Breadcrumbs({ items, className = 'mb-4', onDark = false }: Props) {
-  const trail: Crumb[] = [{ label: 'Explore', to: '/' }, ...items]
+  const inWorkspace = useLocation().pathname.startsWith(paths.workspace)
+  const root: Crumb = inWorkspace ? { label: 'Workspace', to: paths.workspace } : { label: 'Explore', to: paths.explore }
+  const trail: Crumb[] = [root, ...items]
   return (
     <nav aria-label="Breadcrumb" className={className}>
       <ol className={`flex flex-wrap items-center gap-x-1 text-sm ${onDark ? 'text-white/85' : 'text-ink-muted'}`}>

@@ -36,7 +36,7 @@ No backend, no real auth, no database: everything a visitor does is saved in thi
 4. [x] Dashboard
 5. [x] Sites — Knowledge and Handover sections
 6. [x] Access and demo roles — `/login`, "Viewing as" pill, role store
-7. [ ] Two sides — public shell and committee workspace with sidebar; old URLs redirect
+7. [x] Two sides — public shell and committee workspace with sidebar; old URLs redirect
 8. [ ] Learn to grow — `/learn`, `/learn/:cropId` scroll journeys (scroll-craft rules; working files in `docs/scrollcraft/`)
 9. [ ] Join a community — `/join`, `/join/:siteId`, My gardens
 10. [ ] Get involved — help wanted, ready to pick, bed pages, printable QR cards

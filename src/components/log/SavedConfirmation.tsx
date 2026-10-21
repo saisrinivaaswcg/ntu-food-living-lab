@@ -2,6 +2,7 @@ import { BarChart3, CircleCheck, Plus, Undo2 } from 'lucide-react'
 import { motion, useReducedMotion } from 'motion/react'
 import { useEffect, useRef } from 'react'
 import { Link } from 'react-router-dom'
+import { paths } from '../../lib/paths'
 import { jumpToTop } from '../../lib/smoothScroll'
 
 interface Props {
@@ -72,7 +73,7 @@ export default function SavedConfirmation({ title, rows, photoUrl, anotherLabel,
             Undo
           </button>
           <Link
-            to="/dashboard"
+            to={paths.dashboard()}
             className="flex min-h-12 items-center justify-center gap-2 rounded-full border border-line-strong px-3 font-semibold text-ink transition-colors hover:bg-sunken"
           >
             <BarChart3 className="size-4" aria-hidden />

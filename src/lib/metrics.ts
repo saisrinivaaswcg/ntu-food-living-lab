@@ -1075,3 +1075,50 @@ export function bedHistory(logs: LogCollections, bedId: string, asOf: ISODate): 
     recentLoss: losses.some((f) => f.date <= asOf && daysBetween(f.date, asOf) <= 14 && netLoss(f) > 0),
   }
 }
+
+/* ------------------------------------------------------------------ */
+/* Workspace: today at a site                                          */
+/* ------------------------------------------------------------------ */
+
+export interface WorkspaceSummary {
+  /** The last four complete weeks (Mondays, oldest first) */
+  weeks: ISODate[]
+  completeness: Completeness
+  /** Harvested from the first of those weeks up to the anchor date */
+  harvestKg: number
+  harvests: number
+  /** Site-weeks in those four weeks with no weekly-inputs record, newest first */
+  missingWeeks: { siteId: SiteId; weekStart: ISODate }[]
+  /** Latest date anything was logged, by site (null when nothing) */
+  lastLogBySite: Map<SiteId, ISODate | null>
+}
+
+/** What a committee (or Admin, for all sites) needs to see first in the workspace. */
+export function workspaceSummary(logs: LogCollections, siteIds: SiteId[], anchor: ISODate): WorkspaceSummary {
+  const weeks = lastCompleteWeeks(anchor, 4)
+  const completeness = computeCompleteness(logs.weeklyInputs, siteIds, weeks)
+  const inScope = (id: SiteId) => siteIds.includes(id)
+  const harvests = logs.harvests.filter((h) => inScope(h.siteId) && h.date >= weeks[0] && h.date <= anchor)
+  const missingWeeks = completeness.bySite
+    .flatMap((s) => s.weeks.filter((w) => !w.logged).map((w) => ({ siteId: s.siteId, weekStart: w.weekStart })))
+    .sort((a, b) => b.weekStart.localeCompare(a.weekStart))
+  const lastLogBySite = new Map(
+    siteIds.map((id) => {
+      const own: LogCollections = {
+        plantings: logs.plantings.filter((p) => p.siteId === id && p.source !== 'setup'),
+        harvests: logs.harvests.filter((h) => h.siteId === id),
+        weeklyInputs: logs.weeklyInputs.filter((w) => w.siteId === id),
+        failures: logs.failures.filter((f) => f.siteId === id),
+      }
+      return [id, latestLogDate(own)] as const
+    }),
+  )
+  return {
+    weeks,
+    completeness,
+    harvestKg: sum(harvests.map((h) => h.weightKg)),
+    harvests: harvests.length,
+    missingWeeks,
+    lastLogBySite,
+  }
+}

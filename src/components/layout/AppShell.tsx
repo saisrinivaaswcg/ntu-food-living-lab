@@ -1,8 +1,8 @@
 import { motion } from 'motion/react'
 import { Suspense, useLayoutEffect, useState } from 'react'
 import { Outlet, useLocation } from 'react-router-dom'
-import { Toaster } from 'sonner'
 import { jumpToTop } from '../../lib/smoothScroll'
+import AppToaster from './AppToaster'
 import BottomNav from './BottomNav'
 import DemoBanner from './DemoBanner'
 import Footer from './Footer'
@@ -11,8 +11,6 @@ import TopNav from './TopNav'
 
 export default function AppShell() {
   const { pathname, state } = useLocation()
-  // Log pages are used outdoors against the clock: keep their transition short.
-  const quick = pathname.startsWith('/log')
   // Links that use a view transition (Sites → site page) animate through it, not this fade.
   const viaTransition = (state as { viaTransition?: boolean } | null)?.viaTransition === true
   // No fade on the very first page: it would hold back the first paint (and LCP) for nothing.
@@ -44,7 +42,7 @@ export default function AppShell() {
             key={pathname}
             initial={fade ? { opacity: 0 } : false}
             animate={{ opacity: 1 }}
-            transition={{ duration: quick ? 0.15 : 0.4, ease: 'easeOut' }}
+            transition={{ duration: 0.4, ease: 'easeOut' }}
           >
             <Outlet />
           </motion.div>
@@ -52,19 +50,7 @@ export default function AppShell() {
       </main>
       <Footer />
       <BottomNav />
-      {/* Save, undo and export confirmations. Sits above the phone tab bar. */}
-      <Toaster
-        position="bottom-center"
-        offset={24}
-        mobileOffset={{ bottom: 'calc(4.5rem + env(safe-area-inset-bottom))' }}
-        toastOptions={{
-          classNames: {
-            toast: '!rounded-2xl !border-0 !bg-ink !text-canvas !shadow-float !font-sans',
-            description: '!text-canvas/80',
-            icon: '!text-brand-200',
-          },
-        }}
-      />
+      <AppToaster />
     </div>
   )
 }

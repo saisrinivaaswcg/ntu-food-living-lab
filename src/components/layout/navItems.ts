@@ -1,4 +1,5 @@
-import { BarChart3, ClipboardPen, Map, Sprout, type LucideIcon } from 'lucide-react'
+import { LayoutDashboard, Map, Sprout, type LucideIcon } from 'lucide-react'
+import { paths } from '../../lib/paths'
 
 export interface NavItem {
   to: string
@@ -10,9 +11,9 @@ export interface NavItem {
   workspace?: boolean
 }
 
+/** The public side's main links. Add a page here when it exists, never before (no dead links). */
 export const navItems: NavItem[] = [
-  { to: '/', label: 'Explore', icon: Map, end: true },
-  { to: '/log', label: 'Log', icon: ClipboardPen, workspace: true },
-  { to: '/dashboard', label: 'Dashboard', icon: BarChart3 },
-  { to: '/sites', label: 'Sites', icon: Sprout },
+  { to: paths.explore, label: 'Explore', icon: Map, end: true },
+  { to: paths.sites, label: 'Sites', icon: Sprout },
+  { to: paths.workspace, label: 'Workspace', icon: LayoutDashboard, workspace: true },
 ]

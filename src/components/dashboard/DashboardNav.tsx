@@ -1,9 +1,10 @@
 import { NavLink, useLocation } from 'react-router-dom'
+import { paths } from '../../lib/paths'
 
 const TABS = [
-  { to: '/dashboard', label: 'Overview', end: true },
-  { to: '/dashboard/harvest', label: 'Harvest', end: false },
-  { to: '/dashboard/planting', label: 'Planting', end: false },
+  { to: paths.dashboard(), label: 'Overview', end: true },
+  { to: paths.dashboard('harvest'), label: 'Harvest', end: false },
+  { to: paths.dashboard('planting'), label: 'Planting', end: false },
 ]
 
 /** Links between the three dashboards. The query string (period, site) travels with them. */

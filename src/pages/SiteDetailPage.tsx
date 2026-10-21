@@ -1,48 +1,42 @@
 import { useMemo } from 'react'
-import { useParams, useSearchParams } from 'react-router-dom'
-import HandoverTab from '../components/sites/HandoverTab'
+import { Handshake, Shovel } from 'lucide-react'
+import { Link, Navigate, useParams, useSearchParams } from 'react-router-dom'
+import BedList from '../components/sites/BedList'
 import KnowledgeTab from '../components/sites/KnowledgeTab'
 import BedMap from '../components/sites/BedMap'
 import GrowthTimeline from '../components/sites/GrowthTimeline'
 import SiteHero from '../components/sites/SiteHero'
-import SiteSetupEditor from '../components/sites/SiteSetupEditor'
-import SiteTabs from '../components/sites/SiteTabs'
-import { SITE_TABS, panelId, tabId, type SiteTab } from '../components/sites/siteTabItems'
 import CropChips from '../components/ui/CropChips'
 import Reveal from '../components/ui/Reveal'
 import { DEMO_DATA_SHORT_NOTICE } from '../data'
 import { useRole } from '../hooks/useCommunity'
 import { useLogs } from '../hooks/useLogs'
 import { usePageTitle } from '../hooks/usePageTitle'
-import { formatDate } from '../lib/dates'
-import { cropName, findSite } from '../lib/lookups'
-import { bedStatuses, cropsCurrentlyGrowing, growthAsOf, growthTimelines, latestLogDate } from '../lib/metrics'
-import { todayISO } from '../lib/dates'
+import { findSite } from '../lib/lookups'
+import { cropsCurrentlyGrowing, growthAsOf, growthTimelines } from '../lib/metrics'
+import { paths } from '../lib/paths'
 import { canEditSite } from '../lib/roles'
 import NotFoundPage from './NotFoundPage'
 
 export default function SiteDetailPage() {
   const { siteId } = useParams()
-  const [searchParams, setSearchParams] = useSearchParams()
-  // The tab lives in the URL so it can be linked to and survives a reload.
-  const tab: SiteTab = SITE_TABS.find((t) => t.id === searchParams.get('tab'))?.id ?? 'knowledge'
-  function selectTab(next: SiteTab) {
-    setSearchParams(next === 'knowledge' ? {} : { tab: next }, { replace: true })
-  }
+  const [searchParams] = useSearchParams()
   const site = findSite(siteId)
   const { logs } = useLogs()
   const role = useRole()
-  const beds = useMemo(() => (site ? bedStatuses(logs, site, latestLogDate(logs) ?? todayISO()) : []), [logs, site])
   const asOf = growthAsOf(logs)
   const timelines = useMemo(() => (site ? growthTimelines(logs, [site.id], asOf) : []), [logs, site, asOf])
   const growing = useMemo(() => (site ? cropsCurrentlyGrowing(logs, site) : []), [logs, site])
   usePageTitle(site?.name ?? 'Site not found')
 
+  // Handover notes moved to the committee workspace; keep old links working.
+  if (site && searchParams.get('tab') === 'handover') return <Navigate to={paths.siteTool(site.id, 'handover')} replace />
+
   if (!site) {
     return (
       <NotFoundPage
         title="Site not found"
-        message={`There is no site called "${siteId ?? ''}". Choose one of the four campus sites instead.`}
+        message={`There is no site called "${siteId ?? ''}". Choose one of the sites instead.`}
       />
     )
   }
@@ -79,41 +73,15 @@ export default function SiteDetailPage() {
             <p className="mt-1 text-sm text-ink-muted">
               {site.beds.length} beds · {site.areaSqm} m² in all
             </p>
-            {beds.length === 0 ? (
-              <p className="mt-4 bg-sunken p-4 text-ink-muted">No beds recorded for this site.</p>
-            ) : (
-              <ul className="mt-4 border-t border-ink">
-                {beds.map(({ bed, planting, plantsAlive }) => (
-                  <li
-                    key={bed.id}
-                    className="flex flex-wrap items-baseline justify-between gap-x-4 gap-y-1 border-b border-line py-3"
-                  >
-                    <span>
-                      <span className="font-semibold">{bed.label}</span>
-                      <span className="text-sm text-ink-muted"> · {bed.areaSqm} m²</span>
-                    </span>
-                    <span className={planting ? 'text-ink' : 'text-ink-muted'}>
-                      {planting ? (
-                        <>
-                          {cropName(planting.cropId)} · <span className="tabular-nums">{plantsAlive}</span> plants
-                          <span className="text-ink-muted">
-                            {' '}
-                            · {planting.source === 'setup' ? 'set by hand' : `planted ${formatDate(planting.date)}`}
-                          </span>
-                        </>
-                      ) : (
-                        'Nothing growing'
-                      )}
-                    </span>
-                  </li>
-                ))}
-              </ul>
-            )}
+            <BedList site={site} />
             {canEditSite(role, site.id) && (
-              <div className="mt-5">
-                {/* key: a fresh editor when the site changes */}
-                <SiteSetupEditor key={site.id} site={site} />
-              </div>
+              <Link
+                to={paths.siteTool(site.id, 'manage')}
+                className="mt-5 inline-flex min-h-12 items-center gap-2 rounded-sm border border-line-strong px-4 font-semibold hover:bg-sunken"
+              >
+                <Shovel className="size-4" aria-hidden />
+                Manage beds & plants
+              </Link>
             )}
           </section>
         </Reveal>
@@ -145,19 +113,28 @@ export default function SiteDetailPage() {
           </section>
         </Reveal>
 
-        <div className="border-t border-line pt-8 pb-12 lg:pb-16">
-          <SiteTabs active={tab} onChange={selectTab} />
-          <div
-            role="tabpanel"
-            id={panelId(tab)}
-            aria-labelledby={tabId(tab)}
-            tabIndex={0}
-            className="pt-6"
-          >
-            <p className="mb-6 text-sm text-demo">{DEMO_DATA_SHORT_NOTICE}</p>
-            {tab === 'knowledge' ? <KnowledgeTab site={site} /> : <HandoverTab site={site} />}
+        <section aria-labelledby="knowledge-heading" className="border-t border-line pt-10 pb-12 lg:pb-16">
+          <div className="flex flex-wrap items-end justify-between gap-4">
+            <div>
+              <h2 id="knowledge-heading" className="font-display text-section font-medium">
+                What this site has learnt
+              </h2>
+              <p className="mt-1 text-sm text-demo">{DEMO_DATA_SHORT_NOTICE}</p>
+            </div>
+            {canEditSite(role, site.id) && (
+              <Link
+                to={paths.siteTool(site.id, 'handover')}
+                className="inline-flex min-h-12 items-center gap-2 font-semibold text-brand-700 underline underline-offset-4"
+              >
+                <Handshake className="size-4" aria-hidden />
+                Committee handover notes
+              </Link>
+            )}
           </div>
-        </div>
+          <div className="mt-6">
+            <KnowledgeTab site={site} />
+          </div>
+        </section>
       </div>
     </>
   )

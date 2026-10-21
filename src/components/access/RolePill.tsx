@@ -46,7 +46,7 @@ export default function RolePill() {
         aria-expanded={open}
         aria-controls={panelId}
         onClick={() => setOpen((o) => !o)}
-        className="flex min-h-12 max-w-[11rem] items-center gap-1.5 rounded-full border border-line-strong bg-surface px-3 text-sm font-medium text-ink transition-colors hover:bg-sunken sm:max-w-none"
+        className="flex min-h-12 max-w-[9.5rem] shrink-0 items-center gap-1 rounded-full border border-line-strong bg-surface px-2.5 text-sm font-medium text-ink transition-colors hover:bg-sunken sm:max-w-none sm:gap-1.5 sm:px-3"
         data-tour="role-pill"
       >
         <UserRound className="size-4 shrink-0 text-brand-700" aria-hidden />
@@ -58,7 +58,7 @@ export default function RolePill() {
         </span>
         <span className="hidden text-brand-700 underline underline-offset-4 sm:inline">Switch</span>
         <span className="sr-only sm:hidden">, switch role</span>
-        <ChevronDown className={`size-4 shrink-0 transition-transform sm:hidden ${open ? 'rotate-180' : ''}`} aria-hidden />
+        <ChevronDown className={`hidden size-4 shrink-0 transition-transform min-[400px]:block sm:hidden ${open ? 'rotate-180' : ''}`} aria-hidden />
       </button>
 
       {open && (

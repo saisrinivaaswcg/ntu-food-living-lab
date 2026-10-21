@@ -2,7 +2,8 @@ import { MapPin } from 'lucide-react'
 import { motion, useMotionValue, useReducedMotion, useScroll, useSpring, useTransform } from 'motion/react'
 import { useRef, type PointerEvent } from 'react'
 import { Link } from 'react-router-dom'
-import { imageAsset, siteImages, sites } from '../../data'
+import { imageAsset, siteImages } from '../../data'
+import { getSites } from '../../lib/siteRegistry'
 import type { CropId, Site } from '../../types'
 import Breadcrumbs from '../layout/Breadcrumbs'
 import CountUp from '../ui/CountUp'
@@ -47,7 +48,7 @@ export default function SiteHero({ site, growing }: Props) {
     mouseY.set(0)
   }
 
-  const index = sites.findIndex((s) => s.id === site.id)
+  const index = getSites().findIndex((s) => s.id === site.id)
   const stats = [
     { value: site.beds.length, label: site.beds.length === 1 ? 'bed' : 'beds' },
     { value: site.areaSqm, label: 'm² growing area' },

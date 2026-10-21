@@ -378,3 +378,8 @@ export function setShowDemoData(show: boolean): void {
 export function clearUserLogs(): void {
   commit({ ...state, userLogs: emptyLogs() })
 }
+
+/** Everything back to the demo data: no submissions, no edits, original beds, demo data shown. */
+export function resetLogStore(): void {
+  commit({ version: 1, userLogs: emptyLogs(), showDemoData: true, demoEdits: {}, demoDeleted: [], siteSetup: {} })
+}

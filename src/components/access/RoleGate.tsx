@@ -15,18 +15,20 @@ interface Props {
   what: string
   why: string
   children: ReactNode
+  /** Classes for the role-card block (e.g. page padding when the gate wraps a whole layout). */
+  className?: string
 }
 
 /**
  * Shows its children to the roles that can use them. Everyone else gets the matching role cards, one click
  * away, and stays on the same page: never a bare "access denied".
  */
-export default function RoleGate({ allow, when, what, why, children }: Props) {
+export default function RoleGate({ allow, when, what, why, children, className = 'mt-2' }: Props) {
   const role = useRole()
   if (allow.includes(role.kind) && (!when || when(role))) return <>{children}</>
 
   return (
-    <section aria-labelledby="gate-heading" className="mt-2">
+    <section aria-labelledby="gate-heading" className={className}>
       <div className="max-w-3xl">
         <LockOpen className="size-8 text-brand-700" aria-hidden />
         <h1 id="gate-heading" className="mt-3 font-display text-section font-medium">

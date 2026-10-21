@@ -1,36 +1,64 @@
 import { SpeedInsights } from '@vercel/speed-insights/react'
 import { MotionConfig } from 'motion/react'
+import { Suspense } from 'react'
 import { createBrowserRouter, RouterProvider } from 'react-router-dom'
 import AppShell from './components/layout/AppShell'
+import PageLoading from './components/layout/PageLoading'
 import {
-  DashboardPage,
   CreditsPage,
+  DashboardPage,
   ExplorePage,
+  HandoverPage,
   HarvestDashboardPage,
   LogFormPage,
-  LogPage,
   LoginPage,
+  LogPage,
+  ManageSitePage,
   NotFoundPage,
   PlantingDashboardPage,
   SiteDetailPage,
   SitesPage,
+  TodayPage,
+  WorkspaceShell,
 } from './pages/lazyPages'
+import Redirect from './pages/Redirect'
+import { paths } from './lib/paths'
 
 // A data router, so links can use view transitions (Sites → site page photo morph).
+// Two layouts: the public side (AppShell) and the committee workspace (WorkspaceShell). Route map: docs/SPEC.md.
 const router = createBrowserRouter([
   {
     element: <AppShell />,
     children: [
       { index: true, element: <ExplorePage /> },
+      { path: 'sites', element: <SitesPage /> },
+      { path: 'sites/:siteId', element: <SiteDetailPage /> },
+      { path: 'login', element: <LoginPage /> },
+      { path: 'credits', element: <CreditsPage /> },
+      // Old URLs: Log and Dashboards moved into the workspace.
+      { path: 'log/*', element: <Redirect from="/log" to={paths.log()} /> },
+      { path: 'log', element: <Redirect from="/log" to={paths.log()} /> },
+      { path: 'dashboard/*', element: <Redirect from="/dashboard" to={paths.dashboard()} /> },
+      { path: 'dashboard', element: <Redirect from="/dashboard" to={paths.dashboard()} /> },
+      { path: '*', element: <NotFoundPage /> },
+    ],
+  },
+  {
+    path: 'workspace',
+    element: (
+      <Suspense fallback={<PageLoading />}>
+        <WorkspaceShell />
+      </Suspense>
+    ),
+    children: [
+      { index: true, element: <TodayPage /> },
       { path: 'log', element: <LogPage /> },
       { path: 'log/:kind', element: <LogFormPage /> },
       { path: 'dashboard', element: <DashboardPage /> },
       { path: 'dashboard/harvest', element: <HarvestDashboardPage /> },
       { path: 'dashboard/planting', element: <PlantingDashboardPage /> },
-      { path: 'sites', element: <SitesPage /> },
-      { path: 'sites/:siteId', element: <SiteDetailPage /> },
-      { path: 'credits', element: <CreditsPage /> },
-      { path: 'login', element: <LoginPage /> },
+      { path: 'sites/:siteId/manage', element: <ManageSitePage /> },
+      { path: 'sites/:siteId/handover', element: <HandoverPage /> },
       { path: '*', element: <NotFoundPage /> },
     ],
   },

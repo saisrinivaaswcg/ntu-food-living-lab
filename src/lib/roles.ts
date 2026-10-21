@@ -5,6 +5,7 @@
 import { ADMIN_TEAM } from '../data'
 import type { DemoRole, RoleKind, Site, SiteId, StudentProfile } from '../types'
 import { siteName } from './lookups'
+import { paths } from './paths'
 
 export const ROLE_LABELS: Record<RoleKind, string> = {
   visitor: 'Visitor',
@@ -66,7 +67,7 @@ export function landingFor(role: DemoRole): string {
   switch (role.kind) {
     case 'committee':
     case 'admin':
-      return '/log'
+      return paths.workspace
     default:
       return '/'
   }

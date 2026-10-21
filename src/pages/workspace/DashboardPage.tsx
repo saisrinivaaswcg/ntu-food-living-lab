@@ -1,25 +1,25 @@
 import { useMemo } from 'react'
-import ChartFigure from '../components/dashboard/ChartFigure'
-import CompletenessGrid from '../components/dashboard/CompletenessGrid'
-import CompletenessSummary from '../components/dashboard/CompletenessSummary'
-import CostTable from '../components/dashboard/CostTable'
-import DashboardHeader from '../components/dashboard/DashboardHeader'
-import DashboardSection from '../components/dashboard/DashboardSection'
-import { CropBarChart, WeeklyLineChart } from '../components/dashboard/lazyCharts'
-import EfficiencyTable from '../components/dashboard/EfficiencyTable'
-import HeadlineNumbers from '../components/dashboard/HeadlineNumbers'
-import Leaderboard from '../components/dashboard/Leaderboard'
-import NoLogsNotice from '../components/dashboard/NoLogsNotice'
-import SeriesTable from '../components/dashboard/SeriesTable'
-import SiteComparison from '../components/dashboard/SiteComparison'
-import EmptyState from '../components/ui/EmptyState'
-import { costAssumptions, PRICE_SURVEY_DATE, supermarketPrices } from '../data'
-import { useDashboard } from '../hooks/useDashboard'
-import { usePageTitle } from '../hooks/usePageTitle'
-import { downloadText, harvestsToCsv } from '../lib/csv'
-import { addDays, formatShortDate } from '../lib/dates'
-import { formatNumber, formatPercent } from '../lib/format'
-import { cropName, siteName } from '../lib/lookups'
+import ChartFigure from '../../components/dashboard/ChartFigure'
+import CompletenessGrid from '../../components/dashboard/CompletenessGrid'
+import CompletenessSummary from '../../components/dashboard/CompletenessSummary'
+import CostTable from '../../components/dashboard/CostTable'
+import DashboardHeader from '../../components/dashboard/DashboardHeader'
+import DashboardSection from '../../components/dashboard/DashboardSection'
+import { CropBarChart, WeeklyLineChart } from '../../components/dashboard/lazyCharts'
+import EfficiencyTable from '../../components/dashboard/EfficiencyTable'
+import HeadlineNumbers from '../../components/dashboard/HeadlineNumbers'
+import Leaderboard from '../../components/dashboard/Leaderboard'
+import NoLogsNotice from '../../components/dashboard/NoLogsNotice'
+import SeriesTable from '../../components/dashboard/SeriesTable'
+import SiteComparison from '../../components/dashboard/SiteComparison'
+import EmptyState from '../../components/ui/EmptyState'
+import { costAssumptions, PRICE_SURVEY_DATE, supermarketPrices } from '../../data'
+import { useDashboard } from '../../hooks/useDashboard'
+import { usePageTitle } from '../../hooks/usePageTitle'
+import { downloadText, harvestsToCsv } from '../../lib/csv'
+import { addDays, formatShortDate } from '../../lib/dates'
+import { formatNumber, formatPercent } from '../../lib/format'
+import { cropName, siteName } from '../../lib/lookups'
 import {
   computeCompleteness,
   computeKpis,
@@ -33,8 +33,8 @@ import {
   siteComparison,
   sitesWithHarvests,
   weeklySeries,
-} from '../lib/metrics'
-import { notifyExported } from '../lib/notify'
+} from '../../lib/metrics'
+import { notifyExported } from '../../lib/notify'
 
 /** Public dashboard: the overview. All numbers come from lib/metrics; this page only arranges them. */
 export default function DashboardPage() {

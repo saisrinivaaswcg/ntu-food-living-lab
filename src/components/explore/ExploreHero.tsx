@@ -6,6 +6,7 @@ import { crops, exploreHeroImage, exploreHeroVideo, imageAsset, videoAsset } fro
 import { useRole } from '../../hooks/useCommunity'
 import { useLogs } from '../../hooks/useLogs'
 import { formatNumber } from '../../lib/format'
+import { paths } from '../../lib/paths'
 import { usesWorkspace } from '../../lib/roles'
 import CountUp from '../ui/CountUp'
 import PhotoCaption from '../ui/PhotoCaption'
@@ -95,7 +96,7 @@ export default function ExploreHero({ mapId }: { mapId: string }) {
             </a>
             {usesWorkspace(role) && (
               <Link
-                to="/log/harvest"
+                to={paths.log('harvest')}
                 className="inline-flex min-h-12 items-center gap-2 rounded-sm border border-white/70 px-5 font-semibold text-white transition-[background-color,transform] hover:-translate-y-0.5 hover:bg-white/10 active:translate-y-0"
               >
                 <ClipboardPen className="size-4" aria-hidden />

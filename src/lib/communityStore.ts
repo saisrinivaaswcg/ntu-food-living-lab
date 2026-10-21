@@ -143,7 +143,10 @@ export function setCommitteePin(siteId: SiteId, pin: string): CommunitySaveResul
   return commit({ ...state, pins: { ...state.pins, [siteId]: pin } })
 }
 
-/** Back to a fresh visitor: used by Admin's "Reset demo data" and showcase mode. */
-export function resetCommunity(): void {
-  commit(fallback())
+/**
+ * Back to the demo state: used by Admin's "Reset demo data" (which keeps the admin role) and showcase
+ * mode (which goes back to Visitor).
+ */
+export function resetCommunity(keepRole?: DemoRole): void {
+  commit({ ...fallback(), role: keepRole ?? { kind: 'visitor' } })
 }
