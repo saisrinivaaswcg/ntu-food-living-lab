@@ -29,6 +29,7 @@ changes only grammar and world will fail it.
 | Build | Grammar | Nav treatment | Hero device | Act-sequence shape | Close pattern | Signature move | World | Port |
 |---|---|---|---|---|---|---|---|---|
 | learn-to-grow (NTU Food Living Lab, `/learn/:cropId`) | Split stage | The divider: a ruler of the crop's real days, day readout, five stage names | Split 50/50 inside the pin: ghost of the grown plant behind one seed (parallax), title on the right | parallax hero → pin (5 stages, cues) → reveal (photo wipe) → pin peak (collapse) → flow → flow; one pinned act of 6.1vh plus two flow sections; ~10vh total | Collapse to the plant column, then a single-column close with one action as a full-width line and button | Specimen tags: NTU's figures hang off the grown plant on threads tied to the part they describe | Botanical plate: single-weight forest line on paper, terracotta for fruit | Inside the app (Vite dev server) |
+| home-story (NTU Omniplant, `/` under the hero) | Collation (new): one pinned desk, objects are the actors, scatter → collate → unfold | None of its own (app header stays); the forest-green thread through the record is the only chrome | Static, unpinned photo hero with headline, two doors and a real-data "Happening now" row; no scroll effect | static hero → one pin (3 scenes at 0.25 / 0.45 / 0.30 of 0.9vh travel) → flow close; ~1.9vh story + close, 3 scenes | Bookend: the hero's two buttons repeated in flow after the pin releases | Notebooks to ledger: tilted, credited site photo cards with handwritten-style notes collate into one stacked record; each card shrinks into its row's thumbnail while its note slides into the row and is rewritten as the site's latest real harvest | Corkboard to ledger: real site photos as prints, terracotta-tint paper slips, paper and forest | Inside the app (Vite dev server) |
 
 ---
 
@@ -42,6 +43,10 @@ as a constraint, so writing them down is the whole point.
 - Split stage with a day-ruler divider.
 - Specimen tags on a drawn plant as the peak.
 - Botanical-plate world in the app's paper and forest palette.
+- Collation grammar (scatter → collate → unfold on one pinned desk).
+- Notebooks-to-ledger: scattered photo cards and notes collating into one record with rows from the real logs.
+- A bookend close that repeats the hero's two doors.
+- Short-story band: 3 scenes in under 2 viewport-heights.
 
 ---
 

@@ -1,6 +1,6 @@
 import { ArrowRight, Sprout } from 'lucide-react'
 import { useMemo, useState } from 'react'
-import { Link } from 'react-router-dom'
+import { Link, useSearchParams } from 'react-router-dom'
 import TaskRow from '../components/community/TaskRow'
 import Breadcrumbs from '../components/layout/Breadcrumbs'
 import EmptyState from '../components/ui/EmptyState'
@@ -30,7 +30,10 @@ export default function GetInvolvedPage() {
   const { logs, sites } = useLogs()
   const { tasks, claims, myClaims, communities } = useCommunity()
   const [site, setSite] = useState<string>('all')
-  const [beginnerOnly, setBeginnerOnly] = useState(false)
+  // ?beginner=1 (from "New here? Help out") opens the list filtered to beginner-friendly tasks.
+  const [params, setParams] = useSearchParams()
+  const beginnerOnly = params.get('beginner') === '1'
+  const setBeginnerOnly = (on: boolean) => setParams(on ? { beginner: '1' } : {}, { replace: true })
   const asOf = growthAsOf(logs)
 
   const shown = upcomingTasks(tasks).filter((t) => (site === 'all' || t.siteId === site) && (!beginnerOnly || t.beginnerFriendly))

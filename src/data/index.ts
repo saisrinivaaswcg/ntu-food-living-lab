@@ -31,7 +31,7 @@ export { bedSizes, starterItems, startSteps } from './startGarden'
 export type { BedSize, StarterItem, StarterItemId } from './startGarden'
 export { CUP_SEMESTER, spotlightChallenges, defaultSpotlights } from './competition'
 export { demoCommunities, demoJoins, JOIN_PRIVACY_NOTE, pickPolicyOptions, WEEKDAY_NAMES } from './community'
-export { DEMO_LOGIN_NOTICE, DEMO_COMMITTEE_PIN, DEMO_ADMIN_PIN, DEMO_STUDENT, ADMIN_TEAM, contactMethodOptions } from './access'
+export { DEMO_LOGIN_NOTICE, DEMO_COMMITTEE_PIN, DEMO_ADMIN_PIN, DEMO_COMMITTEE_SITE, DEMO_STUDENT, ADMIN_TEAM, contactMethodOptions } from './access'
 
 /** All demo log records, grouped by form type. */
 export const demoLogs: LogCollections = {

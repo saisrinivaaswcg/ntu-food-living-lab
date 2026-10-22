@@ -1,6 +1,6 @@
 import { useEffect } from 'react'
 
-const APP_NAME = 'NTU Food Living Lab'
+const APP_NAME = 'NTU Omniplant'
 
 /** Sets the browser tab title, so screen-reader users hear which page loaded. */
 export function usePageTitle(title?: string): void {

@@ -1,6 +1,6 @@
 import { Building2, Check, Eye, GraduationCap, Sprout, type LucideIcon } from 'lucide-react'
 import { useId, useState, type FormEvent, type ReactNode } from 'react'
-import { ADMIN_TEAM, DEMO_ADMIN_PIN, DEMO_COMMITTEE_PIN, DEMO_STUDENT } from '../../data'
+import { ADMIN_TEAM, DEMO_ADMIN_PIN, DEMO_COMMITTEE_PIN, DEMO_COMMITTEE_SITE, DEMO_STUDENT } from '../../data'
 import { useCommunity } from '../../hooks/useCommunity'
 import { useLogs } from '../../hooks/useLogs'
 import { committeePin, setRole } from '../../lib/communityStore'
@@ -20,15 +20,13 @@ interface Props {
   preferSiteId?: SiteId
 }
 
-const PREFERRED_COMMITTEE_SITE: SiteId = 'hall-12-herb-spice'
-
 /** The four demo roles, each one click away. PINs are pre-filled: this is a demo login, not security. */
 export default function RoleChooser({ onChosen, compact = false, only, preferSiteId }: Props) {
   const uid = useId()
   const { role, profile } = useCommunity()
   const { sites } = useLogs()
   const firstSite = (): SiteId => {
-    const candidates = [preferSiteId, role.kind === 'committee' ? role.siteId : undefined, getLastSiteId(), PREFERRED_COMMITTEE_SITE]
+    const candidates = [preferSiteId, role.kind === 'committee' ? role.siteId : undefined, getLastSiteId(), DEMO_COMMITTEE_SITE]
     return candidates.find((id) => id && sites.some((s) => s.id === id)) ?? sites[0]?.id ?? ''
   }
   const [siteId, setSiteId] = useState<SiteId>(firstSite)

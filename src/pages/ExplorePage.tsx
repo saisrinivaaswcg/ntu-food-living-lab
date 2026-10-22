@@ -2,6 +2,7 @@ import { AnimatePresence } from 'motion/react'
 import { lazy, Suspense, useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { useSearchParams } from 'react-router-dom'
 import ExploreHero from '../components/explore/ExploreHero'
+import HomeStory from '../components/explore/HomeStory'
 import MapLegend from '../components/explore/MapLegend'
 import PinEditor from '../components/explore/PinEditor'
 import SiteList from '../components/explore/SiteList'
@@ -88,6 +89,7 @@ export default function ExplorePage() {
   return (
     <>
       <ExploreHero mapId={MAP_ID} />
+      <HomeStory />
       {editPins && <PinEditor sites={mapSites} moved={new Set(Object.keys(pinOverrides) as SiteId[])} />}
 
       <section id={MAP_ID} aria-labelledby="map-heading" className="scroll-mt-16 pt-14 lg:pt-20">

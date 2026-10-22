@@ -1,4 +1,6 @@
-# Product spec — NTU Campus Food Systems Living Lab
+# Product spec — NTU Omniplant
+
+*Campus food gardens, one shared record.*
 
 A shared platform connecting NTU's campus and hall food-growing sites so that growing data is recorded consistently, knowledge persists across student committees, students can learn to grow and join a garden community, and halls compete as teams in the Hall Garden Cup. Frontend prototype only: mock data in `src/data/`, everything a visitor does in localStorage. No backend, no real login.
 
@@ -45,6 +47,8 @@ Crops (controlled list): Thai basil, mint, lemongrass, pandan, chilli padi, turm
 
 ## 1. Explore (`/`)
 
+- **Hero** (static: no pin, no scroll effects, no entrance animation): the headline, two primary buttons on the first phone screen, **New here? Help out** (`/get-involved?beginner=1`, beginner-friendly tasks only) and **Join a community** (`/join`), and two text links: **Find a site on the map** (`#map`) and **See the committee view** (switches to the demo committee role for Hall 12 if needed, then opens its Handover page; labelled "Demo role"). Under them, **Happening now** from real data (`happeningNow` in `metrics.ts`): kg harvested this term (`CUP_SEMESTER`), beginner slots still open this week, the next beginner session (day, time, site) and students in garden communities (different people who asked to join). Numbers count up; any that would be zero or empty are hidden; the short demo-data notice sits beside the heading.
+- **Home story** under the hero (brief: `docs/scrollcraft/builds/home-story/`), pinned for about 0.9 of a screen: *Four gardens, four notebooks* (the four site photos as tilted, credited cards with handwritten-style notes that drift off), *One shared record* (the cards straighten into one record card, a forest-green thread joins them, each note becomes the site's latest harvest as a log row) and *Lasting value* (Educational → `/learn`, Research → Dashboards, Lasting → Handover; the last two via the demo committee role). Ends with the two buttons again. With reduced motion: three still steps.
 - Leaflet map of the NTU campus with a Map / Satellite toggle: OneMap Default HD tiles from the Singapore Land Authority (OneMap logo and attribution visible, as their terms of use require) and Esri World Imagery (with "Powered by Esri" and its source credit) with the four sites as markers. Marker colour reflects site status.
 - Clicking a marker opens a side panel (desktop: right-hand panel; mobile: bottom sheet) with: site name, photo placeholder (labelled, uses `photoAlt`), status badge + status note, number of beds, crops currently growing, and a **View site** button → `/sites/:siteId`.
 - "Crops currently growing" = for each bed, the crop of its most recent planting, unless a failure on that bed wiped out all plants since then. Show as chips.

@@ -9,6 +9,7 @@ const links = [
   { to: paths.hallCup, label: 'Hall Garden Cup' },
   { to: paths.startGarden, label: 'Start a hall garden' },
   { to: paths.myGardens, label: 'My gardens' },
+  { to: paths.login, label: 'Demo roles' },
   { to: paths.credits, label: 'Photo credits' },
 ]
 
@@ -18,7 +19,8 @@ export default function Footer() {
     <footer className="border-t border-line bg-surface pb-[calc(5rem+env(safe-area-inset-bottom))] xl:pb-0">
       <div className="mx-auto flex max-w-7xl flex-col gap-2 px-4 py-6 text-sm text-ink-muted sm:flex-row sm:items-center sm:justify-between lg:px-8">
         <p>
-          NTU Campus Food Systems Living Lab · prototype. <span className="text-demo">{DEMO_DATA_SHORT_NOTICE}</span>
+          <span className="font-semibold text-ink">NTU Omniplant</span> · Campus food gardens, one shared record. Prototype.{' '}
+          <span className="text-demo">{DEMO_DATA_SHORT_NOTICE}</span>
         </p>
         <nav aria-label="Footer">
           <ul className="flex flex-wrap gap-x-4">

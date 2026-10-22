@@ -29,6 +29,7 @@ import type {
 import { addDays, daysBetween, mondayOf, todayISO } from './dates'
 import { cropIndex, getCropById, getCrops } from './cropRegistry'
 import { getSiteById, getSites } from './siteRegistry'
+import { spotsLeft, upcomingTasks } from './tasks'
 
 
 /** Plants a loss record takes away for good: lost minus any that recovered. */
@@ -1664,4 +1665,46 @@ export function impactReport(
     economy: { value, inputCost, costs: c, net: value - inputCost, labourHours, note: econNote },
     society: { joined, slotsFilled, slotsOffered, handoverDone, note: socNote },
   }
+}
+
+/* ------------------------------------------------------------------ */
+/* Explore: happening now, and the home story's log rows               */
+/* ------------------------------------------------------------------ */
+
+export interface HappeningNow {
+  /** kg harvested at every site this term (so far) */
+  termKg: number
+  /** Beginner-friendly slots still open from today to Sunday */
+  beginnerSlotsThisWeek: number
+  /** The soonest upcoming beginner-friendly task with a slot left */
+  nextBeginnerTask: HelpTask | null
+  /** Different people (name and hall) who asked to join a garden community */
+  studentsInCommunities: number
+}
+
+/** The Explore hero's "Happening now" row. Weeks start on Monday. */
+export function happeningNow(
+  logs: Pick<LogCollections, 'harvests'>,
+  tasks: HelpTask[],
+  claims: TaskClaim[],
+  joins: JoinRequest[],
+  term: Pick<CupSemester, 'start' | 'end'>,
+  today: ISODate = todayISO(),
+): HappeningNow {
+  const termKg = logs.harvests.filter((h) => h.date >= term.start && h.date <= term.end).reduce((n, h) => n + h.weightKg, 0)
+  const sunday = addDays(mondayOf(today), 6)
+  const open = upcomingTasks(tasks, today).filter((t) => t.beginnerFriendly && spotsLeft(t, claims) > 0)
+  const beginnerSlotsThisWeek = open.filter((t) => t.date <= sunday).reduce((n, t) => n + spotsLeft(t, claims), 0)
+  const people = new Set(joins.map((j) => `${j.name.trim().toLowerCase()}|${j.hall}`))
+  return { termKg, beginnerSlotsThisWeek, nextBeginnerTask: open[0] ?? null, studentsInCommunities: people.size }
+}
+
+/** Each site's most recent harvest (latest date, then latest saved), for sites that have one. */
+export function latestHarvestBySite(logs: Pick<LogCollections, 'harvests'>): Map<SiteId, HarvestLog> {
+  const out = new Map<SiteId, HarvestLog>()
+  for (const h of logs.harvests) {
+    const best = out.get(h.siteId)
+    if (!best || h.date > best.date || (h.date === best.date && h.createdAt > best.createdAt)) out.set(h.siteId, h)
+  }
+  return out
 }

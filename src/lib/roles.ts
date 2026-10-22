@@ -62,6 +62,16 @@ export function roleShortName(role: DemoRole, profile: StudentProfile | null): s
   }
 }
 
+/**
+ * "See the committee view" links: the demo committee role to switch to before opening a workspace page,
+ * or null when the current role can already open it. `site` pages need that site's committee (or Admin);
+ * `workspace` pages (Dashboards) take any committee.
+ */
+export function committeeViewRole(role: DemoRole, siteId: SiteId, scope: 'site' | 'workspace'): DemoRole | null {
+  const canOpen = scope === 'site' ? canEditSite(role, siteId) : usesWorkspace(role)
+  return canOpen ? null : { kind: 'committee', siteId }
+}
+
 /** Where each role lands after choosing it on /login (unless the link asked for a page with ?next=). */
 export function landingFor(role: DemoRole): string {
   switch (role.kind) {

@@ -1,4 +1,6 @@
-# NTU Campus Food Systems Living Lab — prototype
+# NTU Omniplant — prototype
+
+*Campus food gardens, one shared record.*
 
 A shared platform for four NTU food-growing sites, so growing data is recorded the same way everywhere and knowledge survives committee handovers.
 

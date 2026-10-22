@@ -1,4 +1,4 @@
-import { ChevronDown, Info, UserRound } from 'lucide-react'
+import { Info, UserRound } from 'lucide-react'
 import { useEffect, useId, useRef, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { DEMO_LOGIN_NOTICE } from '../../data'
@@ -47,19 +47,18 @@ export default function RolePill() {
         aria-expanded={open}
         aria-controls={panelId}
         onClick={() => setOpen((o) => !o)}
-        className="flex min-h-12 max-w-[9.5rem] shrink-0 items-center gap-1 rounded-full border border-line-strong bg-surface px-2.5 text-sm font-medium text-ink transition-colors hover:bg-sunken sm:max-w-none sm:gap-1.5 sm:px-3"
+        className="flex min-h-12 max-w-[11.5rem] shrink-0 items-center gap-1 rounded-full border border-line-strong bg-surface px-2.5 text-sm font-medium text-ink transition-colors hover:bg-sunken sm:max-w-none sm:gap-1.5 sm:px-3"
         data-tour="role-pill"
       >
-        <UserRound className="size-4 shrink-0 text-brand-700" aria-hidden />
+        {/* Phones below 400px drop the icon so the wordmark, role and "Switch" all fit at 360px. */}
+        <UserRound className="hidden size-4 shrink-0 text-brand-700 min-[400px]:block" aria-hidden />
         <span className="sr-only whitespace-nowrap sm:not-sr-only xl:sr-only 2xl:not-sr-only">Viewing as:</span>
-        <span className="truncate font-semibold sm:hidden">{roleShortName(role, profile)}</span>
+        <span className="min-w-0 truncate font-semibold sm:hidden">{roleShortName(role, profile)}</span>
         <span className="hidden truncate font-semibold sm:inline">{roleName(role, profile)}</span>
-        <span className="hidden text-ink-muted sm:inline" aria-hidden>
+        <span className="text-ink-muted" aria-hidden>
           ·
         </span>
-        <span className="hidden text-brand-700 underline underline-offset-4 sm:inline">Switch</span>
-        <span className="sr-only sm:hidden">, switch role</span>
-        <ChevronDown className={`hidden size-4 shrink-0 transition-transform min-[400px]:block sm:hidden ${open ? 'rotate-180' : ''}`} aria-hidden />
+        <span className="shrink-0 text-brand-700 underline underline-offset-4">Switch</span>
       </button>
 
       {open && (

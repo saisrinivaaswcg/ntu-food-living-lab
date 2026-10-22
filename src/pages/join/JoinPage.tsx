@@ -54,7 +54,7 @@ export default function JoinPage() {
         <div className="mt-5">
           <NewcomerPath
             task={firstBeginnerTask}
-            tasksHref={paths.getInvolved}
+            tasksHref={paths.getInvolvedBeginners}
             next={null}
             meetHref="#communities"
             siteLabel="Your garden"

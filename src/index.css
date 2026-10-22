@@ -9,6 +9,8 @@
 @theme {
   --font-sans: "Public Sans Variable", ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
   --font-display: "Newsreader Variable", ui-serif, Georgia, "Times New Roman", serif;
+  /* Handwritten-style notes in the home story: system hand fonts only (no extra download), else Newsreader. */
+  --font-hand: "Bradley Hand", "Segoe Print", "Noteworthy", "Chalkboard SE", "Newsreader Variable", ui-serif, serif;
 
   /* Type scale: few sizes, far apart. Display sizes scale with the viewport. */
   --text-display: clamp(2.25rem, 1.4rem + 3.6vw, 4rem);

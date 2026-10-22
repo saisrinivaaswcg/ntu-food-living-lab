@@ -44,7 +44,7 @@ export default function WorkspaceShell() {
               <Leaf className="size-4" aria-hidden />
             </span>
             <span className="leading-tight whitespace-nowrap">
-              <span className="hidden font-display text-base font-medium min-[400px]:inline">Living Lab</span>
+              <span className="hidden font-display text-base font-medium min-[400px]:inline">Omniplant</span>
               <span className="rounded-sm bg-white/15 min-[400px]:ml-2 px-1.5 py-0.5 text-xs font-semibold tracking-wide uppercase">
                 Workspace
               </span>

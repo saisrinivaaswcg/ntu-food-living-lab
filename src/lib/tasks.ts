@@ -28,7 +28,7 @@ export function taskIcs(task: HelpTask, where: string): string {
   return [
     'BEGIN:VCALENDAR',
     'VERSION:2.0',
-    'PRODID:-//NTU Food Living Lab//Help wanted//EN',
+    'PRODID:-//NTU Omniplant//Help wanted//EN',
     'CALSCALE:GREGORIAN',
     'BEGIN:VEVENT',
     `UID:${task.id}@ntu-food-living-lab`,

@@ -1,4 +1,6 @@
-# NTU Campus Food Systems Living Lab
+# NTU Omniplant
+
+*Campus food gardens, one shared record.*
 
 Frontend prototype of a shared platform for NTU's campus and hall food-growing sites, so growing data is recorded the same way at every site, knowledge survives student-committee handovers, and students can learn to grow, join a garden community and compete hall against hall.
 
@@ -44,6 +46,7 @@ No backend, no real auth, no database: everything a visitor does is saved in thi
 12. [x] New hall sites — start-a-garden guide, request, Admin approval
 13. [x] Committee tools — manage site, grow more, handover wizard, impact report
 14. [x] Image slots — `docs/IMAGE_PROMPTS.md`, AI illustration slots wired with SVG fallbacks
+15. [x] NTU Omniplant — rename, static Explore hero with "Happening now", 3-scene home story (`docs/scrollcraft/builds/home-story/`)
 
 (The guided tour, showcase mode and `/live` board were dropped.)
 

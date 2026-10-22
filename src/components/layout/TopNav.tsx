@@ -41,11 +41,11 @@ export default function TopNav() {
             <Leaf className="size-5" aria-hidden />
           </span>
           <span className="leading-tight">
-            <span className="font-display text-[15px] font-medium whitespace-nowrap min-[400px]:text-lg">NTU Food Living Lab</span>
+            <span className="font-display text-[15px] font-medium whitespace-nowrap min-[400px]:text-lg">NTU Omniplant</span>
             <span
               className={`hidden text-xs text-ink-muted transition-opacity duration-300 sm:block ${scrolled ? 'opacity-0' : 'opacity-100'}`}
             >
-              Campus Food Systems
+              Campus food gardens, one shared record
             </span>
           </span>
         </Link>

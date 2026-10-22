@@ -1,4 +1,4 @@
-import type { ContactMethod, StudentProfile } from '../types'
+import type { ContactMethod, SiteId, StudentProfile } from '../types'
 
 /**
  * DEMO LOGIN — not security. Anyone can switch roles; the PINs are printed on the login cards and
@@ -8,6 +8,9 @@ export const DEMO_LOGIN_NOTICE = 'Demo login: anyone can switch roles. No real s
 
 export const DEMO_COMMITTEE_PIN = '2468'
 export const DEMO_ADMIN_PIN = '1357'
+
+/** The site a demo committee role opens on when none is chosen (role cards, "See the committee view"). */
+export const DEMO_COMMITTEE_SITE: SiteId = 'hall-12-herb-spice'
 
 /** The ready-made student, for trying the Student role without joining anything. */
 export const DEMO_STUDENT: StudentProfile = {

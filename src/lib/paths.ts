@@ -17,6 +17,8 @@ export const paths = {
   joinSite: (siteId: SiteId) => `/join/${siteId}`,
   myGardens: '/my-gardens',
   getInvolved: '/get-involved',
+  /** Get involved, filtered to beginner-friendly tasks */
+  getInvolvedBeginners: '/get-involved?beginner=1',
   hallCup: '/hall-cup',
   bed: (siteId: SiteId, bedId: string) => `/bed/${siteId}/${encodeURIComponent(bedId)}`,
   startGarden: '/start-a-garden',

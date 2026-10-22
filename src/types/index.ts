@@ -1,5 +1,5 @@
 /**
- * Domain model for the NTU Campus Food Systems Living Lab.
+ * Domain model for NTU Omniplant.
  *
  * Every site logs into the SAME shapes below. That is the whole point of the
  * platform: identical fields + controlled vocabularies = data that can be
